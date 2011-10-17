@@ -3,196 +3,86 @@
 <html>
 <head>
     <title></title>
+</head>
+<style type="text/css">
 
-    <style type="text/css">
-        body {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    body {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        text-shadow: rgba(0, 0, 0, .2) 2px 1px 2px;
+    }
 
-    <!-- Declare a vertex shader to be used later. -->
-    <script id="vs-shader" type="x-shader/x-vertex">
-        attribute vec4 position;
-        varying vec2 xyPos;
-        uniform mat4 transform;
+    pre {
+        margin: 0;
+        padding: 0;
+    }
 
-        void main(void) {
-            xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
-            gl_Position = transform*position;
-        }
-    </script>
-    <!--  -->
+    table {
+        width: 100%;
+        height: 100%;
+    }
 
-    <!-- Declare a fragment shader to be used later. -->
-    <script id="fs-shader" type="x-shader/x-fragment">
-        #ifdef GL_ES
-        precision highp float;
-        #endif
+    #content-container {
+        width: 40%;
+        background: #eee;
+        border-right: 2px solid #666;
+    }
 
-        varying vec2 xyPos;
-        uniform vec2 resolution;
-        uniform sampler2D tex;
+    #code-container {
+        background: #fff;
+        overflow: hidden;
+        border-left: 5px solid #ddd;
+    }
 
-        void main(void) {
-            gl_FragColor = texture2D(tex, xyPos);
-        }
-    </script>
-    <!--  -->
+    #content {
+        padding: 1rem;
+    }
 
-    <script type="text/javascript">
+    #code {
+        width: 400px;
+        padding: 1rem;
+    }
 
-        // Namespace for our sample application.
-        window.timotuominen = { webgl: {} };
+</style>
+<script type="text/javascript">
 
-        
-        // Provides a rendering loop for our purposes. We will assign our own
-        // function to render to do the rendering each frame.
-        timotuominen.webgl.Runner = function () {
-            return {
-                el: null, gl: null,
-                isRunning: true,
-                initialize: function () {
-                    this.gl = this.el.getContext("experimental-webgl");
-                    this.gl.viewportWidth = this.el.width;
-                    this.gl.viewportHeight = this.el.height;
-                    this.gl.clearColor(.3,.3,.3,1.0);
-                    this.renderLoop = this.renderLoop.bind(this);
-                },
-                renderLoop: function() {
-                    this.isRunning && setTimeout(this.renderLoop, 1000/60);
-                    this.render && this.render();
+    function displayCode(code) {
+        var escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        document.getElementById("code").innerHTML = escaped;
+    }
+
+    (function () {
+        var xmlHttp = new XMLHttpRequest();
+        if (xmlHttp) {
+            xmlHttp.open("GET", "demo.html", true);
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState === 4) {
+                    displayCode(xmlHttp.responseText);
                 }
             };
-        };
-
-
-        // Utilities for WebGL shaders.
-        timotuominen.webgl.shaderUtils = {
-            createProgram: function (gl, vsCode, fsCode) {
-                var i, vs, fs, tmpProgram = gl.createProgram();
-                try {
-                    vs = this.compileShader(gl, vsCode, gl.VERTEX_SHADER);
-                    fs = this.compileShader(gl, fsCode, gl.FRAGMENT_SHADER);
-                } catch (e) {
-                    gl.deleteProgram( tmpProgram );
-                    throw e;
-                }
-                gl.attachShader(tmpProgram, vs);
-                gl.deleteShader(vs);
-                gl.attachShader(tmpProgram, fs);
-                gl.deleteShader(fs);
-                gl.linkProgram(tmpProgram);
-                return tmpProgram;
-            },
-            compileShader: function (gl, code, type) {
-                var s = gl.createShader(type);
-                gl.shaderSource(s, code);
-                gl.compileShader(s);
-                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                    throw "SHADER ERROR: " + gl.getShaderInfoLog(s);
-                }
-                return s;
-            },
-            createTexture: function (gl, image) {
-                var texture = gl.createTexture();
-                gl.enable(gl.TEXTURE_2D);
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.bindTexture(gl.TEXTURE_2D, null);
-                return texture;
-            }
-        };
-
-
-        // The actual demo we will show.
-        timotuominen.webgl.FromScratchDemo = function () {
-            return {
-                el: null,
-                textures: {},
-                vsCode: null,
-                fsCode: null,
-
-                run: function (el) {
-                    var self = this,
-                        runner, gl, shader, vertexBuffer, texture,
-                        matrix = new Float32Array([
-                            1.,0.,0.,0.,
-                            0.,1.,0.,0.,
-                            0.,0.,1.,0.,
-                            0.,0.,0.,1.
-                        ]),
-                        vertices = new Float32Array([-1.0,-1.0, 1.0,-1.0, -1.0,1.0, 1.0,-1.0, 1.0,1.0, -1.0,1.0]),
-                        utils = timotuominen.webgl.shaderUtils;
-
-                    runner = new timotuominen.webgl.Runner();
-                    runner.render = function () {
-                        if (!shader) {
-                            shader = utils.createProgram(gl, self.vsCode, self.fsCode);
-                        }
-                        if (!texture && self.textures.photo) {
-                            texture = utils.createTexture(gl, self.textures.photo);
-                        }
-                        if (!vertexBuffer) {
-                            vertexBuffer = gl.createBuffer();
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-                            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-                        }
-                        if (shader) {
-                            gl.useProgram(shader);
-                            gl.uniform2f(gl.getUniformLocation(shader, "resolution"), gl.viewportWidth, gl.viewportHeight);
-                            gl.uniformMatrix4fv(gl.getUniformLocation(shader, "transform"), false, matrix);
-                            gl.enableVertexAttribArray(gl.getAttribLocation(shader, "position"));
-                            gl.vertexAttribPointer(gl.getAttribLocation(shader, "position"), 2, gl.FLOAT, false, 0, 0);
-                            if (texture) {
-                                gl.activeTexture(gl.TEXTURE0);
-                                gl.bindTexture(gl.TEXTURE_2D, texture);
-                                gl.uniform1i(gl.getUniformLocation(shader, "tex"), 0);
-                            }
-                        }
-                        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-                        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                        if (vertices && vertexBuffer) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-                            gl.drawArrays(gl.TRIANGLES, 0, vertices.length/2);
-                        }
-                    };
-                    runner.el = el;
-                    runner.initialize();
-                    gl = runner.gl;
-                    runner.renderLoop();
-                }
-            }
-        };
-
-
-        // Function to call when the page has loaded.
-        function initialize () {
-            var demo, image, canvas;
-
-            demo = new timotuominen.webgl.FromScratchDemo();
-            demo.vsCode = document.getElementById("vs-shader").innerHTML;
-            demo.fsCode = document.getElementById("fs-shader").innerHTML;
-
-            image = new Image();
-            image.onload = function () { demo.textures.photo = image; };
-            image.src = "IMG_2235.JPG";
-
-            canvas = document.getElementById('canvas');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            demo.run(canvas);
+            xmlHttp.send(null);
         }
-    </script>
-</head>
+    })();
 
-<body onload="initialize()">
-    <canvas id="canvas"></canvas>
+
+</script>
+<body>
+
+<table cellpadding="0" cellspacing="0">
+    <tbody>
+    <tr>
+        <td id="content-container">
+            <div id="content"></div>
+        </td>
+        <td id="code-container">
+            <pre id="code"></pre>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 </body>
-
 </html>
