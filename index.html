@@ -18,6 +18,7 @@
     pre {
         margin: 0;
         padding: 0;
+        font-size: 13px;
     }
 
     table {
@@ -26,19 +27,30 @@
     }
 
     #content-container {
-        width: 40%;
+        width: 400px;
         background: #eee;
         border-right: 5px solid #aaa;
+        vertical-align: top;
     }
 
     #code-container {
         background: #fff;
         overflow: hidden;
         border-left: 3px solid #666;
+        vertical-align: top;
     }
 
     #content {
-        padding: 1rem;
+        left: 30px;
+        width: 350px;
+        position: absolute;
+        text-align: right;
+    }
+
+    #content div {
+        position: absolute;
+        right: 0;
+        left: 0;
     }
 
     #code {
@@ -50,20 +62,51 @@
 <script type="text/javascript">
 
     (function () {
-        var code, processedCode, escapedCode;
 
-        function processComments() {
-            processedCode = code.replace(/<\!--.*-->\n?| *\/\/.*\n/g, "" );
+        function processComments(code) {
+            var lines = code.split("\n"),
+                comments = [],
+                plainCode = "";
+
+            for (var i = 0, lineNumber = 0; i < lines.length; i++) {
+                var match = /<\!-- ?(.*)-->\n?| *\/\/ ?(.*)\n?/g.exec(lines[i]);
+                if (match && i > 1) {
+                    var text = match[1] || match[2],
+                        lastComment = comments.length && comments[comments.length-1];
+
+                    if (lastComment && lastComment.lineNumber === lineNumber) {
+                        comments[comments.length-1].text += " " + text;
+                    } else {
+                        comments.push({
+                            lineNumber: lineNumber,
+                            text: text
+                        });
+                    }
+                } else {
+                    plainCode += lines[i] + "\n";
+                    lineNumber++;
+                }
+            }
+            return {
+                plainCode: plainCode,
+                comments: comments
+            }
         }
 
-        function escapeCode() {
-            escapedCode = processedCode.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function escapeCode(code) {
+            return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        function displayCode() {
-            processComments();
-            escapeCode();
-            document.getElementById("code").innerHTML = escapedCode;
+        function displayCode(code) {
+            var obj = processComments(code);
+            for (var i = 0; i < obj.comments.length; i++) {
+                var comment = obj.comments[i],
+                    el = document.createElement("div");
+                el.innerHTML = comment.text;
+                el.style.top = "" + (comment.lineNumber+1)*15 + "px";
+                document.getElementById("content").appendChild(el);
+            }
+            document.getElementById("code").innerHTML = escapeCode(obj.plainCode);
         }
 
         (function () {
@@ -72,8 +115,7 @@
                 xmlHttp.open("GET", "demo.html", true);
                 xmlHttp.onreadystatechange = function () {
                     if (xmlHttp.readyState === 4) {
-                        code = xmlHttp.responseText;
-                        displayCode();
+                        displayCode(xmlHttp.responseText);
                     }
                 };
                 xmlHttp.send(null);
