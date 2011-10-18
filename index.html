@@ -28,13 +28,13 @@
     #content-container {
         width: 40%;
         background: #eee;
-        border-right: 2px solid #666;
+        border-right: 5px solid #aaa;
     }
 
     #code-container {
         background: #fff;
         overflow: hidden;
-        border-left: 5px solid #ddd;
+        border-left: 3px solid #666;
     }
 
     #content {
@@ -49,22 +49,37 @@
 </style>
 <script type="text/javascript">
 
-    function displayCode(code) {
-        var escaped = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        document.getElementById("code").innerHTML = escaped;
-    }
-
     (function () {
-        var xmlHttp = new XMLHttpRequest();
-        if (xmlHttp) {
-            xmlHttp.open("GET", "demo.html", true);
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState === 4) {
-                    displayCode(xmlHttp.responseText);
-                }
-            };
-            xmlHttp.send(null);
+        var code, processedCode, escapedCode;
+
+        function processComments() {
+            processedCode = code.replace(/<\!--.*-->\n?| *\/\/.*\n/g, "" );
         }
+
+        function escapeCode() {
+            escapedCode = processedCode.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function displayCode() {
+            processComments();
+            escapeCode();
+            document.getElementById("code").innerHTML = escapedCode;
+        }
+
+        (function () {
+            var xmlHttp = new XMLHttpRequest();
+            if (xmlHttp) {
+                xmlHttp.open("GET", "demo.html", true);
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState === 4) {
+                        code = xmlHttp.responseText;
+                        displayCode();
+                    }
+                };
+                xmlHttp.send(null);
+            }
+        })();
+
     })();
 
 
