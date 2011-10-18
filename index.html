@@ -13,31 +13,31 @@
         width: 100%;
         height: 100%;
         text-shadow: rgba(0, 0, 0, .2) 2px 1px 2px;
+        overflow-x: hidden;
+        font-family: "Droid Sans", "Arial", sans;
+        font-size: .9rem;
+        line-height: 1.3rem;
     }
 
     pre {
         margin: 0;
         padding: 0;
         font-size: 13px;
+        line-height: 14px;
     }
 
-    table {
-        width: 100%;
-        height: 100%;
-    }
-
-    #content-container {
-        width: 400px;
+    #wrapper {
         background: #eee;
-        border-right: 5px solid #aaa;
-        vertical-align: top;
     }
 
-    #code-container {
+    #bg-wrapper {
+        margin-left: 400px;
         background: #fff;
-        overflow: hidden;
-        border-left: 3px solid #666;
-        vertical-align: top;
+        border-left: 4px solid #ddd;
+    }
+
+    #code {
+        padding: 0 1rem;
     }
 
     #content {
@@ -53,11 +53,6 @@
         left: 0;
     }
 
-    #code {
-        width: 400px;
-        padding: 1rem;
-    }
-
 </style>
 <script type="text/javascript">
 
@@ -71,10 +66,8 @@
             for (var i = 0, lineNumber = 0; i < lines.length; i++) {
                 var match = /<\!-- ?(.*)-->\n?| *\/\/ ?(.*)\n?/g.exec(lines[i]);
                 if (match && i > 1) {
-                    var text = match[1] || match[2],
-                        lastComment = comments.length && comments[comments.length-1];
-
-                    if (lastComment && lastComment.lineNumber === lineNumber) {
+                    var text = match[1] || match[2];
+                    if (comments.length && comments[comments.length-1].lineNumber === lineNumber) {
                         comments[comments.length-1].text += " " + text;
                     } else {
                         comments.push({
@@ -103,7 +96,7 @@
                 var comment = obj.comments[i],
                     el = document.createElement("div");
                 el.innerHTML = comment.text;
-                el.style.top = "" + (comment.lineNumber+1)*15 + "px";
+                el.style.top = "" + (comment.lineNumber)*14 + "px";
                 document.getElementById("content").appendChild(el);
             }
             document.getElementById("code").innerHTML = escapeCode(obj.plainCode);
@@ -128,18 +121,12 @@
 </script>
 <body>
 
-<table cellpadding="0" cellspacing="0">
-    <tbody>
-    <tr>
-        <td id="content-container">
-            <div id="content"></div>
-        </td>
-        <td id="code-container">
-            <pre id="code"></pre>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div id="wrapper">
+    <div id="content"></div>
+    <div id="bg-wrapper">
+        <pre id="code"></pre>
+    </div>
+</div>
 
 </body>
 </html>
