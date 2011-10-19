@@ -1,5 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
+<!-- <a href="demo.html">live demo</a> -->
 <html>
 <head>
     <title></title>
@@ -10,33 +11,6 @@
             padding: 0;
         }
     </style>
-
-    <!-- Declare a vertex shader to be used later. -->
-    <script id="vs-shader" type="x-shader/x-vertex">
-        attribute vec4 position;
-        varying vec2 xyPos;
-        uniform mat4 transform;
-
-        void main(void) {
-            xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
-            gl_Position = transform*position;
-        }
-    </script>
-
-    <!-- Declare a fragment shader to be used later. -->
-    <script id="fs-shader" type="x-shader/x-fragment">
-        #ifdef GL_ES
-        precision highp float;
-        #endif
-
-        varying vec2 xyPos;
-        uniform vec2 resolution;
-        uniform sampler2D tex;
-
-        void main(void) {
-            gl_FragColor = texture2D(tex, xyPos);
-        }
-    </script>
 
     <script type="text/javascript">
 
@@ -187,6 +161,34 @@
             demo.run(canvas);
         }
     </script>
+
+        <!-- Declare a vertex shader to be used later. -->
+    <script id="vs-shader" type="x-shader/x-vertex">
+        attribute vec4 position;
+        varying vec2 xyPos;
+        uniform mat4 transform;
+
+        void main(void) {
+            xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
+            gl_Position = transform*position;
+        }
+    </script>
+
+    <!-- Declare a fragment shader to be used later. -->
+    <script id="fs-shader" type="x-shader/x-fragment">
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        varying vec2 xyPos;
+        uniform vec2 resolution;
+        uniform sampler2D tex;
+
+        void main(void) {
+            gl_FragColor = texture2D(tex, xyPos);
+        }
+    </script>
+    
 </head>
 
 <body onload="initialize()">

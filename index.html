@@ -59,13 +59,16 @@
     (function () {
 
         function processComments(code) {
-            var lines = code.split("\n"),
+            var lines,
                 comments = [],
                 plainCode = "";
 
+            code = code.replace(/^<!DOCTYPE.*\n?.*>\n/g, "");
+            
+            lines = code.split("\n");
             for (var i = 0, lineNumber = 0; i < lines.length; i++) {
-                var match = /<\!-- ?(.*)-->\n?| *\/\/ ?(.*)\n?/g.exec(lines[i]);
-                if (match && i > 1) {
+                var match = /<\!-- ?(.*)-->\n?|^ *\/\/ ?(.*)\n?/g.exec(lines[i]);
+                if (match) {
                     var text = match[1] || match[2];
                     if (comments.length && comments[comments.length-1].lineNumber === lineNumber) {
                         comments[comments.length-1].text += " " + text;
