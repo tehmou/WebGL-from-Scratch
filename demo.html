@@ -1,9 +1,44 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
-<!-- <a href="demo.html">live demo</a> -->
+<!--
+<h1>WebGL standalone<br/>example</h1>
+
+<p><i>The WebGL tutorial written from scratch&mdash;without any external libraries.
+See the this demo <a href="demo.html">live</a></i></p>
+
+<p>To directly tap into hardware acceleration, we need to setup a 3D rendering pipeline. Of course, we can still do 2D as
+well by using planes, but the technology under the hood is for 3D.</p>
+
+<p>To do this, we feed the graphics card specifically crafted pieces of code it can digest. These pieces are called
+
+<b>shaders</b>. Shaders are always written in a special <a href="http://en.wikipedia.org/wiki/GLSL">shader language</a>.
+It looks a bit like C, but with powerful syntax for processing structures with multiple components&mdash;such as colors.</p>
+
+<p>So, what exactly happens when we render?</p>
+
+<p>First, we are given a chance to manipulate our 3D model with a <b>vertex shader</b>. The name comes from the corners
+of a model being called vertices (singular "vertex"). Most commonly you would apply a matrix transformation, or two, to
+render your model in the correct place. You can read more about matrices in 3D programming from plenty of sources.</p>
+
+<p>The second step we can do, is assigning a <b>fragment shader</b> (also sometimes referred to as a pixel shader).
+A fragment shaders allows us to run the same code for every single pixel visible. The vertex shader can pass values to
+the pixel shader, such as the current xy-position on the surface of the model being rendered. This way we can know which
+pixel of the texture image to use when rendering.</p>
+
+<p>You have to have both of these shader, but fortunately the simplest form for each is only a few lines. In this
+example the shader are embedded to the HTML page as script blocks of a specific type, but you could as well load them
+from a text file with ajax, or to write them inline as a JavaScript string. WebGL will never know where the code came
+from.</p>
+
+<p>Enough introduction, let's get started with the code!</p>
+-->
+
+        
+<!-- START OF demo.html -->
 <html>
 <head>
-    <title></title>
+    <title>WebGL from Scratch</title>
+
 
     <style type="text/css">
         body {
@@ -12,33 +47,61 @@
         }
     </style>
 
+    <!--
+    <h2>Vertex shader</h2>
+    <p>Let's start with the vertex shader, as it is processed first in the WebGL rendering chain. Noticed that the type
+    here only means that we don't want to execute the code as JavaScript. It will be referenced later only by its id,
+    and its contents will retrieved as plain text.</p>
+    -->
+    <script id="vs-shader" type="x-shader/x-vertex">
+        attribute vec4 position;    // Position on the surface of the model.
+        varying vec2 xyPos;         // Used to pass the xy-coordinate for the texture pixel.
+        uniform mat4 transform;     // Matrix used for transformation (not required, just useful).
+
+        // Entry point for shader is always the method main. It does not return anything, nor does it take arguments.
+        void main(void) {
+            // Calculate the texture xy-coordinate, considering our surface is of size (1.0,1.0) with origin at (0.5,0.5).
+            xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
+            // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
+            gl_Position = transform*position;
+        }
+    </script>
+
+    <!--
+    <h2>Fragment shader</h2>
+    <p>If you are wondering about all the keywords, here is a quick list of what the ones before variables mean.</p>
+    <ul>
+    <li>attribute: a value WebGL gives to us.</li>
+    <li>varying: shader across shaders and can be modified.</li>
+    <li>uniform: assignable from <b>outside</b> of WebGL. In our case can be set from JS.</li>
+    </ul>
+    -->
+    <script id="fs-shader" type="x-shader/x-fragment">
+
+        // Some boilerplate code. 3
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        varying vec2 xyPos;         // Value the vertex shader passes to us.
+        uniform sampler2D tex;      // Texture we want to use.
+
+        void main(void) {
+            // gl_FragColor is the return value. Simply read the pixel value of
+            // our texture at coordinate xyPos.
+            gl_FragColor = texture2D(tex, xyPos);
+        }
+    </script>
+
+
+    <!--
+    <h2>The JavaScript part</h2>
+    -->
     <script type="text/javascript">
 
-        // Namespace for our sample application.
         window.timotuominen = { webgl: {} };
 
         
-        // Provides a rendering loop for our purposes. We will assign our own
-        // function to render to do the rendering each frame.
-        timotuominen.webgl.Runner = function () {
-            return {
-                el: null, gl: null,
-                isRunning: true,
-                initialize: function () {
-                    this.gl = this.el.getContext("experimental-webgl");
-                    this.gl.viewportWidth = this.el.width;
-                    this.gl.viewportHeight = this.el.height;
-                    this.gl.clearColor(.3,.3,.3,1.0);
-                    this.renderLoop = this.renderLoop.bind(this);
-                },
-                renderLoop: function() {
-                    this.isRunning && setTimeout(this.renderLoop, 1000/60);
-                    this.render && this.render();
-                }
-            };
-        };
-
-
         // Utilities for WebGL shaders.
         timotuominen.webgl.shaderUtils = {
             createProgram: function (gl, vsCode, fsCode) {
@@ -81,6 +144,42 @@
         };
 
 
+        // We start by creating a utility class that takes care of the WebGL initialization and viewport.
+       timotuominen.webgl.Runner = function () {
+            return {
+                el: null, // Hold the canvas element.
+                gl: null, // Reference to the WebGL object.
+                isRunning: true, // Whether we should continue the render loop.
+                initialize: function () {
+                    // First we create the WebGL object by requesting "experimental-webgl" context.
+                    // If WebGL is not supported, this will either throw an error or result null.
+                    // For this example we will not handle these scenarios.
+                    this.gl = this.el.getContext("experimental-webgl");
+
+                    // Store the size of the canvas. DOM operation are in general expensive,
+                    // and we certainly don't want to do this on every frame. 2
+                    this.viewportWidth = this.el.width;
+                    this.viewportHeight = this.el.height;
+
+                    // Color that is used to clear the whole canvas before starting to
+                    // draw the frame. We use rgba here, in which all four components
+                    // are from 0.0 to 1.0.
+                    this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
+
+                    // Bind the renderLoop to this object. Since we will be using a timeout to
+                    // call renderLoop continually, it would otherwise be the window object.
+                    this.renderLoop = this.renderLoop.bind(this);
+                },
+                // The rendering loop that repeatedly call itself 60 times a second, as long
+                // as isRunning is truthy. 4
+                renderLoop: function() {
+                    this.isRunning && setTimeout(this.renderLoop, 1000/60);
+                    this.render && this.render();
+                }
+            };
+        };
+
+
         // The actual demo we will show.
         timotuominen.webgl.FromScratchDemo = function () {
             return {
@@ -116,7 +215,6 @@
                         }
                         if (shader) {
                             gl.useProgram(shader);
-                            gl.uniform2f(gl.getUniformLocation(shader, "resolution"), gl.viewportWidth, gl.viewportHeight);
                             gl.uniformMatrix4fv(gl.getUniformLocation(shader, "transform"), false, matrix);
                             gl.enableVertexAttribArray(gl.getAttribLocation(shader, "position"));
                             gl.vertexAttribPointer(gl.getAttribLocation(shader, "position"), 2, gl.FLOAT, false, 0, 0);
@@ -126,7 +224,7 @@
                                 gl.uniform1i(gl.getUniformLocation(shader, "tex"), 0);
                             }
                         }
-                        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+                        gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
                         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                         if (vertices && vertexBuffer) {
                             gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -160,35 +258,10 @@
 
             demo.run(canvas);
         }
+
+
     </script>
 
-        <!-- Declare a vertex shader to be used later. -->
-    <script id="vs-shader" type="x-shader/x-vertex">
-        attribute vec4 position;
-        varying vec2 xyPos;
-        uniform mat4 transform;
-
-        void main(void) {
-            xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
-            gl_Position = transform*position;
-        }
-    </script>
-
-    <!-- Declare a fragment shader to be used later. -->
-    <script id="fs-shader" type="x-shader/x-fragment">
-        #ifdef GL_ES
-        precision highp float;
-        #endif
-
-        varying vec2 xyPos;
-        uniform vec2 resolution;
-        uniform sampler2D tex;
-
-        void main(void) {
-            gl_FragColor = texture2D(tex, xyPos);
-        }
-    </script>
-    
 </head>
 
 <body onload="initialize()">
