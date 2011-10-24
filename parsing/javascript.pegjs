@@ -1,68 +1,106 @@
-{
-    function format (name, input) {
-        if (typeof parseHandler[name] === "function") {
-            return parseHandler[name](input);
-        } else {
-            return input;
-        }
-    };
-}
-
+/*
+ * JavaScript parser based on the grammar described in ECMA-262, 5th ed.
+ * (http://www.ecma-international.org/publications/standards/Ecma-262.htm)
+ *
+ * The parser builds a tree representing the parsed JavaScript, composed of
+ * basic JavaScript values, arrays and objects (basically JSON). It can be
+ * easily used by various JavaScript processors, transformers, etc.
+ *
+ * Intentional deviations from ECMA-262, 5th ed.:
+ *
+ * * The specification does not consider |FunctionDeclaration| and
+ * |FunctionExpression| as statements, but JavaScript implementations do and
+ * so are we. This syntax is actually used in the wild (e.g. by jQuery).
+ *
+ * Limitations:
+ *
+ * * Non-BMP characters are completely ignored to avoid surrogate
+ * pair handling (JavaScript strings in most implementations are AFAIK
+ * encoded in UTF-16, though this is not required by the specification --
+ * see ECMA-262, 5th ed., 4.3.16).
+ *
+ * * One can create identifiers containing illegal characters using Unicode
+ * escape sequences. For example, "abcd\u0020efgh" is not a valid
+ * identifier, but it is accepted by the parser.
+ *
+ * * Strict mode is not recognized. That means that within strict mode code,
+ * "implements", "interface", "let", "package", "private", "protected",
+ * "public", "static" and "yield" can be used as names. Many other
+ * restrictions and exceptions from ECMA-262, 5th ed., Annex C are also not
+ * applied.
+ *
+ * * The parser does not handle regular expression literal syntax (basically,
+ * it treats anything between "/"'s as an opaque character sequence and also
+ * does not recognize invalid flags properly).
+ *
+ * * The parser doesn't report any early errors except syntax errors (see
+ * ECMA-262, 5th ed., 16).
+ *
+ * At least some of these limitations should be fixed sometimes.
+ *
+ * Many thanks to inimino (http://inimino.org/~inimino/blog/) for his ES5 PEG
+ * (http://boshi.inimino.org/3box/asof/1270029991384/PEG/ECMAScript_unified.peg),
+ * which helped me to solve some problems (such as automatic semicolon
+ * insertion) and also served to double check that I converted the original
+ * grammar correctly.
+ */
 
 start
-  = __ program:Program __ { return format("Program", program); }
+  = __ program:Program __ { return program; }
 
 /* ===== A.1 Lexical Grammar ===== */
 
 SourceCharacter
-  = sourceCharacter:. { return format("SourceCharacter", sourceCharacter); }
+  = .
 
 WhiteSpace "whitespace"
-  = whitespace:[\t\v\f \u00A0\uFEFF] { return format("WhiteSpace", whiteSpace); }
-  / whitespace:Zs { return format("WhiteSpace", whiteSpace); }
+  = [\t\v\f \u00A0\uFEFF]
+  / Zs
 
 LineTerminator
-  = lineTerminator:[\n\r\u2028\u2029] { return format("LineTerminator", lineTerminator); }
+  = [\n\r\u2028\u2029]
 
-LineTerminatorSequence "end of line" { console.log("moi"); }
+LineTerminatorSequence "end of line"
   = "\n"
-  / "\r\n" { parseHandler.lineBreak(); }
-  / "\r" { parseHandler.lineBreak(); }
-  / "\u2028" { parseHandler.lineBreak(); } // line spearator
-  / "\u2029" { parseHandler.lineBreak(); } // paragraph separator
+  / "\r\n"
+  / "\r"
+  / "\u2028" // line spearator
+  / "\u2029" // paragraph separator
 
 Comment "comment"
-  = comment:MultiLineComment
-  / comment:SingleLineComment
+  = MultiLineComment
+  / SingleLineComment
 
 MultiLineComment
-  = "/*" comment:((!"*/" char_:SourceCharacter { return char_; })*) "*/" { parseHandler.comment(comment.join("")); }
+  = "/*" (!"*/" SourceCharacter)* "*/"
 
 MultiLineCommentNoLineTerminator
-  = "/*" comment:((!("*/" / LineTerminator) char_:SourceCharacter { return char_; })*) "*/" { parseHandler.comment(comment.join("")); }
+  = "/*" (!("*/" / LineTerminator) SourceCharacter)* "*/"
 
 SingleLineComment
-  = "//" comment:(!LineTerminator char_:SourceCharacter { return char_; })* { parseHandler.comment(comment.join("")); }
+  = "//" (!LineTerminator SourceCharacter)*
 
 Identifier "identifier"
-  = !ReservedWord name:IdentifierName
+  = !ReservedWord name:IdentifierName { return name; }
 
 IdentifierName "identifier"
-  = start:IdentifierStart parts:IdentifierPart*
+  = start:IdentifierStart parts:IdentifierPart* {
+      return start + parts.join("");
+    }
 
 IdentifierStart
   = UnicodeLetter
   / "$"
   / "_"
-  / "\\" sequence:UnicodeEscapeSequence
+  / "\\" sequence:UnicodeEscapeSequence { return sequence; }
 
 IdentifierPart
   = IdentifierStart
   / UnicodeCombiningMark
   / UnicodeDigit
   / UnicodeConnectorPunctuation
-  / "\u200C" // zero-width non-joiner
-  / "\u200D" // zero-width joiner
+  / "\u200C" { return "\u200C"; } // zero-width non-joiner
+  / "\u200D" { return "\u200D"; } // zero-width joiner
 
 UnicodeLetter
   = Lu
@@ -138,33 +176,51 @@ FutureReservedWord
 Literal
   = NullLiteral
   / BooleanLiteral
-  / value:NumericLiteral
-  / value:StringLiteral
+  / value:NumericLiteral {
+      return {
+        type: "NumericLiteral",
+        value: value
+      };
+    }
+  / value:StringLiteral {
+      return {
+        type: "StringLiteral",
+        value: value
+      };
+    }
   / RegularExpressionLiteral
 
 NullLiteral
-  = NullToken
+  = NullToken { return { type: "NullLiteral" }; }
 
 BooleanLiteral
-  = TrueToken
-  / FalseToken
+  = TrueToken { return { type: "BooleanLiteral", value: true }; }
+  / FalseToken { return { type: "BooleanLiteral", value: false }; }
 
 NumericLiteral "number"
-  = literal:(HexIntegerLiteral / DecimalLiteral) !IdentifierStart
+  = literal:(HexIntegerLiteral / DecimalLiteral) !IdentifierStart {
+      return literal;
+    }
 
 DecimalLiteral
   = before:DecimalIntegerLiteral
     "."
     after:DecimalDigits?
-    exponent:ExponentPart?
-  / "." after:DecimalDigits exponent:ExponentPart?
-  / before:DecimalIntegerLiteral exponent:ExponentPart?
+    exponent:ExponentPart? {
+      return parseFloat(before + "." + after + exponent);
+    }
+  / "." after:DecimalDigits exponent:ExponentPart? {
+      return parseFloat("." + after + exponent);
+    }
+  / before:DecimalIntegerLiteral exponent:ExponentPart? {
+      return parseFloat(before + exponent);
+    }
 
 DecimalIntegerLiteral
-  = "0" / digit:NonZeroDigit digits:DecimalDigits?
+  = "0" / digit:NonZeroDigit digits:DecimalDigits? { return digit + digits; }
 
 DecimalDigits
-  = digits:DecimalDigit+
+  = digits:DecimalDigit+ { return digits.join(""); }
 
 DecimalDigit
   = [0-9]
@@ -173,45 +229,49 @@ NonZeroDigit
   = [1-9]
 
 ExponentPart
-  = indicator:ExponentIndicator integer:SignedInteger
+  = indicator:ExponentIndicator integer:SignedInteger {
+      return indicator + integer;
+    }
 
 ExponentIndicator
   = [eE]
 
 SignedInteger
-  = sign:[-+]? digits:DecimalDigits
+  = sign:[-+]? digits:DecimalDigits { return sign + digits; }
 
 HexIntegerLiteral
-  = "0" [xX] digits:HexDigit+
+  = "0" [xX] digits:HexDigit+ { return parseInt("0x" + digits.join("")); }
 
 HexDigit
   = [0-9a-fA-F]
 
 StringLiteral "string"
-  = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'")
+  = parts:('"' DoubleStringCharacters? '"' / "'" SingleStringCharacters? "'") {
+      return parts[1];
+    }
 
 DoubleStringCharacters
-  = chars:DoubleStringCharacter+
+  = chars:DoubleStringCharacter+ { return chars.join(""); }
 
 SingleStringCharacters
-  = chars:SingleStringCharacter+
+  = chars:SingleStringCharacter+ { return chars.join(""); }
 
 DoubleStringCharacter
-  = !('"' / "\\" / LineTerminator) char_:SourceCharacter
-  / "\\" sequence:EscapeSequence
+  = !('"' / "\\" / LineTerminator) char_:SourceCharacter { return char_; }
+  / "\\" sequence:EscapeSequence { return sequence; }
   / LineContinuation
 
 SingleStringCharacter
-  = !("'" / "\\" / LineTerminator) char_:SourceCharacter
-  / "\\" sequence:EscapeSequence
+  = !("'" / "\\" / LineTerminator) char_:SourceCharacter { return char_; }
+  / "\\" sequence:EscapeSequence { return sequence; }
   / LineContinuation
 
 LineContinuation
-  = "\\" sequence:LineTerminatorSequence
+  = "\\" sequence:LineTerminatorSequence { return sequence; }
 
 EscapeSequence
   = CharacterEscapeSequence
-  / "0" !DecimalDigit
+  / "0" !DecimalDigit { return "\0"; }
   / HexEscapeSequence
   / UnicodeEscapeSequence
 
@@ -220,10 +280,18 @@ CharacterEscapeSequence
   / NonEscapeCharacter
 
 SingleEscapeCharacter
-  = char_:['"\\bfnrtv]
+  = char_:['"\\bfnrtv] {
+      return char_
+        .replace("b", "\b")
+        .replace("f", "\f")
+        .replace("n", "\n")
+        .replace("r", "\r")
+        .replace("t", "\t")
+        .replace("v", "\x0B") // IE does not recognize "\v".
+    }
 
 NonEscapeCharacter
-  = (!EscapeCharacter / LineTerminator) char_:SourceCharacter
+  = (!EscapeCharacter / LineTerminator) char_:SourceCharacter { return char_; }
 
 EscapeCharacter
   = SingleEscapeCharacter
@@ -232,27 +300,39 @@ EscapeCharacter
   / "u"
 
 HexEscapeSequence
-  = "x" h1:HexDigit h2:HexDigit
+  = "x" h1:HexDigit h2:HexDigit {
+      return String.fromCharCode(parseInt("0x" + h1 + h2));
+    }
 
 UnicodeEscapeSequence
-  = "u" h1:HexDigit h2:HexDigit h3:HexDigit h4:HexDigit
+  = "u" h1:HexDigit h2:HexDigit h3:HexDigit h4:HexDigit {
+      return String.fromCharCode(parseInt("0x" + h1 + h2 + h3 + h4));
+    }
 
 RegularExpressionLiteral "regular expression"
-  = "/" body:RegularExpressionBody "/" flags:RegularExpressionFlags
+  = "/" body:RegularExpressionBody "/" flags:RegularExpressionFlags {
+      return {
+        type: "RegularExpressionLiteral",
+        body: body,
+        flags: flags
+      };
+    }
 
 RegularExpressionBody
-  = char_:RegularExpressionFirstChar chars:RegularExpressionChars
+  = char_:RegularExpressionFirstChar chars:RegularExpressionChars {
+      return char_ + chars;
+    }
 
 RegularExpressionChars
-  = chars:RegularExpressionChar*
+  = chars:RegularExpressionChar* { return chars.join(""); }
 
 RegularExpressionFirstChar
-  = ![*\\/[] char_:RegularExpressionNonTerminator
+  = ![*\\/[] char_:RegularExpressionNonTerminator { return char_; }
   / RegularExpressionBackslashSequence
   / RegularExpressionClass
 
 RegularExpressionChar
-  = ![\\/[] char_:RegularExpressionNonTerminator
+  = ![\\/[] char_:RegularExpressionNonTerminator { return char_; }
   / RegularExpressionBackslashSequence
   / RegularExpressionClass
 
@@ -261,57 +341,57 @@ RegularExpressionChar
  * "RegularExpressionNonTerminator".
  */
 RegularExpressionBackslashSequence
-  = "\\" char_:RegularExpressionNonTerminator
+  = "\\" char_:RegularExpressionNonTerminator { return "\\" + char_; }
 
 RegularExpressionNonTerminator
-  = !LineTerminator char_:SourceCharacter
+  = !LineTerminator char_:SourceCharacter { return char_; }
 
 RegularExpressionClass
-  = "[" chars:RegularExpressionClassChars "]"
+  = "[" chars:RegularExpressionClassChars "]" { return "[" + chars + "]"; }
 
 RegularExpressionClassChars
-  = chars:RegularExpressionClassChar*
+  = chars:RegularExpressionClassChar* { return chars.join(""); }
 
 RegularExpressionClassChar
-  = ![\]\\] char_:RegularExpressionNonTerminator
+  = ![\]\\] char_:RegularExpressionNonTerminator { return char_; }
   / RegularExpressionBackslashSequence
 
 RegularExpressionFlags
-  = parts:IdentifierPart*
+  = parts:IdentifierPart* { return parts.join(""); }
 
 /* Tokens */
 
-BreakToken      = "break"            !IdentifierPart
-CaseToken       = "case"             !IdentifierPart
-CatchToken      = "catch"            !IdentifierPart
-ContinueToken   = "continue"         !IdentifierPart
-DebuggerToken   = "debugger"         !IdentifierPart
-DefaultToken    = "default"          !IdentifierPart
-DeleteToken     = "delete"           !IdentifierPart
-DoToken         = "do"               !IdentifierPart
-ElseToken       = "else"             !IdentifierPart
-FalseToken      = "false"            !IdentifierPart
-FinallyToken    = "finally"          !IdentifierPart
-ForToken        = "for"              !IdentifierPart
-FunctionToken   = "function"         !IdentifierPart
-GetToken        = "get"              !IdentifierPart
-IfToken         = "if"               !IdentifierPart
-InstanceofToken = "instanceof"       !IdentifierPart
-InToken         = "in"               !IdentifierPart
-NewToken        = "new"              !IdentifierPart
-NullToken       = "null"             !IdentifierPart
-ReturnToken     = "return"           !IdentifierPart
-SetToken        = "set"              !IdentifierPart
-SwitchToken     = "switch"           !IdentifierPart
-ThisToken       = "this"             !IdentifierPart
-ThrowToken      = "throw"            !IdentifierPart
-TrueToken       = "true"             !IdentifierPart
-TryToken        = "try"              !IdentifierPart
-TypeofToken     = "typeof"           !IdentifierPart
-VarToken        = "var"              !IdentifierPart
-VoidToken       = "void"             !IdentifierPart
-WhileToken      = "while"            !IdentifierPart
-WithToken       = "with"             !IdentifierPart
+BreakToken = "break" !IdentifierPart
+CaseToken = "case" !IdentifierPart
+CatchToken = "catch" !IdentifierPart
+ContinueToken = "continue" !IdentifierPart
+DebuggerToken = "debugger" !IdentifierPart
+DefaultToken = "default" !IdentifierPart
+DeleteToken = "delete" !IdentifierPart { return "delete"; }
+DoToken = "do" !IdentifierPart
+ElseToken = "else" !IdentifierPart
+FalseToken = "false" !IdentifierPart
+FinallyToken = "finally" !IdentifierPart
+ForToken = "for" !IdentifierPart
+FunctionToken = "function" !IdentifierPart
+GetToken = "get" !IdentifierPart
+IfToken = "if" !IdentifierPart
+InstanceofToken = "instanceof" !IdentifierPart { return "instanceof"; }
+InToken = "in" !IdentifierPart { return "in"; }
+NewToken = "new" !IdentifierPart
+NullToken = "null" !IdentifierPart
+ReturnToken = "return" !IdentifierPart
+SetToken = "set" !IdentifierPart
+SwitchToken = "switch" !IdentifierPart
+ThisToken = "this" !IdentifierPart
+ThrowToken = "throw" !IdentifierPart
+TrueToken = "true" !IdentifierPart
+TryToken = "try" !IdentifierPart
+TypeofToken = "typeof" !IdentifierPart { return "typeof"; }
+VarToken = "var" !IdentifierPart
+VoidToken = "void" !IdentifierPart { return "void"; }
+WhileToken = "while" !IdentifierPart
+WithToken = "with" !IdentifierPart
 
 /*
  * Unicode Character Categories
@@ -396,38 +476,79 @@ __
 /* ===== A.3 Expressions ===== */
 
 PrimaryExpression
-  = ThisToken
-  / name:Identifier
+  = ThisToken { return { type: "This" }; }
+  / name:Identifier { return { type: "Variable", name: name }; }
   / Literal
   / ArrayLiteral
   / ObjectLiteral
-  / "(" __ expression:Expression __ ")"
+  / "(" __ expression:Expression __ ")" { return expression; }
 
 ArrayLiteral
-  = "[" __ elements:ElementList? __ (Elision __)? "]"
+  = "[" __ elements:ElementList? __ (Elision __)? "]" {
+      return {
+        type: "ArrayLiteral",
+        elements: elements !== "" ? elements : []
+      };
+    }
 
 ElementList
   = (Elision __)?
     head:AssignmentExpression
-    tail:(__ "," __ Elision? __ AssignmentExpression)*
+    tail:(__ "," __ Elision? __ AssignmentExpression)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][5]);
+      }
+      return result;
+    }
 
 Elision
   = "," (__ ",")*
 
 ObjectLiteral
-  = "{" __ properties:(PropertyNameAndValueList __ ("," __)?)? "}"
+  = "{" __ properties:(PropertyNameAndValueList __ ("," __)?)? "}" {
+      return {
+        type: "ObjectLiteral",
+        properties: properties !== "" ? properties[0] : []
+      };
+    }
 
 PropertyNameAndValueList
-  = head:PropertyAssignment tail:(__ "," __ PropertyAssignment)*
+  = head:PropertyAssignment tail:(__ "," __ PropertyAssignment)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][3]);
+      }
+      return result;
+    }
 
 PropertyAssignment
-  = name:PropertyName __ ":" __ value:AssignmentExpression
+  = name:PropertyName __ ":" __ value:AssignmentExpression {
+      return {
+        type: "PropertyAssignment",
+        name: name,
+        value: value
+      };
+    }
   / GetToken __ name:PropertyName __
     "(" __ ")" __
-    "{" __ body:FunctionBody __ "}"
+    "{" __ body:FunctionBody __ "}" {
+      return {
+        type: "GetterDefinition",
+        name: name,
+        body: body
+      };
+    }
   / SetToken __ name:PropertyName __
     "(" __ param:PropertySetParameterList __ ")" __
-    "{" __ body:FunctionBody __ "}"
+    "{" __ body:FunctionBody __ "}" {
+      return {
+        type: "SetterDefinition",
+        name: name,
+        param: param,
+        body: body
+      };
+    }
 
 PropertyName
   = IdentifierName
@@ -441,39 +562,121 @@ MemberExpression
   = base:(
         PrimaryExpression
       / FunctionExpression
-      / NewToken __ constructor:MemberExpression __ arguments:Arguments
+      / NewToken __ constructor:MemberExpression __ arguments:Arguments {
+          return {
+            type: "NewOperator",
+            constructor: constructor,
+            arguments: arguments
+          };
+        }
     )
     accessors:(
-        __ "[" __ name:Expression __ "]"
-      / __ "." __ name:IdentifierName
-    )*
+        __ "[" __ name:Expression __ "]" { return name; }
+      / __ "." __ name:IdentifierName { return name; }
+    )* {
+      var result = base;
+      for (var i = 0; i < accessors.length; i++) {
+        result = {
+          type: "PropertyAccess",
+          base: result,
+          name: accessors[i]
+        };
+      }
+      return result;
+    }
 
 NewExpression
   = MemberExpression
-  / NewToken __ constructor:NewExpression
+  / NewToken __ constructor:NewExpression {
+      return {
+        type: "NewOperator",
+        constructor: constructor,
+        arguments: []
+      };
+    }
 
 CallExpression
   = base:(
-      name:MemberExpression __ arguments:Arguments
+      name:MemberExpression __ arguments:Arguments {
+        return {
+          type: "FunctionCall",
+          name: name,
+          arguments: arguments
+        };
+      }
     )
     argumentsOrAccessors:(
-        __ arguments:Arguments
-      / __ "[" __ name:Expression __ "]"
-      / __ "." __ name:IdentifierName
-    )*
+        __ arguments:Arguments {
+          return {
+            type: "FunctionCallArguments",
+            arguments: arguments
+          };
+        }
+      / __ "[" __ name:Expression __ "]" {
+          return {
+            type: "PropertyAccessProperty",
+            name: name
+          };
+        }
+      / __ "." __ name:IdentifierName {
+          return {
+            type: "PropertyAccessProperty",
+            name: name
+          };
+        }
+    )* {
+      var result = base;
+      for (var i = 0; i < argumentsOrAccessors.length; i++) {
+        switch (argumentsOrAccessors[i].type) {
+          case "FunctionCallArguments":
+            result = {
+              type: "FuctionCall",
+              name: result,
+              arguments: argumentsOrAccessors[i].arguments
+            };
+            break;
+          case "PropertyAccessProperty":
+            result = {
+              type: "PropertyAccess",
+              base: result,
+              name: argumentsOrAccessors[i].name
+            };
+            break;
+          default:
+            throw new Error(
+              "Invalid expression type: " + argumentsOrAccessors[i].type
+            );
+        }
+      }
+      return result;
+    }
 
 Arguments
-  = "(" __ arguments:ArgumentList? __ ")"
+  = "(" __ arguments:ArgumentList? __ ")" {
+    return arguments !== "" ? arguments : [];
+  }
 
 ArgumentList
-  = head:AssignmentExpression tail:(__ "," __ AssignmentExpression)*
+  = head:AssignmentExpression tail:(__ "," __ AssignmentExpression)* {
+    var result = [head];
+    for (var i = 0; i < tail.length; i++) {
+      result.push(tail[i][3]);
+    }
+    return result;
+  }
 
 LeftHandSideExpression
   = CallExpression
   / NewExpression
 
 PostfixExpression
-  = expression:LeftHandSideExpression _ operator:PostfixOperator
+  = expression:LeftHandSideExpression _ operator:PostfixOperator {
+      return {
+        type: "PostfixExpression",
+        operator: operator,
+        expression: expression
+      };
+    }
   / LeftHandSideExpression
 
 PostfixOperator
@@ -482,7 +685,13 @@ PostfixOperator
 
 UnaryExpression
   = PostfixExpression
-  / operator:UnaryOperator __ expression:UnaryExpression
+  / operator:UnaryOperator __ expression:UnaryExpression {
+      return {
+        type: "UnaryExpression",
+        operator: operator,
+        expression: expression
+      };
+    }
 
 UnaryOperator
   = DeleteToken
@@ -493,26 +702,59 @@ UnaryOperator
   / "+"
   / "-"
   / "~"
-  /  "!"
+  / "!"
 
 MultiplicativeExpression
   = head:UnaryExpression
-    tail:(__ MultiplicativeOperator __ UnaryExpression)*
+    tail:(__ MultiplicativeOperator __ UnaryExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 MultiplicativeOperator
-  = operator:("*" / "/" / "%") !"="
+  = operator:("*" / "/" / "%") !"=" { return operator; }
 
 AdditiveExpression
   = head:MultiplicativeExpression
-    tail:(__ AdditiveOperator __ MultiplicativeExpression)*
+    tail:(__ AdditiveOperator __ MultiplicativeExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 AdditiveOperator
-  = "+" !("+" / "=")
-  / "-" !("-" / "=")
+  = "+" !("+" / "=") { return "+"; }
+  / "-" !("-" / "=") { return "-"; }
 
 ShiftExpression
   = head:AdditiveExpression
-    tail:(__ ShiftOperator __ AdditiveExpression)*
+    tail:(__ ShiftOperator __ AdditiveExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 ShiftOperator
   = "<<"
@@ -521,7 +763,18 @@ ShiftOperator
 
 RelationalExpression
   = head:ShiftExpression
-    tail:(__ RelationalOperator __ ShiftExpression)*
+    tail:(__ RelationalOperator __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 RelationalOperator
   = "<="
@@ -533,7 +786,18 @@ RelationalOperator
 
 RelationalExpressionNoIn
   = head:ShiftExpression
-    tail:(__ RelationalOperatorNoIn __ ShiftExpression)*
+    tail:(__ RelationalOperatorNoIn __ ShiftExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 RelationalOperatorNoIn
   = "<="
@@ -544,11 +808,33 @@ RelationalOperatorNoIn
 
 EqualityExpression
   = head:RelationalExpression
-    tail:(__ EqualityOperator __ RelationalExpression)*
+    tail:(__ EqualityOperator __ RelationalExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 EqualityExpressionNoIn
   = head:RelationalExpressionNoIn
-    tail:(__ EqualityOperator __ RelationalExpressionNoIn)*
+    tail:(__ EqualityOperator __ RelationalExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 EqualityOperator
   = "==="
@@ -558,85 +844,223 @@ EqualityOperator
 
 BitwiseANDExpression
   = head:EqualityExpression
-    tail:(__ BitwiseANDOperator __ EqualityExpression)*
+    tail:(__ BitwiseANDOperator __ EqualityExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseANDExpressionNoIn
   = head:EqualityExpressionNoIn
-    tail:(__ BitwiseANDOperator __ EqualityExpressionNoIn)*
+    tail:(__ BitwiseANDOperator __ EqualityExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseANDOperator
-  = "&" !("&" / "=")
+  = "&" !("&" / "=") { return "&"; }
 
 BitwiseXORExpression
   = head:BitwiseANDExpression
-    tail:(__ BitwiseXOROperator __ BitwiseANDExpression)*
+    tail:(__ BitwiseXOROperator __ BitwiseANDExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseXORExpressionNoIn
   = head:BitwiseANDExpressionNoIn
-    tail:(__ BitwiseXOROperator __ BitwiseANDExpressionNoIn)*
+    tail:(__ BitwiseXOROperator __ BitwiseANDExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseXOROperator
-  = "^" !("^" / "=")
+  = "^" !("^" / "=") { return "^"; }
 
 BitwiseORExpression
   = head:BitwiseXORExpression
-    tail:(__ BitwiseOROperator __ BitwiseXORExpression)*
+    tail:(__ BitwiseOROperator __ BitwiseXORExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseORExpressionNoIn
   = head:BitwiseXORExpressionNoIn
-    tail:(__ BitwiseOROperator __ BitwiseXORExpressionNoIn)*
+    tail:(__ BitwiseOROperator __ BitwiseXORExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 BitwiseOROperator
-  = "|" !("|" / "=")
+  = "|" !("|" / "=") { return "|"; }
 
 LogicalANDExpression
   = head:BitwiseORExpression
-    tail:(__ LogicalANDOperator __ BitwiseORExpression)*
+    tail:(__ LogicalANDOperator __ BitwiseORExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 LogicalANDExpressionNoIn
   = head:BitwiseORExpressionNoIn
-    tail:(__ LogicalANDOperator __ BitwiseORExpressionNoIn)*
+    tail:(__ LogicalANDOperator __ BitwiseORExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 LogicalANDOperator
-  = "&&" !"="
+  = "&&" !"=" { return "&&"; }
 
 LogicalORExpression
   = head:LogicalANDExpression
-    tail:(__ LogicalOROperator __ LogicalANDExpression)*
+    tail:(__ LogicalOROperator __ LogicalANDExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 LogicalORExpressionNoIn
   = head:LogicalANDExpressionNoIn
-    tail:(__ LogicalOROperator __ LogicalANDExpressionNoIn)*
+    tail:(__ LogicalOROperator __ LogicalANDExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 LogicalOROperator
-  = "||" !"="
+  = "||" !"=" { return "||"; }
 
 ConditionalExpression
   = condition:LogicalORExpression __
     "?" __ trueExpression:AssignmentExpression __
-    ":" __ falseExpression:AssignmentExpression
+    ":" __ falseExpression:AssignmentExpression {
+      return {
+        type: "ConditionalExpression",
+        condition: condition,
+        trueExpression: trueExpression,
+        falseExpression: falseExpression
+      };
+    }
   / LogicalORExpression
 
 ConditionalExpressionNoIn
   = condition:LogicalORExpressionNoIn __
     "?" __ trueExpression:AssignmentExpressionNoIn __
-    ":" __ falseExpression:AssignmentExpressionNoIn
+    ":" __ falseExpression:AssignmentExpressionNoIn {
+      return {
+        type: "ConditionalExpression",
+        condition: condition,
+        trueExpression: trueExpression,
+        falseExpression: falseExpression
+      };
+    }
   / LogicalORExpressionNoIn
 
 AssignmentExpression
   = left:LeftHandSideExpression __
     operator:AssignmentOperator __
-    right:AssignmentExpression
+    right:AssignmentExpression {
+      return {
+        type: "AssignmentExpression",
+        operator: operator,
+        left: left,
+        right: right
+      };
+    }
   / ConditionalExpression
 
 AssignmentExpressionNoIn
   = left:LeftHandSideExpression __
     operator:AssignmentOperator __
-    right:AssignmentExpressionNoIn
+    right:AssignmentExpressionNoIn {
+      return {
+        type: "AssignmentExpression",
+        operator: operator,
+        left: left,
+        right: right
+      };
+    }
   / ConditionalExpressionNoIn
 
 AssignmentOperator
-  = "=" (!"=")
+  = "=" (!"=") { return "="; }
   / "*="
   / "/="
   / "%="
@@ -651,11 +1075,33 @@ AssignmentOperator
 
 Expression
   = head:AssignmentExpression
-    tail:(__ "," __ AssignmentExpression)*
+    tail:(__ "," __ AssignmentExpression)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 ExpressionNoIn
   = head:AssignmentExpressionNoIn
-    tail:(__ "," __ AssignmentExpressionNoIn)*
+    tail:(__ "," __ AssignmentExpressionNoIn)* {
+      var result = head;
+      for (var i = 0; i < tail.length; i++) {
+        result = {
+          type: "BinaryExpression",
+          operator: tail[i][1],
+          left: result,
+          right: tail[i][3]
+        };
+      }
+      return result;
+    }
 
 /* ===== A.4 Statements ===== */
 
@@ -684,43 +1130,90 @@ Statement
   / FunctionExpression
 
 Block
-  = "{" __ statements:(StatementList __)? "}"
+  = "{" __ statements:(StatementList __)? "}" {
+      return {
+        type: "Block",
+        statements: statements !== "" ? statements[0] : []
+      };
+    }
 
 StatementList
-  = head:Statement tail:(__ Statement)*
+  = head:Statement tail:(__ Statement)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][1]);
+      }
+      return result;
+    }
 
 VariableStatement
-  = VarToken __ declarations:VariableDeclarationList EOS
+  = VarToken __ declarations:VariableDeclarationList EOS {
+      return {
+        type: "VariableStatement",
+        declarations: declarations
+      };
+    }
 
 VariableDeclarationList
-  = head:VariableDeclaration tail:(__ "," __ VariableDeclaration)*
+  = head:VariableDeclaration tail:(__ "," __ VariableDeclaration)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][3]);
+      }
+      return result;
+    }
 
 VariableDeclarationListNoIn
-  = head:VariableDeclarationNoIn tail:(__ "," __ VariableDeclarationNoIn)*
+  = head:VariableDeclarationNoIn tail:(__ "," __ VariableDeclarationNoIn)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][3]);
+      }
+      return result;
+    }
 
 VariableDeclaration
-  = name:Identifier __ value:Initialiser?
+  = name:Identifier __ value:Initialiser? {
+      return {
+        type: "VariableDeclaration",
+        name: name,
+        value: value !== "" ? value : null
+      };
+    }
 
 VariableDeclarationNoIn
-  = name:Identifier __ value:InitialiserNoIn?
+  = name:Identifier __ value:InitialiserNoIn? {
+      return {
+        type: "VariableDeclaration",
+        name: name,
+        value: value !== "" ? value : null
+      };
+    }
 
 Initialiser
-  = "=" (!"=") __ expression:AssignmentExpression
+  = "=" (!"=") __ expression:AssignmentExpression { return expression; }
 
 InitialiserNoIn
-  = "=" (!"=") __ expression:AssignmentExpressionNoIn
+  = "=" (!"=") __ expression:AssignmentExpressionNoIn { return expression; }
 
 EmptyStatement
-  = ";"
+  = ";" { return { type: "EmptyStatement" }; }
 
 ExpressionStatement
-  = !("{" / FunctionToken) expression:Expression EOS
+  = !("{" / FunctionToken) expression:Expression EOS { return expression; }
 
 IfStatement
   = IfToken __
     "(" __ condition:Expression __ ")" __
     ifStatement:Statement
-    elseStatement:(__ ElseToken __ Statement)?
+    elseStatement:(__ ElseToken __ Statement)? {
+      return {
+        type: "IfStatement",
+        condition: condition,
+        ifStatement: ifStatement,
+        elseStatement: elseStatement !== "" ? elseStatement[3] : null
+      };
+    }
 
 IterationStatement
   = DoWhileStatement
@@ -731,16 +1224,33 @@ IterationStatement
 DoWhileStatement
   = DoToken __
     statement:Statement __
-    WhileToken __ "(" __ condition:Expression __ ")" EOS
+    WhileToken __ "(" __ condition:Expression __ ")" EOS {
+      return {
+        type: "DoWhileStatement",
+        condition: condition,
+        statement: statement
+      };
+    }
 
 WhileStatement
-  = WhileToken __ "(" __ condition:Expression __ ")" __ statement:Statement
+  = WhileToken __ "(" __ condition:Expression __ ")" __ statement:Statement {
+      return {
+        type: "WhileStatement",
+        condition: condition,
+        statement: statement
+      };
+    }
 
 ForStatement
   = ForToken __
     "(" __
     initializer:(
-        VarToken __ declarations:VariableDeclarationListNoIn
+        VarToken __ declarations:VariableDeclarationListNoIn {
+          return {
+            type: "VariableStatement",
+            declarations: declarations
+          };
+        }
       / ExpressionNoIn?
     ) __
     ";" __
@@ -749,102 +1259,252 @@ ForStatement
     counter:Expression? __
     ")" __
     statement:Statement
+    {
+      return {
+        type: "ForStatement",
+        initializer: initializer !== "" ? initializer : null,
+        test: test !== "" ? test : null,
+        counter: counter !== "" ? counter : null,
+        statement: statement
+      };
+    }
 
 ForInStatement
   = ForToken __
     "(" __
     iterator:(
-        VarToken __ declaration:VariableDeclarationNoIn
+        VarToken __ declaration:VariableDeclarationNoIn { return declaration; }
       / LeftHandSideExpression
     ) __
     InToken __
     collection:Expression __
     ")" __
     statement:Statement
+    {
+      return {
+        type: "ForInStatement",
+        iterator: iterator,
+        collection: collection,
+        statement: statement
+      };
+    }
 
 ContinueStatement
   = ContinueToken _
     label:(
-        identifier:Identifier EOS
-      / EOSNoLineTerminator
-    )
+        identifier:Identifier EOS { return identifier; }
+      / EOSNoLineTerminator { return ""; }
+    ) {
+      return {
+        type: "ContinueStatement",
+        label: label !== "" ? label : null
+      };
+    }
 
 BreakStatement
   = BreakToken _
     label:(
-        identifier:Identifier EOS
-      / EOSNoLineTerminator
-    )
+        identifier:Identifier EOS { return identifier; }
+      / EOSNoLineTerminator { return ""; }
+    ) {
+      return {
+        type: "BreakStatement",
+        label: label !== "" ? label : null
+      };
+    }
 
 ReturnStatement
   = ReturnToken _
     value:(
-        expression:Expression EOS
-      / EOSNoLineTerminator
-    )
+        expression:Expression EOS { return expression; }
+      / EOSNoLineTerminator { return ""; }
+    ) {
+      return {
+        type: "ReturnStatement",
+        value: value !== "" ? value : null
+      };
+    }
 
 WithStatement
-  = WithToken __ "(" __ environment:Expression __ ")" __ statement:Statement
+  = WithToken __ "(" __ environment:Expression __ ")" __ statement:Statement {
+      return {
+        type: "WithStatement",
+        environment: environment,
+        statement: statement
+      };
+    }
 
 SwitchStatement
-  = SwitchToken __ "(" __ expression:Expression __ ")" __ clauses:CaseBlock
+  = SwitchToken __ "(" __ expression:Expression __ ")" __ clauses:CaseBlock {
+      return {
+        type: "SwitchStatement",
+        expression: expression,
+        clauses: clauses
+      };
+    }
 
 CaseBlock
   = "{" __
     before:CaseClauses?
     defaultAndAfter:(__ DefaultClause __ CaseClauses?)? __
-    "}"
+    "}" {
+      var before = before !== "" ? before : [];
+      if (defaultAndAfter !== "") {
+        var defaultClause = defaultAndAfter[1];
+        var clausesAfter = defaultAndAfter[3] !== ""
+          ? defaultAndAfter[3]
+          : [];
+      } else {
+        var defaultClause = null;
+        var clausesAfter = [];
+      }
+
+      return (defaultClause ? before.concat(defaultClause) : before).concat(clausesAfter);
+    }
 
 CaseClauses
-  = head:CaseClause tail:(__ CaseClause)*
+  = head:CaseClause tail:(__ CaseClause)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][1]);
+      }
+      return result;
+    }
 
 CaseClause
-  = CaseToken __ selector:Expression __ ":" statements:(__ StatementList)?
+  = CaseToken __ selector:Expression __ ":" statements:(__ StatementList)? {
+      return {
+        type: "CaseClause",
+        selector: selector,
+        statements: statements !== "" ? statements[1] : []
+      };
+    }
 
 DefaultClause
-  = DefaultToken __ ":" statements:(__ StatementList)?
+  = DefaultToken __ ":" statements:(__ StatementList)? {
+      return {
+        type: "DefaultClause",
+        statements: statements !== "" ? statements[1] : []
+      };
+    }
 
 LabelledStatement
-  = label:Identifier __ ":" __ statement:Statement
+  = label:Identifier __ ":" __ statement:Statement {
+      return {
+        type: "LabelledStatement",
+        label: label,
+        statement: statement
+      };
+    }
 
 ThrowStatement
-  = ThrowToken _ exception:Expression EOSNoLineTerminator
+  = ThrowToken _ exception:Expression EOSNoLineTerminator {
+      return {
+        type: "ThrowStatement",
+        exception: exception
+      };
+    }
 
 TryStatement
-  = TryToken __ block:Block __ catch_:Catch __ finally_:Finally
-  / TryToken __ block:Block __ catch_:Catch
-  / TryToken __ block:Block __ finally_:Finally
+  = TryToken __ block:Block __ catch_:Catch __ finally_:Finally {
+      return {
+        type: "TryStatement",
+        block: block,
+        "catch": catch_,
+        "finally": finally_
+      };
+    }
+  / TryToken __ block:Block __ catch_:Catch {
+      return {
+        type: "TryStatement",
+        block: block,
+        "catch": catch_,
+        "finally": null
+      };
+    }
+  / TryToken __ block:Block __ finally_:Finally {
+      return {
+        type: "TryStatement",
+        block: block,
+        "catch": null,
+        "finally": finally_
+      };
+    }
 
 Catch
-  = CatchToken __ "(" __ identifier:Identifier __ ")" __ block:Block
+  = CatchToken __ "(" __ identifier:Identifier __ ")" __ block:Block {
+      return {
+        type: "Catch",
+        identifier: identifier,
+        block: block
+      };
+    }
 
 Finally
-  = FinallyToken __ block:Block
+  = FinallyToken __ block:Block {
+      return {
+        type: "Finally",
+        block: block
+      };
+    }
+
 DebuggerStatement
-  = DebuggerToken EOS
+  = DebuggerToken EOS { return { type: "DebuggerStatement" }; }
 
 /* ===== A.5 Functions and Programs ===== */
 
 FunctionDeclaration
   = FunctionToken __ name:Identifier __
     "(" __ params:FormalParameterList? __ ")" __
-    "{" __ elements:FunctionBody __ "}"
+    "{" __ elements:FunctionBody __ "}" {
+      return {
+        type: "Function",
+        name: name,
+        params: params !== "" ? params : [],
+        elements: elements
+      };
+    }
 
 FunctionExpression
   = FunctionToken __ name:Identifier? __
     "(" __ params:FormalParameterList? __ ")" __
-    "{" __ elements:FunctionBody __ "}"
+    "{" __ elements:FunctionBody __ "}" {
+      return {
+        type: "Function",
+        name: name !== "" ? name : null,
+        params: params !== "" ? params : [],
+        elements: elements
+      };
+    }
 
 FormalParameterList
-  = head:Identifier tail:(__ "," __ Identifier)*
+  = head:Identifier tail:(__ "," __ Identifier)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][3]);
+      }
+      return result;
+    }
 
 FunctionBody
-  = elements:SourceElements?
+  = elements:SourceElements? { return elements !== "" ? elements : []; }
 
 Program
-  = elements:SourceElements?
+  = elements:SourceElements? {
+      return {
+        type: "Program",
+        elements: elements !== "" ? elements : []
+      };
+    }
+
 SourceElements
-  = head:SourceElement tail:(__ SourceElement)*
+  = head:SourceElement tail:(__ SourceElement)* {
+      var result = [head];
+      for (var i = 0; i < tail.length; i++) {
+        result.push(tail[i][1]);
+      }
+      return result;
+    }
 
 /*
  * The specification also allows |FunctionDeclaration| here. We do it

@@ -68,13 +68,15 @@
         result.comments = [];
         result.plainCode = "";
         return {
-            program: function () { },
+            program: function (program) {
+                console.log(program);
+            },
             lineBreak: function () {
                 lineNumber++;
             },
-            comment: function (text) {
+            comment: function (comment) {
                 result.comments.push({
-                    text: text,
+                    text: comment,
                     lineNumber: lineNumber
                 })
             }
