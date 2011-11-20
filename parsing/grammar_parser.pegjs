@@ -1,3 +1,20 @@
+{
+    function processSequence(elements) {
+      var elementsList = [], elementsObject = [];
+
+      for (var i = 0; i < elements.length; i++) {
+        var item = elements[i];
+        if (typeof(item) === "Array") {
+           elementsList.push(item.join(":"));
+           elementsObject.push(item[0] + ": " + item[0]);
+        } else {
+           elementsList.push(item);
+        }
+      }
+      return elementsList.join(" ") + " {\n      parseHandler('name', {\n" + "\n      });\n    }\n";
+    }
+}
+
 grammar
   = __ initializer:initializer? rules:rule+ {
       return initializer + rules.join("\n\n");
@@ -28,15 +45,15 @@ slashSequence
 
 sequence
   = elements:labeled* code:action {
-      return elements.join(" ") + " " + code;
+      return processSequence(elements);
     }
   / elements:labeled* {
-      return elements.join(" ");
+      return processSequence(elements);
     }
 
 labeled
   = label:identifier colon expression:prefixed {
-      return label + ":" + expression;
+      return [label, expression];
     }
   / prefixed
 

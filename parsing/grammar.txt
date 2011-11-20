@@ -1,0 +1,3063 @@
+start 
+  = __ program,Program __ {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SourceCharacter 
+  = . {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+WhiteSpace "whitespace"
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Zs {
+      parseHandler('name', {
+
+      });
+    }
+
+
+LineTerminator 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LineTerminatorSequence "end of line"
+  = "\n" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\r\n" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\r" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\u2028" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\u2029" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+Comment "comment"
+  = MultiLineComment {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / SingleLineComment {
+      parseHandler('name', {
+
+      });
+    }
+
+
+MultiLineComment 
+  = "/*" ( ! "*/" SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+   )* "*/" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+MultiLineCommentNoLineTerminator 
+  = "/*" ( ! ( "*/" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+   )* "*/" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SingleLineComment 
+  = "//" ( ! LineTerminator SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Identifier "identifier"
+  = ! ReservedWord name,IdentifierName {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+IdentifierName "identifier"
+  = start,IdentifierStart parts,IdentifierPart* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+IdentifierStart 
+  = UnicodeLetter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "$" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "_" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\\" sequence,UnicodeEscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+
+
+IdentifierPart 
+  = IdentifierStart {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / UnicodeCombiningMark {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / UnicodeDigit {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / UnicodeConnectorPunctuation {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\u200C" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\u200D" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+UnicodeLetter 
+  = Lu {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Ll {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Lt {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Lm {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Lo {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Nl {
+      parseHandler('name', {
+
+      });
+    }
+
+
+UnicodeCombiningMark 
+  = Mn {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Mc {
+      parseHandler('name', {
+
+      });
+    }
+
+
+UnicodeDigit 
+  = Nd {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+UnicodeConnectorPunctuation 
+  = Pc {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ReservedWord 
+  = Keyword {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FutureReservedWord {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NullLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / BooleanLiteral {
+      parseHandler('name', {
+
+      });
+    }
+
+
+Keyword 
+  = ( "break" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "case" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "catch" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "continue" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "debugger" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "default" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "delete" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "do" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "else" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "finally" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "for" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "function" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "if" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "instanceof" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "in" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "new" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "return" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "switch" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "this" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "throw" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "try" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "typeof" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "var" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "void" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "while" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "with" {
+      parseHandler('name', {
+
+      });
+    }
+ ) ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FutureReservedWord 
+  = ( "class" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "const" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "enum" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "export" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "extends" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "import" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "super" {
+      parseHandler('name', {
+
+      });
+    }
+ ) ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Literal 
+  = NullLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / BooleanLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / value,NumericLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / value,StringLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionLiteral {
+      parseHandler('name', {
+
+      });
+    }
+
+
+NullLiteral 
+  = NullToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BooleanLiteral 
+  = TrueToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FalseToken {
+      parseHandler('name', {
+
+      });
+    }
+
+
+NumericLiteral "number"
+  = literal,( HexIntegerLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / DecimalLiteral {
+      parseHandler('name', {
+
+      });
+    }
+ ) ! IdentifierStart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DecimalLiteral 
+  = before,DecimalIntegerLiteral "." after,DecimalDigits? exponent,ExponentPart? {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "." after,DecimalDigits exponent,ExponentPart? {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / before,DecimalIntegerLiteral exponent,ExponentPart? {
+      parseHandler('name', {
+
+      });
+    }
+
+
+DecimalIntegerLiteral 
+  = "0" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / digit,NonZeroDigit digits,DecimalDigits? {
+      parseHandler('name', {
+
+      });
+    }
+
+
+DecimalDigits 
+  = digits,DecimalDigit+ {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DecimalDigit 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+NonZeroDigit 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ExponentPart 
+  = indicator,ExponentIndicator integer,SignedInteger {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ExponentIndicator 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SignedInteger 
+  = sign,[]? digits,DecimalDigits {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+HexIntegerLiteral 
+  = "0" [] digits,HexDigit+ {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+HexDigit 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+StringLiteral "string"
+  = parts,( '"' DoubleStringCharacters? '"' {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "'" SingleStringCharacters? "'" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DoubleStringCharacters 
+  = chars,DoubleStringCharacter+ {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SingleStringCharacters 
+  = chars,SingleStringCharacter+ {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DoubleStringCharacter 
+  = ! ( '"' {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\\" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) char_,SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\\" sequence,EscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineContinuation {
+      parseHandler('name', {
+
+      });
+    }
+
+
+SingleStringCharacter 
+  = ! ( "'" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\\" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) char_,SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "\\" sequence,EscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineContinuation {
+      parseHandler('name', {
+
+      });
+    }
+
+
+LineContinuation 
+  = "\\" sequence,LineTerminatorSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EscapeSequence 
+  = CharacterEscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "0" ! DecimalDigit {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / HexEscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / UnicodeEscapeSequence {
+      parseHandler('name', {
+
+      });
+    }
+
+
+CharacterEscapeSequence 
+  = SingleEscapeCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NonEscapeCharacter {
+      parseHandler('name', {
+
+      });
+    }
+
+
+SingleEscapeCharacter 
+  = char_,[] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+NonEscapeCharacter 
+  = ( ! EscapeCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) char_,SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EscapeCharacter 
+  = SingleEscapeCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / DecimalDigit {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "x" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "u" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+HexEscapeSequence 
+  = "x" h1,HexDigit h2,HexDigit {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+UnicodeEscapeSequence 
+  = "u" h1,HexDigit h2,HexDigit h3,HexDigit h4,HexDigit {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionLiteral "regular expression"
+  = "/" body,RegularExpressionBody "/" flags,RegularExpressionFlags {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionBody 
+  = char_,RegularExpressionFirstChar chars,RegularExpressionChars {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionChars 
+  = chars,RegularExpressionChar* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionFirstChar 
+  = ! [] char_,RegularExpressionNonTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionBackslashSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionClass {
+      parseHandler('name', {
+
+      });
+    }
+
+
+RegularExpressionChar 
+  = ! [] char_,RegularExpressionNonTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionBackslashSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionClass {
+      parseHandler('name', {
+
+      });
+    }
+
+
+RegularExpressionBackslashSequence 
+  = "\\" char_,RegularExpressionNonTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionNonTerminator 
+  = ! LineTerminator char_,SourceCharacter {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionClass 
+  = "[" chars,RegularExpressionClassChars "]" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionClassChars 
+  = chars,RegularExpressionClassChar* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RegularExpressionClassChar 
+  = ! [] char_,RegularExpressionNonTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / RegularExpressionBackslashSequence {
+      parseHandler('name', {
+
+      });
+    }
+
+
+RegularExpressionFlags 
+  = parts,IdentifierPart* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BreakToken 
+  = "break" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+CaseToken 
+  = "case" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+CatchToken 
+  = "catch" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ContinueToken 
+  = "continue" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DebuggerToken 
+  = "debugger" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DefaultToken 
+  = "default" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DeleteToken 
+  = "delete" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DoToken 
+  = "do" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ElseToken 
+  = "else" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FalseToken 
+  = "false" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FinallyToken 
+  = "finally" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ForToken 
+  = "for" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FunctionToken 
+  = "function" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+GetToken 
+  = "get" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+IfToken 
+  = "if" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+InstanceofToken 
+  = "instanceof" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+InToken 
+  = "in" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+NewToken 
+  = "new" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+NullToken 
+  = "null" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ReturnToken 
+  = "return" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SetToken 
+  = "set" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SwitchToken 
+  = "switch" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ThisToken 
+  = "this" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ThrowToken 
+  = "throw" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+TrueToken 
+  = "true" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+TryToken 
+  = "try" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+TypeofToken 
+  = "typeof" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VarToken 
+  = "var" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VoidToken 
+  = "void" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+WhileToken 
+  = "while" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+WithToken 
+  = "with" ! IdentifierPart {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Ll 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Lm 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Lo 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Lt 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Lu 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Mc 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Mn 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Nd 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Nl 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Pc 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Zs 
+  = [] {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EOS 
+  = __ ";" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / _ LineTerminatorSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / _ & "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / __ EOF {
+      parseHandler('name', {
+
+      });
+    }
+
+
+EOSNoLineTerminator 
+  = _ ";" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / _ LineTerminatorSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / _ & "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / _ EOF {
+      parseHandler('name', {
+
+      });
+    }
+
+
+EOF 
+  = ! . {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+_ 
+  = ( WhiteSpace {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / MultiLineCommentNoLineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / SingleLineComment {
+      parseHandler('name', {
+
+      });
+    }
+ )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+__ 
+  = ( WhiteSpace {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LineTerminatorSequence {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Comment {
+      parseHandler('name', {
+
+      });
+    }
+ )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+PrimaryExpression 
+  = ThisToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / name,Identifier {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / Literal {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ArrayLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ObjectLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "(" __ expression,Expression __ ")" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+ArrayLiteral 
+  = "[" __ elements,ElementList? __ ( Elision __ {
+      parseHandler('name', {
+
+      });
+    }
+   )? "]" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ElementList 
+  = ( Elision __ {
+      parseHandler('name', {
+
+      });
+    }
+   )? head,AssignmentExpression tail,( __ "," __ Elision? __ AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Elision 
+  = "," ( __ "," {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ObjectLiteral 
+  = "{" __ properties,( PropertyNameAndValueList __ ( "," __ {
+      parseHandler('name', {
+
+      });
+    }
+   )? {
+      parseHandler('name', {
+
+      });
+    }
+   )? "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+PropertyNameAndValueList 
+  = head,PropertyAssignment tail,( __ "," __ PropertyAssignment {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+PropertyAssignment 
+  = name,PropertyName __ ":" __ value,AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / GetToken __ name,PropertyName __ "(" __ ")" __ "{" __ body,FunctionBody __ "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / SetToken __ name,PropertyName __ "(" __ param,PropertySetParameterList __ ")" __ "{" __ body,FunctionBody __ "}" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+PropertyName 
+  = IdentifierName {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / StringLiteral {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NumericLiteral {
+      parseHandler('name', {
+
+      });
+    }
+
+
+PropertySetParameterList 
+  = Identifier {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+MemberExpression 
+  = base,( PrimaryExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FunctionExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NewToken __ constructor,MemberExpression __ arguments,Arguments {
+      parseHandler('name', {
+
+      });
+    }
+ ) accessors,( __ "[" __ name,Expression __ "]" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / __ "." __ name,IdentifierName {
+      parseHandler('name', {
+
+      });
+    }
+ )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+NewExpression 
+  = MemberExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NewToken __ constructor,NewExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+CallExpression 
+  = base,( name,MemberExpression __ arguments,Arguments {
+      parseHandler('name', {
+
+      });
+    }
+   ) argumentsOrAccessors,( __ arguments,Arguments {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / __ "[" __ name,Expression __ "]" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / __ "." __ name,IdentifierName {
+      parseHandler('name', {
+
+      });
+    }
+ )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Arguments 
+  = "(" __ arguments,ArgumentList? __ ")" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ArgumentList 
+  = head,AssignmentExpression tail,( __ "," __ AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LeftHandSideExpression 
+  = CallExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / NewExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+PostfixExpression 
+  = expression,LeftHandSideExpression _ operator,PostfixOperator {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LeftHandSideExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+PostfixOperator 
+  = "++" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "--" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+UnaryExpression 
+  = PostfixExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / operator,UnaryOperator __ expression,UnaryExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+UnaryOperator 
+  = DeleteToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / VoidToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / TypeofToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "++" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "--" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "+" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "-" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "~" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "!" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+MultiplicativeExpression 
+  = head,UnaryExpression tail,( __ MultiplicativeOperator __ UnaryExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+MultiplicativeOperator 
+  = operator,( "*" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "/" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "%" {
+      parseHandler('name', {
+
+      });
+    }
+ ) ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+AdditiveExpression 
+  = head,MultiplicativeExpression tail,( __ AdditiveOperator __ MultiplicativeExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+AdditiveOperator 
+  = "+" ! ( "+" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "=" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "-" ! ( "-" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "=" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+
+
+ShiftExpression 
+  = head,AdditiveExpression tail,( __ ShiftOperator __ AdditiveExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ShiftOperator 
+  = "<<" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">>>" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">>" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+RelationalExpression 
+  = head,ShiftExpression tail,( __ RelationalOperator __ ShiftExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RelationalOperator 
+  = "<=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "<" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / InstanceofToken {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / InToken {
+      parseHandler('name', {
+
+      });
+    }
+
+
+RelationalExpressionNoIn 
+  = head,ShiftExpression tail,( __ RelationalOperatorNoIn __ ShiftExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+RelationalOperatorNoIn 
+  = "<=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "<" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / InstanceofToken {
+      parseHandler('name', {
+
+      });
+    }
+
+
+EqualityExpression 
+  = head,RelationalExpression tail,( __ EqualityOperator __ RelationalExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EqualityExpressionNoIn 
+  = head,RelationalExpressionNoIn tail,( __ EqualityOperator __ RelationalExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EqualityOperator 
+  = "===" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "!==" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "==" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "!=" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+BitwiseANDExpression 
+  = head,EqualityExpression tail,( __ BitwiseANDOperator __ EqualityExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseANDExpressionNoIn 
+  = head,EqualityExpressionNoIn tail,( __ BitwiseANDOperator __ EqualityExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseANDOperator 
+  = "&" ! ( "&" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "=" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseXORExpression 
+  = head,BitwiseANDExpression tail,( __ BitwiseXOROperator __ BitwiseANDExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseXORExpressionNoIn 
+  = head,BitwiseANDExpressionNoIn tail,( __ BitwiseXOROperator __ BitwiseANDExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseXOROperator 
+  = "^" ! ( "^" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "=" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseORExpression 
+  = head,BitwiseXORExpression tail,( __ BitwiseOROperator __ BitwiseXORExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseORExpressionNoIn 
+  = head,BitwiseXORExpressionNoIn tail,( __ BitwiseOROperator __ BitwiseXORExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BitwiseOROperator 
+  = "|" ! ( "|" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "=" {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalANDExpression 
+  = head,BitwiseORExpression tail,( __ LogicalANDOperator __ BitwiseORExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalANDExpressionNoIn 
+  = head,BitwiseORExpressionNoIn tail,( __ LogicalANDOperator __ BitwiseORExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalANDOperator 
+  = "&&" ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalORExpression 
+  = head,LogicalANDExpression tail,( __ LogicalOROperator __ LogicalANDExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalORExpressionNoIn 
+  = head,LogicalANDExpressionNoIn tail,( __ LogicalOROperator __ LogicalANDExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LogicalOROperator 
+  = "||" ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ConditionalExpression 
+  = condition,LogicalORExpression __ "?" __ trueExpression,AssignmentExpression __ ":" __ falseExpression,AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LogicalORExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+ConditionalExpressionNoIn 
+  = condition,LogicalORExpressionNoIn __ "?" __ trueExpression,AssignmentExpressionNoIn __ ":" __ falseExpression,AssignmentExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LogicalORExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+
+
+AssignmentExpression 
+  = left,LeftHandSideExpression __ operator,AssignmentOperator __ right,AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ConditionalExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+AssignmentExpressionNoIn 
+  = left,LeftHandSideExpression __ operator,AssignmentOperator __ right,AssignmentExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ConditionalExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+
+
+AssignmentOperator 
+  = "=" ( ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+   ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "*=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "/=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "%=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "+=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "-=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "<<=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">>=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ">>>=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "&=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "^=" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / "|=" {
+      parseHandler('name', {
+
+      });
+    }
+
+
+Expression 
+  = head,AssignmentExpression tail,( __ "," __ AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ExpressionNoIn 
+  = head,AssignmentExpressionNoIn tail,( __ "," __ AssignmentExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Statement 
+  = Block {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / VariableStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / EmptyStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ExpressionStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / IfStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / IterationStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ContinueStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / BreakStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ReturnStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / WithStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LabelledStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / SwitchStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ThrowStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / TryStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / DebuggerStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FunctionDeclaration {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FunctionExpression {
+      parseHandler('name', {
+
+      });
+    }
+
+
+Block 
+  = "{" __ statements,( StatementList __ {
+      parseHandler('name', {
+
+      });
+    }
+   )? "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+StatementList 
+  = head,Statement tail,( __ Statement {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VariableStatement 
+  = VarToken __ declarations,VariableDeclarationList EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VariableDeclarationList 
+  = head,VariableDeclaration tail,( __ "," __ VariableDeclaration {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VariableDeclarationListNoIn 
+  = head,VariableDeclarationNoIn tail,( __ "," __ VariableDeclarationNoIn {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VariableDeclaration 
+  = name,Identifier __ value,Initialiser? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+VariableDeclarationNoIn 
+  = name,Identifier __ value,InitialiserNoIn? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Initialiser 
+  = "=" ( ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+   ) __ expression,AssignmentExpression {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+InitialiserNoIn 
+  = "=" ( ! "=" {
+      parseHandler('name', {
+
+      });
+    }
+   ) __ expression,AssignmentExpressionNoIn {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+EmptyStatement 
+  = ";" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ExpressionStatement 
+  = ! ( "{" {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / FunctionToken {
+      parseHandler('name', {
+
+      });
+    }
+ ) expression,Expression EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+IfStatement 
+  = IfToken __ "(" __ condition,Expression __ ")" __ ifStatement,Statement elseStatement,( __ ElseToken __ Statement {
+      parseHandler('name', {
+
+      });
+    }
+   )? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+IterationStatement 
+  = DoWhileStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / WhileStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ForStatement {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ForInStatement {
+      parseHandler('name', {
+
+      });
+    }
+
+
+DoWhileStatement 
+  = DoToken __ statement,Statement __ WhileToken __ "(" __ condition,Expression __ ")" EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+WhileStatement 
+  = WhileToken __ "(" __ condition,Expression __ ")" __ statement,Statement {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ForStatement 
+  = ForToken __ "(" __ initializer,( VarToken __ declarations,VariableDeclarationListNoIn {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / ExpressionNoIn? {
+      parseHandler('name', {
+
+      });
+    }
+ ) __ ";" __ test,Expression? __ ";" __ counter,Expression? __ ")" __ statement,Statement {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ForInStatement 
+  = ForToken __ "(" __ iterator,( VarToken __ declaration,VariableDeclarationNoIn {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / LeftHandSideExpression {
+      parseHandler('name', {
+
+      });
+    }
+ ) __ InToken __ collection,Expression __ ")" __ statement,Statement {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ContinueStatement 
+  = ContinueToken _ label,( identifier,Identifier EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / EOSNoLineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+BreakStatement 
+  = BreakToken _ label,( identifier,Identifier EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / EOSNoLineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ReturnStatement 
+  = ReturnToken _ value,( expression,Expression EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / EOSNoLineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+ ) {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+WithStatement 
+  = WithToken __ "(" __ environment,Expression __ ")" __ statement,Statement {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SwitchStatement 
+  = SwitchToken __ "(" __ expression,Expression __ ")" __ clauses,CaseBlock {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+CaseBlock 
+  = "{" __ before,CaseClauses? defaultAndAfter,( __ DefaultClause __ CaseClauses? {
+      parseHandler('name', {
+
+      });
+    }
+   )? __ "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+CaseClauses 
+  = head,CaseClause tail,( __ CaseClause {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+CaseClause 
+  = CaseToken __ selector,Expression __ ":" statements,( __ StatementList {
+      parseHandler('name', {
+
+      });
+    }
+   )? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DefaultClause 
+  = DefaultToken __ ":" statements,( __ StatementList {
+      parseHandler('name', {
+
+      });
+    }
+   )? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+LabelledStatement 
+  = label,Identifier __ ":" __ statement,Statement {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+ThrowStatement 
+  = ThrowToken _ exception,Expression EOSNoLineTerminator {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+TryStatement 
+  = TryToken __ block,Block __ catch_,Catch __ finally_,Finally {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / TryToken __ block,Block __ catch_,Catch {
+      parseHandler('name', {
+
+      });
+    }
+  
+  / TryToken __ block,Block __ finally_,Finally {
+      parseHandler('name', {
+
+      });
+    }
+
+
+Catch 
+  = CatchToken __ "(" __ identifier,Identifier __ ")" __ block,Block {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Finally 
+  = FinallyToken __ block,Block {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+DebuggerStatement 
+  = DebuggerToken EOS {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FunctionDeclaration 
+  = FunctionToken __ name,Identifier __ "(" __ params,FormalParameterList? __ ")" __ "{" __ elements,FunctionBody __ "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FunctionExpression 
+  = FunctionToken __ name,Identifier? __ "(" __ params,FormalParameterList? __ ")" __ "{" __ elements,FunctionBody __ "}" {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FormalParameterList 
+  = head,Identifier tail,( __ "," __ Identifier {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+FunctionBody 
+  = elements,SourceElements? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+Program 
+  = elements,SourceElements? {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SourceElements 
+  = head,SourceElement tail,( __ SourceElement {
+      parseHandler('name', {
+
+      });
+    }
+   )* {
+      parseHandler('name', {
+
+      });
+    }
+  
+
+SourceElement 
+  = Statement {
+      parseHandler('name', {
+
+      });
+    }
+  

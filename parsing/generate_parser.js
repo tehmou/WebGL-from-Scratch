@@ -1,19 +1,26 @@
 var sys = require("sys");
 var fs = require("fs");
 var pegjs = require("pegjs");
+var loadFiles = require("./loadFiles");
 
+loadFiles.loadFiles(
+    [ "grammar_parser.pegjs", "javascript.pegjs" ],
+    function (files) {
+        sys.print("Generating grammar parser...\n");
+        var grammarParser = pegjs.buildParser("" + files[0]);
+        sys.print("Generating grammar...\n");
+        var grammar = grammarParser.parse("" + files[1]);
+        fs.writeFile("grammar.txt", grammar);
+        sys.print(grammar);
 
-fs.readFile("parser.pegjs", function (err, grammarParserGrammar) {
-    fs.readFile("javascript.pegjs", function (err, javascriptGrammar) {
-        fs.readFile("")
+        return;
 
-        var grammarParser = pegjs.buildParser("" + grammarParserGrammar);
-        var grammar = grammarParser.parse("" + javascriptGrammar);
-        //fs.writeFile("gg", grammar);
+        sys.print("Generating parser...\n");
         var parser = pegjs.buildParser(grammar);
+
         var src = parser.toSource();
         src = src.replace(/^.*\n/, "timotuominen.createParser = function (parseHandler) {\n");
         src = src.replace(/\n.*$/, "\n};");
         fs.writeFile("createParser.js", src);
-    });
-});
+    }
+);
