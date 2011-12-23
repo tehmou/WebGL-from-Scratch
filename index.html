@@ -67,18 +67,24 @@
         var lineNumber = 0;
         result.comments = [];
         result.plainCode = "";
-        return {
-            program: function (program) {
-                console.log(program);
-            },
-            lineBreak: function () {
-                lineNumber++;
-            },
-            comment: function (comment) {
-                result.comments.push({
-                    text: comment,
-                    lineNumber: lineNumber
-                })
+        return function (type, data) {
+            switch (type) {
+                case "Program":
+                    console.log(data);
+                    break;
+
+                case "LineTerminatorSequence":
+                    lineNumber++;
+                    break;
+
+                case "SingleLineComment":
+                case "MultiLineComment":
+                case "MultiLineCommentNoLineTerminator":
+                    result.comments.push({
+                        text: data,
+                        lineNumber: lineNumber
+                    });
+                    break;
             }
         };
     };
@@ -92,9 +98,31 @@
         function displayCode(code) {
             var result = {},
                 handler = timotuominen.createHandler(result),
-                match = /<script type="text\/javascript">(([\n\r]|.)*)<\/script>/.exec(code);
+                languages = {
+                    js: {
+                        regexp: /<script .*type="text\/javascript".*>((:?[\n\r]|.)*?)<\/script>/g
+                    },
+                    shader: {
+                        regexp: /<script .*type="x-shader.*>((:?[\n\r]|.)*?)<\/script>/g
+                    }
+                },
+                match;
 
-            code = match[1];
+            for (var key in languages) {
+                if (languages.hasOwnProperty(key)) {
+                    var language = languages[key];
+                    languages.matches = [];
+                    while (match = language.regexp.exec(code)) {
+                        language.matches.push(match[1]);
+                    }
+                    for (var i = 0; i < language.matches.length; i++) {
+                        code = code.replace(language.matches[i], "");
+                    }
+                }
+            }
+            document.getElementById("code").innerHTML = escapeCode(code);
+
+            /*code = match[1];
             timotuominen.createParser(handler).parse(code);
 
             for (var i = 0; i < result.comments.length; i++) {
@@ -104,7 +132,7 @@
                 el.style.top = "" + (comment.lineNumber)*20 + "px";
                 document.getElementById("content").appendChild(el);
             }
-            document.getElementById("code").innerHTML = escapeCode(result.plainCode);
+            document.getElementById("code").innerHTML = escapeCode(result.plainCode);*/
         }
 
         (function () {
