@@ -2,8 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title></title>
-</head>
+<title></title>
 <style type="text/css">
 
     body {
@@ -14,7 +13,7 @@
         height: 100%;
         text-shadow: rgba(0, 0, 0, .2) 2px 1px 2px;
         overflow-x: hidden;
-        font-family: "Droid Sans", "Arial", sans;
+        font-family: "Droid Sans", "Arial", sans-serif;
         font-size: .9rem;
         line-height: 1.3rem;
     }
@@ -59,35 +58,7 @@
     var timotuominen = timotuominen || {};
 </script>
 
-<script src="parsing/createParser.js" type="text/javascript"></script>
-
 <script type="text/javascript">
-
-    timotuominen.createHandler = function (result) {
-        var lineNumber = 0;
-        result.comments = [];
-        result.plainCode = "";
-        return function (type, data) {
-            switch (type) {
-                case "Program":
-                    console.log(data);
-                    break;
-
-                case "LineTerminatorSequence":
-                    lineNumber++;
-                    break;
-
-                case "SingleLineComment":
-                case "MultiLineComment":
-                case "MultiLineCommentNoLineTerminator":
-                    result.comments.push({
-                        text: data,
-                        lineNumber: lineNumber
-                    });
-                    break;
-            }
-        };
-    };
 
     (function () {
 
@@ -99,42 +70,50 @@
             return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        function displayCode (code) {
-            var result = {},
-                handler = timotuominen.createHandler(result),
-                languages = {
+        function findMatches (code) {
+            var languages = {
                     js: {
-                        regexp: /<script .*type="text\/javascript".*>((:?[\n\r]|.)*?)<\/script>/g
+                        regexp: '<script .*type="text\/javascript".*>((:?[\n\r]|.)*?)<\/script>'
                     },
                     shader: {
-                        regexp: /<script .*type="x-shader.*>((:?[\n\r]|.)*?)<\/script>/g
+                        regexp: '<script .*type="x-shader.*>((:?[\n\r]|.)*?)<\/script>'
                     }
                 },
-                match;
+                key, matches = [];
 
-            for (var key in languages) {
-                if (languages.hasOwnProperty(key)) {
-                    var language = languages[key];
-                    language.matches = [];
-                    while (match = language.regexp.exec(code)) {
-                        match = match[1];
-                        language.matches.push({
-                            text: match,
-                            line: numLines(code.substr(0, code.indexOf(match)))
-                        });
-                    }
-                }
-            }
             for (key in languages) {
                 if (languages.hasOwnProperty(key)) {
-                    language = languages[key];
-                    for (var i = 0; i < language.matches.length; i++) {
-                        code = code.replace(language.matches[i], "");
+                    var language = languages[key],
+                        matcher = new RegExp(language.regexp, "g"),
+                        position = 0, positionInRemaining, match;
+
+                    while ((positionInRemaining = code.substr(position).search(matcher)) !== -1) {
+                        position += positionInRemaining;
+                        match = new RegExp(language.regexp).exec(code.substr(position))[1];
+                        matches.push({
+                            language: key,
+                            text: match,
+                            line: numLines(code.substr(position))
+                        });
+                        position += match.length;
                     }
                 }
             }
-            console.log(languages);
-            document.getElementById("code").innerHTML = escapeCode(code);
+            return matches;
+        }
+
+        function displayCode (code) {
+            var htmlCode = code,
+                matches = findMatches(code);
+
+            matches.sort(function (a, b) { return a.line > b.line; });
+            console.log(matches);
+
+
+            /*for (var i = 0; i < matches.length; i++) {
+                htmlCode = htmlCode.replace(matches[i].text, "");
+            }*/
+            document.getElementById("code").innerHTML = escapeCode(htmlCode);
 
             /*code = match[1];
             timotuominen.createParser(handler).parse(code);
@@ -166,6 +145,8 @@
 
 
 </script>
+
+</head>
 <body>
 
 <div id="wrapper">
