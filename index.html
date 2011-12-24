@@ -117,9 +117,40 @@
             document.getElementById("code").innerHTML = outputCode;
 
             function getComments (block, currentLine) {
+                var re, matches, match, i, pos = 0;
+                addComment(block.language, currentLine);
+
+                switch (block.language) {
+                    case "html":
+                        re = /<\!--(:?[\n\r]|.)*?-->/g;
+                        if (matches = block.text.match(re)) {
+                            for (i = 0; i < matches.length; i++) {
+                                match = matches[i];
+                                pos = block.text.indexOf(match);
+                                addComment(/<\!--\n?((:?[\n\r]|.)*?)\n?-->/.exec(match)[1], currentLine + numLines(block.text.substr(pos)));
+                                block.text = block.text.replace(match, "");
+                            }
+                        }
+                        break;
+                    
+                    case "text/javascript":
+                    case "x-shader/x-fragment":
+                    case "x-shader/x-vertex":
+                        re = /(:?\n\s*)?\/\/.*/g;
+                        if (matches = block.text.match(re)) {
+                            for (i = 0; i < matches.length; i++) {
+                                match = matches[i];
+                                block.text = block.text.replace(match, "");
+                            }
+                        }
+                        break;
+                }
+            }
+
+            function addComment (text, line) {
                 var el = document.createElement("div");
-                el.innerHTML = block.language;
-                el.style.top = (currentLine*20) + "px";
+                el.innerHTML = text;
+                el.style.top = line*20 + "px";
                 document.getElementById("content").appendChild(el);
             }
             /*code = match[1];
