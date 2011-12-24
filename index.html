@@ -70,62 +70,45 @@
             return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        function findMatches (code) {
-            var languages = {
-                    js: {
-                        regexp: '<script .*type="text\/javascript".*>((:?[\n\r]|.)*?)<\/script>'
-                    },
-                    shader: {
-                        regexp: '<script .*type="x-shader.*>((:?[\n\r]|.)*?)<\/script>'
-                    }
-                },
-                key, matches = [];
+        function sliceHTML (code) {
+            var blocks = [],
+                scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)<\/script>',
+                scriptRegExp = new RegExp(scriptMatcher, "g"),
+                position = 0,
+                lastInsertedPosition = 0,
+                positionInRemaining,
+                match, text, language;
 
-            for (key in languages) {
-                if (languages.hasOwnProperty(key)) {
-                    var language = languages[key],
-                        matcher = new RegExp(language.regexp, "g"),
-                        position = 0, positionInRemaining, match;
+            while ((positionInRemaining = code.substr(lastInsertedPosition).search(scriptRegExp)) !== -1) {
+                position = lastInsertedPosition + positionInRemaining;
+                match = new RegExp(scriptMatcher).exec(code.substr(position));
+                language = match[1];
+                text = match[2];
+                position += code.substr(position).indexOf(text);
 
-                    while ((positionInRemaining = code.substr(position).search(matcher)) !== -1) {
-                        position += positionInRemaining;
-                        match = new RegExp(language.regexp).exec(code.substr(position))[1];
-                        matches.push({
-                            language: key,
-                            position: position + code.substr(position).indexOf(match),
-                            length: match.length
-                        });
-                        position += match.length;
-                    }
-                }
-            }
-            matches.sort(function (a, b) { return a.position > b.position; });
-            return matches;
-        }
-
-        function sliceByMatches (code, matches) {
-            var blocks = [];
-            for (var i = 0, position = 0; i < matches.length; i++) {
-                var match = matches[i];
                 blocks.push({
                     language: "html",
-                    text: code.substr(position, match.position)
+                    text: code.substr(lastInsertedPosition, position - lastInsertedPosition),
+                    position: lastInsertedPosition
                 });
                 blocks.push({
-                    language: match.language,
-                    text: code.substr(match.position, match.length)
+                    language: language,
+                    text: text,
+                    position: position
                 });
-                position = match.position + match.length;
+                lastInsertedPosition = position + text.length;
             }
             blocks.push({
                 language: "html",
-                text: code.substr(position)
+                text: code.substr(position),
+                position: position
             });
+
             return blocks;
         }
 
         function displayCode (code) {
-            var blocks = sliceByMatches(code, findMatches(code));
+            var blocks = sliceHTML(code);
 
             var outputCode = "";
             for (i = 0; i < blocks.length; i++) {
