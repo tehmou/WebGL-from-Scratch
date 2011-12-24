@@ -91,11 +91,15 @@
 
     (function () {
 
-        function escapeCode(code) {
+        function numLines (str) {
+            return 1 + str.match(/[^\n]*\n[^\n]*/gi).length;
+        }
+
+        function escapeCode (code) {
             return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        function displayCode(code) {
+        function displayCode (code) {
             var result = {},
                 handler = timotuominen.createHandler(result),
                 languages = {
@@ -111,15 +115,25 @@
             for (var key in languages) {
                 if (languages.hasOwnProperty(key)) {
                     var language = languages[key];
-                    languages.matches = [];
+                    language.matches = [];
                     while (match = language.regexp.exec(code)) {
-                        language.matches.push(match[1]);
+                        match = match[1];
+                        language.matches.push({
+                            text: match,
+                            line: numLines(code.substr(0, code.indexOf(match)))
+                        });
                     }
+                }
+            }
+            for (key in languages) {
+                if (languages.hasOwnProperty(key)) {
+                    language = languages[key];
                     for (var i = 0; i < language.matches.length; i++) {
                         code = code.replace(language.matches[i], "");
                     }
                 }
             }
+            console.log(languages);
             document.getElementById("code").innerHTML = escapeCode(code);
 
             /*code = match[1];
