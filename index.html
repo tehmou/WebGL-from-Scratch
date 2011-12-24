@@ -63,7 +63,7 @@
     (function () {
 
         function numLines (str) {
-            return 1 + (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
+            return (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
         }
 
         function escapeCode (code) {
@@ -72,7 +72,7 @@
 
         function sliceHTML (code) {
             var blocks = [],
-                scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)<\/script>',
+                scriptMatcher = '<script .*type="(.*)".*>\n((:?[\n\r]|.)*?)<\/script>',
                 scriptRegExp = new RegExp(scriptMatcher, "g"),
                 position = 0,
                 lastInsertedPosition = 0,
