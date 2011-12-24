@@ -63,7 +63,7 @@
     (function () {
 
         function numLines (str) {
-            return 1 + str.match(/[^\n]*\n[^\n]*/gi).length;
+            return 1 + (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
         }
 
         function escapeCode (code) {
@@ -88,20 +88,18 @@
 
                 blocks.push({
                     language: "html",
-                    text: code.substr(lastInsertedPosition, position - lastInsertedPosition),
-                    position: lastInsertedPosition
+                    text: code.substr(lastInsertedPosition, position-lastInsertedPosition)
                 });
                 blocks.push({
                     language: language,
-                    text: text,
-                    position: position
+                    text: text
                 });
+                
                 lastInsertedPosition = position + text.length;
             }
             blocks.push({
                 language: "html",
-                text: code.substr(position),
-                position: position
+                text: code.substr(lastInsertedPosition)
             });
 
             return blocks;
@@ -111,12 +109,19 @@
             var blocks = sliceHTML(code);
 
             var outputCode = "";
-            for (i = 0; i < blocks.length; i++) {
-                outputCode += blocks[i].text;
+            for (var i = 0; i < blocks.length; i++) {
+                getComments(blocks[i], numLines(outputCode));
+                outputCode += escapeCode(blocks[i].text);
             }
 
-            document.getElementById("code").innerHTML = escapeCode(outputCode);
+            document.getElementById("code").innerHTML = outputCode;
 
+            function getComments (block, currentLine) {
+                var el = document.createElement("div");
+                el.innerHTML = block.language;
+                el.style.top = (currentLine*20) + "px";
+                document.getElementById("content").appendChild(el);
+            }
             /*code = match[1];
             timotuominen.createParser(handler).parse(code);
 
