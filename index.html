@@ -117,8 +117,7 @@
             document.getElementById("code").innerHTML = outputCode;
 
             function getComments (block, currentLine) {
-                var re, matches, match, i, pos = 0;
-                addComment(block.language, currentLine);
+                var re, matches, match, i, pos = 0, line;
 
                 switch (block.language) {
                     case "html":
@@ -127,7 +126,8 @@
                             for (i = 0; i < matches.length; i++) {
                                 match = matches[i];
                                 pos = block.text.indexOf(match);
-                                addComment(/<\!--\n?((:?[\n\r]|.)*?)\n?-->/.exec(match)[1], currentLine + numLines(block.text.substr(pos)));
+                                line = currentLine + numLines(block.text.substr(0, pos));
+                                addComment(/<\!--\n?((:?[\n\r]|.)*?)\n?-->/.exec(match)[1], line);
                                 block.text = block.text.replace(match, "");
                             }
                         }
@@ -140,6 +140,9 @@
                         if (matches = block.text.match(re)) {
                             for (i = 0; i < matches.length; i++) {
                                 match = matches[i];
+                                pos = block.text.indexOf(match);
+                                line = currentLine + numLines(block.text.substr(0, pos));
+                                addComment(/\/\/(.*)/.exec(match)[1], line);
                                 block.text = block.text.replace(match, "");
                             }
                         }
@@ -148,22 +151,12 @@
             }
 
             function addComment (text, line) {
+                console.log(line, text);
                 var el = document.createElement("div");
                 el.innerHTML = text;
                 el.style.top = line*20 + "px";
                 document.getElementById("content").appendChild(el);
             }
-            /*code = match[1];
-            timotuominen.createParser(handler).parse(code);
-
-            for (var i = 0; i < result.comments.length; i++) {
-                var comment = result.comments[i],
-                    el = document.createElement("div");
-                el.innerHTML = comment.text;
-                el.style.top = "" + (comment.lineNumber)*20 + "px";
-                document.getElementById("content").appendChild(el);
-            }
-            document.getElementById("code").innerHTML = escapeCode(result.plainCode);*/
         }
 
         (function () {
