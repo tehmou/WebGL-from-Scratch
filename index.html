@@ -92,28 +92,47 @@
                         match = new RegExp(language.regexp).exec(code.substr(position))[1];
                         matches.push({
                             language: key,
-                            text: match,
-                            line: numLines(code.substr(position))
+                            position: position + code.substr(position).indexOf(match),
+                            length: match.length
                         });
                         position += match.length;
                     }
                 }
             }
+            matches.sort(function (a, b) { return a.position > b.position; });
             return matches;
         }
 
+        function sliceByMatches (code, matches) {
+            var blocks = [];
+            for (var i = 0, position = 0; i < matches.length; i++) {
+                var match = matches[i];
+                blocks.push({
+                    language: "html",
+                    text: code.substr(position, match.position)
+                });
+                blocks.push({
+                    language: match.language,
+                    text: code.substr(match.position, match.length)
+                });
+                position = match.position + match.length;
+            }
+            blocks.push({
+                language: "html",
+                text: code.substr(position)
+            });
+            return blocks;
+        }
+
         function displayCode (code) {
-            var htmlCode = code,
-                matches = findMatches(code);
+            var blocks = sliceByMatches(code, findMatches(code));
 
-            matches.sort(function (a, b) { return a.line > b.line; });
-            console.log(matches);
+            var outputCode = "";
+            for (i = 0; i < blocks.length; i++) {
+                outputCode += blocks[i].text;
+            }
 
-
-            /*for (var i = 0; i < matches.length; i++) {
-                htmlCode = htmlCode.replace(matches[i].text, "");
-            }*/
-            document.getElementById("code").innerHTML = escapeCode(htmlCode);
+            document.getElementById("code").innerHTML = escapeCode(outputCode);
 
             /*code = match[1];
             timotuominen.createParser(handler).parse(code);
