@@ -18,38 +18,20 @@
         line-height: 1.3rem;
     }
 
-    pre {
+    .red {
+        color: red;
+    }
+
+    #content span, #content pre {
+        display: inline-block;
+        width: 50%;
+        vertical-align: top;
+    }
+    #content pre {
         margin: 0;
         padding: 0;
         font-size: 13px;
         line-height: 20px;
-    }
-
-    #wrapper {
-        background: #eee;
-    }
-
-    #bg-wrapper {
-        margin-left: 500px;
-        background: #fff;
-        border-left: 4px solid #ddd;
-    }
-
-    #code {
-        padding: 0 1rem;
-    }
-
-    #content {
-        left: 30px;
-        width: 450px;
-        position: absolute;
-        text-align: right;
-    }
-
-    #content div {
-        position: absolute;
-        right: 0;
-        left: 0;
     }
 
 </style>
@@ -57,6 +39,8 @@
 <script type="text/javascript">
     var timotuominen = timotuominen || {};
 </script>
+
+<script src="js/htmlProcessor.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 
@@ -70,92 +54,27 @@
             return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        function sliceHTML (code) {
-            var blocks = [],
-                scriptMatcher = '<script .*type="(.*)".*>\n((:?[\n\r]|.)*?)<\/script>',
-                scriptRegExp = new RegExp(scriptMatcher, "g"),
-                position = 0,
-                lastInsertedPosition = 0,
-                positionInRemaining,
-                match, text, language;
-
-            while ((positionInRemaining = code.substr(lastInsertedPosition).search(scriptRegExp)) !== -1) {
-                position = lastInsertedPosition + positionInRemaining;
-                match = new RegExp(scriptMatcher).exec(code.substr(position));
-                language = match[1];
-                text = match[2];
-                position += code.substr(position).indexOf(text);
-
-                blocks.push({
-                    language: "html",
-                    text: code.substr(lastInsertedPosition, position-lastInsertedPosition)
-                });
-                blocks.push({
-                    language: language,
-                    text: text
-                });
-                
-                lastInsertedPosition = position + text.length;
-            }
-            blocks.push({
-                language: "html",
-                text: code.substr(lastInsertedPosition)
-            });
-
-            return blocks;
-        }
-
         function displayCode (code) {
-            var blocks = sliceHTML(code);
+            var blocks = htmlProcessor.sliceHTML(code);
 
-            var outputCode = "";
             for (var i = 0; i < blocks.length; i++) {
-                getComments(blocks[i], numLines(outputCode));
-                outputCode += escapeCode(blocks[i].text);
+                htmlProcessor.processBlock(blocks[i]).map(function (item) {
+                    addComment(item[0], item[1]);
+                });
             }
 
-            document.getElementById("code").innerHTML = outputCode;
-
-            function getComments (block, currentLine) {
-                var re, matches, match, i, pos = 0, line;
-
-                switch (block.language) {
-                    case "html":
-                        re = /<\!--(:?[\n\r]|.)*?-->/g;
-                        if (matches = block.text.match(re)) {
-                            for (i = 0; i < matches.length; i++) {
-                                match = matches[i];
-                                pos = block.text.indexOf(match);
-                                line = currentLine + numLines(block.text.substr(0, pos));
-                                addComment(/<\!--\n?((:?[\n\r]|.)*?)\n?-->/.exec(match)[1], line);
-                                block.text = block.text.replace(match, "");
-                            }
-                        }
-                        break;
-                    
-                    case "text/javascript":
-                    case "x-shader/x-fragment":
-                    case "x-shader/x-vertex":
-                        re = /(:?\n\s*)?\/\/.*/g;
-                        if (matches = block.text.match(re)) {
-                            for (i = 0; i < matches.length; i++) {
-                                match = matches[i];
-                                pos = block.text.indexOf(match);
-                                line = currentLine + numLines(block.text.substr(0, pos));
-                                addComment(/\/\/(.*)/.exec(match)[1], line);
-                                block.text = block.text.replace(match, "");
-                            }
-                        }
-                        break;
-                }
-            }
-
-            function addComment (text, line) {
-                console.log(line, text);
-                var el = document.createElement("div");
-                el.innerHTML = text;
-                el.style.top = line*20 + "px";
+            function addComment (comment, code, cssClass) {
+                cssClass = cssClass || "";
+                var el = document.createElement("div"),
+                    commentEl = document.createElement("span"),
+                    codeEl = document.createElement("pre");
+                
+                commentEl.innerHTML = comment;
+                codeEl.innerHTML = escapeCode(code);
+                el.appendChild(commentEl);
+                el.appendChild(codeEl);
                 document.getElementById("content").appendChild(el);
+                el.className = cssClass;
             }
         }
 
@@ -180,12 +99,7 @@
 </head>
 <body>
 
-<div id="wrapper">
-    <div id="content"></div>
-    <div id="bg-wrapper">
-        <pre id="code"></pre>
-    </div>
-</div>
+<div id="content"></div>
 
 </body>
 </html>

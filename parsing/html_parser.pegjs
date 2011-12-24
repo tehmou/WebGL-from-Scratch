@@ -3,6 +3,8 @@ start = __ tags:Tag* __ { return tags.join("\n"); }
 Tag
   = _ "<" "/"? name:Identifier attrs:(!">" .)* ">" { return attrs.map(function (o) { return o.join(""); }).join(""); }
 
+
+
 Identifier
   = [a-zA-Z]*
   
@@ -23,6 +25,7 @@ WhiteSpace "whitespace"
 
 Comment "comment"
   = "<!--" (!"-->" .)* "-->"
+  / "<!" (!">" .)* ">"
 
 _
   = (WhiteSpace / Comment / !"<" .)*

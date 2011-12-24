@@ -144,7 +144,6 @@ timotuominen.createParser = function (parseHandler) {
         "PropertyAssignment": parse_PropertyAssignment,
         "PropertyName": parse_PropertyName,
         "PropertyNameAndValueList": parse_PropertyNameAndValueList,
-        "PropertySetParameterList": parse_PropertySetParameterList,
         "RegularExpressionBackslashSequence": parse_RegularExpressionBackslashSequence,
         "RegularExpressionBody": parse_RegularExpressionBody,
         "RegularExpressionChar": parse_RegularExpressionChar,
@@ -172,7 +171,6 @@ timotuominen.createParser = function (parseHandler) {
         "SingleStringCharacter": parse_SingleStringCharacter,
         "SingleStringCharacters": parse_SingleStringCharacters,
         "SourceCharacter": parse_SourceCharacter,
-        "SourceElement": parse_SourceElement,
         "SourceElements": parse_SourceElements,
         "Statement": parse_Statement,
         "StatementList": parse_StatementList,
@@ -189,8 +187,6 @@ timotuominen.createParser = function (parseHandler) {
         "UnaryExpression": parse_UnaryExpression,
         "UnaryOperator": parse_UnaryOperator,
         "UnicodeCombiningMark": parse_UnicodeCombiningMark,
-        "UnicodeConnectorPunctuation": parse_UnicodeConnectorPunctuation,
-        "UnicodeDigit": parse_UnicodeDigit,
         "UnicodeEscapeSequence": parse_UnicodeEscapeSequence,
         "UnicodeLetter": parse_UnicodeLetter,
         "VarToken": parse_VarToken,
@@ -310,7 +306,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(program) { parseHandler('start'); })(result1[1])
+          ? (function(program) { return program; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -337,24 +333,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.length > pos) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed('any character');
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('SourceCharacter'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -377,28 +363,18 @@ timotuominen.createParser = function (parseHandler) {
         var savedReportMatchFailures = reportMatchFailures;
         reportMatchFailures = false;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result4 = input.charAt(pos);
+          var result2 = input.charAt(pos);
           pos++;
         } else {
-          var result4 = null;
+          var result2 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
         }
-        if (result4 !== null) {
-          var result0 = result4;
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_Zs();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('WhiteSpace'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result1 = parse_Zs();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -426,24 +402,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('LineTerminator'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -466,71 +432,61 @@ timotuominen.createParser = function (parseHandler) {
         var savedReportMatchFailures = reportMatchFailures;
         reportMatchFailures = false;
         if (input.substr(pos, 1) === "\n") {
-          var result7 = "\n";
+          var result5 = "\n";
           pos += 1;
         } else {
-          var result7 = null;
+          var result5 = null;
           if (reportMatchFailures) {
             matchFailed("\"\\n\"");
           }
         }
-        if (result7 !== null) {
-          var result0 = result7;
+        if (result5 !== null) {
+          var result0 = result5;
         } else {
           if (input.substr(pos, 2) === "\r\n") {
-            var result6 = "\r\n";
+            var result4 = "\r\n";
             pos += 2;
           } else {
-            var result6 = null;
+            var result4 = null;
             if (reportMatchFailures) {
               matchFailed("\"\\r\\n\"");
             }
           }
-          if (result6 !== null) {
-            var result0 = result6;
+          if (result4 !== null) {
+            var result0 = result4;
           } else {
             if (input.substr(pos, 1) === "\r") {
-              var result5 = "\r";
+              var result3 = "\r";
               pos += 1;
             } else {
-              var result5 = null;
+              var result3 = null;
               if (reportMatchFailures) {
                 matchFailed("\"\\r\"");
               }
             }
-            if (result5 !== null) {
-              var result0 = result5;
+            if (result3 !== null) {
+              var result0 = result3;
             } else {
               if (input.substr(pos, 1) === "\u2028") {
-                var result4 = "\u2028";
+                var result2 = "\u2028";
                 pos += 1;
               } else {
-                var result4 = null;
+                var result2 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"\\u2028\"");
                 }
               }
-              if (result4 !== null) {
-                var result0 = result4;
+              if (result2 !== null) {
+                var result0 = result2;
               } else {
-                var savedPos0 = pos;
                 if (input.substr(pos, 1) === "\u2029") {
-                  var result2 = "\u2029";
+                  var result1 = "\u2029";
                   pos += 1;
                 } else {
-                  var result2 = null;
+                  var result1 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"\\u2029\"");
                   }
-                }
-                var result3 = result2 !== null
-                  ? (function() { parseHandler('LineTerminatorSequence'); })()
-                  : null;
-                if (result3 !== null) {
-                  var result1 = result3;
-                } else {
-                  var result1 = null;
-                  pos = savedPos0;
                 }
                 if (result1 !== null) {
                   var result0 = result1;
@@ -563,21 +519,11 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedReportMatchFailures = reportMatchFailures;
         reportMatchFailures = false;
-        var result4 = parse_MultiLineComment();
-        if (result4 !== null) {
-          var result0 = result4;
+        var result2 = parse_MultiLineComment();
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_SingleLineComment();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('Comment'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result1 = parse_SingleLineComment();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -606,114 +552,104 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 2) === "/*") {
-          var result3 = "/*";
+          var result1 = "/*";
           pos += 2;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"/*\"");
           }
         }
-        if (result3 !== null) {
-          var result4 = [];
+        if (result1 !== null) {
+          var result2 = [];
+          var savedPos1 = pos;
           var savedPos2 = pos;
-          var savedPos3 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
           if (input.substr(pos, 2) === "*/") {
-            var result9 = "*/";
+            var result7 = "*/";
             pos += 2;
           } else {
-            var result9 = null;
+            var result7 = null;
             if (reportMatchFailures) {
               matchFailed("\"*/\"");
             }
           }
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result9 === null) {
-            var result7 = '';
+          if (result7 === null) {
+            var result5 = '';
           } else {
-            var result7 = null;
-            pos = savedPos3;
-          }
-          if (result7 !== null) {
-            var result8 = parse_SourceCharacter();
-            if (result8 !== null) {
-              var result6 = [result7, result8];
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-          } else {
-            var result6 = null;
+            var result5 = null;
             pos = savedPos2;
           }
-          while (result6 !== null) {
-            result4.push(result6);
+          if (result5 !== null) {
+            var result6 = parse_SourceCharacter();
+            if (result6 !== null) {
+              var result4 = [result5, result6];
+            } else {
+              var result4 = null;
+              pos = savedPos1;
+            }
+          } else {
+            var result4 = null;
+            pos = savedPos1;
+          }
+          while (result4 !== null) {
+            result2.push(result4);
+            var savedPos1 = pos;
             var savedPos2 = pos;
-            var savedPos3 = pos;
             var savedReportMatchFailuresVar0 = reportMatchFailures;
             reportMatchFailures = false;
             if (input.substr(pos, 2) === "*/") {
-              var result9 = "*/";
+              var result7 = "*/";
               pos += 2;
             } else {
-              var result9 = null;
+              var result7 = null;
               if (reportMatchFailures) {
                 matchFailed("\"*/\"");
               }
             }
             reportMatchFailures = savedReportMatchFailuresVar0;
-            if (result9 === null) {
-              var result7 = '';
-            } else {
-              var result7 = null;
-              pos = savedPos3;
-            }
-            if (result7 !== null) {
-              var result8 = parse_SourceCharacter();
-              if (result8 !== null) {
-                var result6 = [result7, result8];
-              } else {
-                var result6 = null;
-                pos = savedPos2;
-              }
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-          }
-          if (result4 !== null) {
-            if (input.substr(pos, 2) === "*/") {
-              var result5 = "*/";
-              pos += 2;
+            if (result7 === null) {
+              var result5 = '';
             } else {
               var result5 = null;
+              pos = savedPos2;
+            }
+            if (result5 !== null) {
+              var result6 = parse_SourceCharacter();
+              if (result6 !== null) {
+                var result4 = [result5, result6];
+              } else {
+                var result4 = null;
+                pos = savedPos1;
+              }
+            } else {
+              var result4 = null;
+              pos = savedPos1;
+            }
+          }
+          if (result2 !== null) {
+            if (input.substr(pos, 2) === "*/") {
+              var result3 = "*/";
+              pos += 2;
+            } else {
+              var result3 = null;
               if (reportMatchFailures) {
                 matchFailed("\"*/\"");
               }
             }
-            if (result5 !== null) {
-              var result1 = [result3, result4, result5];
+            if (result3 !== null) {
+              var result0 = [result1, result2, result3];
             } else {
-              var result1 = null;
-              pos = savedPos1;
+              var result0 = null;
+              pos = savedPos0;
             }
           } else {
-            var result1 = null;
-            pos = savedPos1;
+            var result0 = null;
+            pos = savedPos0;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('MultiLineComment'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -738,134 +674,124 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 2) === "/*") {
-          var result3 = "/*";
+          var result1 = "/*";
           pos += 2;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"/*\"");
           }
         }
-        if (result3 !== null) {
-          var result4 = [];
+        if (result1 !== null) {
+          var result2 = [];
+          var savedPos1 = pos;
           var savedPos2 = pos;
-          var savedPos3 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
           if (input.substr(pos, 2) === "*/") {
-            var result11 = "*/";
+            var result9 = "*/";
             pos += 2;
           } else {
-            var result11 = null;
+            var result9 = null;
             if (reportMatchFailures) {
               matchFailed("\"*/\"");
             }
           }
-          if (result11 !== null) {
-            var result9 = result11;
+          if (result9 !== null) {
+            var result7 = result9;
           } else {
-            var result10 = parse_LineTerminator();
-            if (result10 !== null) {
-              var result9 = result10;
+            var result8 = parse_LineTerminator();
+            if (result8 !== null) {
+              var result7 = result8;
             } else {
-              var result9 = null;;
+              var result7 = null;;
             };
           }
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result9 === null) {
-            var result7 = '';
+          if (result7 === null) {
+            var result5 = '';
           } else {
-            var result7 = null;
-            pos = savedPos3;
-          }
-          if (result7 !== null) {
-            var result8 = parse_SourceCharacter();
-            if (result8 !== null) {
-              var result6 = [result7, result8];
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-          } else {
-            var result6 = null;
+            var result5 = null;
             pos = savedPos2;
           }
-          while (result6 !== null) {
-            result4.push(result6);
-            var savedPos2 = pos;
-            var savedPos3 = pos;
-            var savedReportMatchFailuresVar0 = reportMatchFailures;
-            reportMatchFailures = false;
-            if (input.substr(pos, 2) === "*/") {
-              var result11 = "*/";
-              pos += 2;
+          if (result5 !== null) {
+            var result6 = parse_SourceCharacter();
+            if (result6 !== null) {
+              var result4 = [result5, result6];
             } else {
-              var result11 = null;
-              if (reportMatchFailures) {
-                matchFailed("\"*/\"");
-              }
-            }
-            if (result11 !== null) {
-              var result9 = result11;
-            } else {
-              var result10 = parse_LineTerminator();
-              if (result10 !== null) {
-                var result9 = result10;
-              } else {
-                var result9 = null;;
-              };
-            }
-            reportMatchFailures = savedReportMatchFailuresVar0;
-            if (result9 === null) {
-              var result7 = '';
-            } else {
-              var result7 = null;
-              pos = savedPos3;
-            }
-            if (result7 !== null) {
-              var result8 = parse_SourceCharacter();
-              if (result8 !== null) {
-                var result6 = [result7, result8];
-              } else {
-                var result6 = null;
-                pos = savedPos2;
-              }
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-          }
-          if (result4 !== null) {
-            if (input.substr(pos, 2) === "*/") {
-              var result5 = "*/";
-              pos += 2;
-            } else {
-              var result5 = null;
-              if (reportMatchFailures) {
-                matchFailed("\"*/\"");
-              }
-            }
-            if (result5 !== null) {
-              var result1 = [result3, result4, result5];
-            } else {
-              var result1 = null;
+              var result4 = null;
               pos = savedPos1;
             }
           } else {
-            var result1 = null;
+            var result4 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('MultiLineCommentNoLineTerminator'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          while (result4 !== null) {
+            result2.push(result4);
+            var savedPos1 = pos;
+            var savedPos2 = pos;
+            var savedReportMatchFailuresVar0 = reportMatchFailures;
+            reportMatchFailures = false;
+            if (input.substr(pos, 2) === "*/") {
+              var result9 = "*/";
+              pos += 2;
+            } else {
+              var result9 = null;
+              if (reportMatchFailures) {
+                matchFailed("\"*/\"");
+              }
+            }
+            if (result9 !== null) {
+              var result7 = result9;
+            } else {
+              var result8 = parse_LineTerminator();
+              if (result8 !== null) {
+                var result7 = result8;
+              } else {
+                var result7 = null;;
+              };
+            }
+            reportMatchFailures = savedReportMatchFailuresVar0;
+            if (result7 === null) {
+              var result5 = '';
+            } else {
+              var result5 = null;
+              pos = savedPos2;
+            }
+            if (result5 !== null) {
+              var result6 = parse_SourceCharacter();
+              if (result6 !== null) {
+                var result4 = [result5, result6];
+              } else {
+                var result4 = null;
+                pos = savedPos1;
+              }
+            } else {
+              var result4 = null;
+              pos = savedPos1;
+            }
+          }
+          if (result2 !== null) {
+            if (input.substr(pos, 2) === "*/") {
+              var result3 = "*/";
+              pos += 2;
+            } else {
+              var result3 = null;
+              if (reportMatchFailures) {
+                matchFailed("\"*/\"");
+              }
+            }
+            if (result3 !== null) {
+              var result0 = [result1, result2, result3];
+            } else {
+              var result0 = null;
+              pos = savedPos0;
+            }
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -890,84 +816,74 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 2) === "//") {
-          var result3 = "//";
+          var result1 = "//";
           pos += 2;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"//\"");
           }
         }
-        if (result3 !== null) {
-          var result4 = [];
+        if (result1 !== null) {
+          var result2 = [];
+          var savedPos1 = pos;
           var savedPos2 = pos;
-          var savedPos3 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result8 = parse_LineTerminator();
+          var result6 = parse_LineTerminator();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result8 === null) {
-            var result6 = '';
+          if (result6 === null) {
+            var result4 = '';
           } else {
-            var result6 = null;
-            pos = savedPos3;
-          }
-          if (result6 !== null) {
-            var result7 = parse_SourceCharacter();
-            if (result7 !== null) {
-              var result5 = [result6, result7];
-            } else {
-              var result5 = null;
-              pos = savedPos2;
-            }
-          } else {
-            var result5 = null;
+            var result4 = null;
             pos = savedPos2;
           }
-          while (result5 !== null) {
-            result4.push(result5);
-            var savedPos2 = pos;
-            var savedPos3 = pos;
-            var savedReportMatchFailuresVar0 = reportMatchFailures;
-            reportMatchFailures = false;
-            var result8 = parse_LineTerminator();
-            reportMatchFailures = savedReportMatchFailuresVar0;
-            if (result8 === null) {
-              var result6 = '';
-            } else {
-              var result6 = null;
-              pos = savedPos3;
-            }
-            if (result6 !== null) {
-              var result7 = parse_SourceCharacter();
-              if (result7 !== null) {
-                var result5 = [result6, result7];
-              } else {
-                var result5 = null;
-                pos = savedPos2;
-              }
-            } else {
-              var result5 = null;
-              pos = savedPos2;
-            }
-          }
           if (result4 !== null) {
-            var result1 = [result3, result4];
+            var result5 = parse_SourceCharacter();
+            if (result5 !== null) {
+              var result3 = [result4, result5];
+            } else {
+              var result3 = null;
+              pos = savedPos1;
+            }
           } else {
-            var result1 = null;
+            var result3 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('SingleLineComment'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          while (result3 !== null) {
+            result2.push(result3);
+            var savedPos1 = pos;
+            var savedPos2 = pos;
+            var savedReportMatchFailuresVar0 = reportMatchFailures;
+            reportMatchFailures = false;
+            var result6 = parse_LineTerminator();
+            reportMatchFailures = savedReportMatchFailuresVar0;
+            if (result6 === null) {
+              var result4 = '';
+            } else {
+              var result4 = null;
+              pos = savedPos2;
+            }
+            if (result4 !== null) {
+              var result5 = parse_SourceCharacter();
+              if (result5 !== null) {
+                var result3 = [result4, result5];
+              } else {
+                var result3 = null;
+                pos = savedPos1;
+              }
+            } else {
+              var result3 = null;
+              pos = savedPos1;
+            }
+          }
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -1018,7 +934,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(name) { parseHandler('Identifier'); })(result1[1])
+          ? (function(name) { return name; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -1069,7 +985,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(start, parts) { parseHandler('IdentifierName'); })(result1[0], result1[1])
+          ? (function(start, parts) {
+                return start + parts.join("");
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -1150,7 +1068,7 @@ timotuominen.createParser = function (parseHandler) {
                 pos = savedPos1;
               }
               var result3 = result2 !== null
-                ? (function(sequence) { parseHandler('IdentifierStart'); })(result2[1])
+                ? (function(sequence) { return sequence; })(result2[1])
                 : null;
               if (result3 !== null) {
                 var result1 = result3;
@@ -1185,30 +1103,40 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result8 = parse_IdentifierStart();
-        if (result8 !== null) {
-          var result0 = result8;
+        var result10 = parse_IdentifierStart();
+        if (result10 !== null) {
+          var result0 = result10;
         } else {
-          var result7 = parse_UnicodeCombiningMark();
-          if (result7 !== null) {
-            var result0 = result7;
+          var result9 = parse_UnicodeCombiningMark();
+          if (result9 !== null) {
+            var result0 = result9;
           } else {
-            var result6 = parse_UnicodeDigit();
-            if (result6 !== null) {
-              var result0 = result6;
+            var result8 = parse_Nd();
+            if (result8 !== null) {
+              var result0 = result8;
             } else {
-              var result5 = parse_UnicodeConnectorPunctuation();
-              if (result5 !== null) {
-                var result0 = result5;
+              var result7 = parse_Pc();
+              if (result7 !== null) {
+                var result0 = result7;
               } else {
+                var savedPos1 = pos;
                 if (input.substr(pos, 1) === "\u200C") {
-                  var result4 = "\u200C";
+                  var result5 = "\u200C";
                   pos += 1;
                 } else {
-                  var result4 = null;
+                  var result5 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"\\u200C\"");
                   }
+                }
+                var result6 = result5 !== null
+                  ? (function() { return "\u200C"; })()
+                  : null;
+                if (result6 !== null) {
+                  var result4 = result6;
+                } else {
+                  var result4 = null;
+                  pos = savedPos1;
                 }
                 if (result4 !== null) {
                   var result0 = result4;
@@ -1224,7 +1152,7 @@ timotuominen.createParser = function (parseHandler) {
                     }
                   }
                   var result3 = result2 !== null
-                    ? (function() { parseHandler('IdentifierPart'); })()
+                    ? (function() { return "\u200D"; })()
                     : null;
                   if (result3 !== null) {
                     var result1 = result3;
@@ -1261,37 +1189,27 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result8 = parse_Lu();
-        if (result8 !== null) {
-          var result0 = result8;
+        var result6 = parse_Lu();
+        if (result6 !== null) {
+          var result0 = result6;
         } else {
-          var result7 = parse_Ll();
-          if (result7 !== null) {
-            var result0 = result7;
+          var result5 = parse_Ll();
+          if (result5 !== null) {
+            var result0 = result5;
           } else {
-            var result6 = parse_Lt();
-            if (result6 !== null) {
-              var result0 = result6;
+            var result4 = parse_Lt();
+            if (result4 !== null) {
+              var result0 = result4;
             } else {
-              var result5 = parse_Lm();
-              if (result5 !== null) {
-                var result0 = result5;
+              var result3 = parse_Lm();
+              if (result3 !== null) {
+                var result0 = result3;
               } else {
-                var result4 = parse_Lo();
-                if (result4 !== null) {
-                  var result0 = result4;
+                var result2 = parse_Lo();
+                if (result2 !== null) {
+                  var result0 = result2;
                 } else {
-                  var savedPos0 = pos;
-                  var result2 = parse_Nl();
-                  var result3 = result2 !== null
-                    ? (function() { parseHandler('UnicodeLetter'); })()
-                    : null;
-                  if (result3 !== null) {
-                    var result1 = result3;
-                  } else {
-                    var result1 = null;
-                    pos = savedPos0;
-                  }
+                  var result1 = parse_Nl();
                   if (result1 !== null) {
                     var result0 = result1;
                   } else {
@@ -1321,86 +1239,16 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result4 = parse_Mn();
-        if (result4 !== null) {
-          var result0 = result4;
+        var result2 = parse_Mn();
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_Mc();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('UnicodeCombiningMark'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result1 = parse_Mc();
           if (result1 !== null) {
             var result0 = result1;
           } else {
             var result0 = null;;
           };
-        }
-        
-        
-        
-        cache[cacheKey] = {
-          nextPos: pos,
-          result:  result0
-        };
-        return result0;
-      }
-      
-      function parse_UnicodeDigit() {
-        var cacheKey = 'UnicodeDigit@' + pos;
-        var cachedResult = cache[cacheKey];
-        if (cachedResult) {
-          pos = cachedResult.nextPos;
-          return cachedResult.result;
-        }
-        
-        
-        var savedPos0 = pos;
-        var result1 = parse_Nd();
-        var result2 = result1 !== null
-          ? (function() { parseHandler('UnicodeDigit'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
-        }
-        
-        
-        
-        cache[cacheKey] = {
-          nextPos: pos,
-          result:  result0
-        };
-        return result0;
-      }
-      
-      function parse_UnicodeConnectorPunctuation() {
-        var cacheKey = 'UnicodeConnectorPunctuation@' + pos;
-        var cachedResult = cache[cacheKey];
-        if (cachedResult) {
-          pos = cachedResult.nextPos;
-          return cachedResult.result;
-        }
-        
-        
-        var savedPos0 = pos;
-        var result1 = parse_Pc();
-        var result2 = result1 !== null
-          ? (function() { parseHandler('UnicodeConnectorPunctuation'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -1421,29 +1269,19 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result6 = parse_Keyword();
-        if (result6 !== null) {
-          var result0 = result6;
+        var result4 = parse_Keyword();
+        if (result4 !== null) {
+          var result0 = result4;
         } else {
-          var result5 = parse_FutureReservedWord();
-          if (result5 !== null) {
-            var result0 = result5;
+          var result3 = parse_FutureReservedWord();
+          if (result3 !== null) {
+            var result0 = result3;
           } else {
-            var result4 = parse_NullLiteral();
-            if (result4 !== null) {
-              var result0 = result4;
+            var result2 = parse_NullLiteral();
+            if (result2 !== null) {
+              var result0 = result2;
             } else {
-              var savedPos0 = pos;
-              var result2 = parse_BooleanLiteral();
-              var result3 = result2 !== null
-                ? (function() { parseHandler('ReservedWord'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
-              } else {
-                var result1 = null;
-                pos = savedPos0;
-              }
+              var result1 = parse_BooleanLiteral();
               if (result1 !== null) {
                 var result0 = result1;
               } else {
@@ -1472,320 +1310,319 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "break") {
-          var result31 = "break";
+          var result29 = "break";
           pos += 5;
         } else {
-          var result31 = null;
+          var result29 = null;
           if (reportMatchFailures) {
             matchFailed("\"break\"");
           }
         }
-        if (result31 !== null) {
-          var result3 = result31;
+        if (result29 !== null) {
+          var result1 = result29;
         } else {
           if (input.substr(pos, 4) === "case") {
-            var result30 = "case";
+            var result28 = "case";
             pos += 4;
           } else {
-            var result30 = null;
+            var result28 = null;
             if (reportMatchFailures) {
               matchFailed("\"case\"");
             }
           }
-          if (result30 !== null) {
-            var result3 = result30;
+          if (result28 !== null) {
+            var result1 = result28;
           } else {
             if (input.substr(pos, 5) === "catch") {
-              var result29 = "catch";
+              var result27 = "catch";
               pos += 5;
             } else {
-              var result29 = null;
+              var result27 = null;
               if (reportMatchFailures) {
                 matchFailed("\"catch\"");
               }
             }
-            if (result29 !== null) {
-              var result3 = result29;
+            if (result27 !== null) {
+              var result1 = result27;
             } else {
               if (input.substr(pos, 8) === "continue") {
-                var result28 = "continue";
+                var result26 = "continue";
                 pos += 8;
               } else {
-                var result28 = null;
+                var result26 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"continue\"");
                 }
               }
-              if (result28 !== null) {
-                var result3 = result28;
+              if (result26 !== null) {
+                var result1 = result26;
               } else {
                 if (input.substr(pos, 8) === "debugger") {
-                  var result27 = "debugger";
+                  var result25 = "debugger";
                   pos += 8;
                 } else {
-                  var result27 = null;
+                  var result25 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"debugger\"");
                   }
                 }
-                if (result27 !== null) {
-                  var result3 = result27;
+                if (result25 !== null) {
+                  var result1 = result25;
                 } else {
                   if (input.substr(pos, 7) === "default") {
-                    var result26 = "default";
+                    var result24 = "default";
                     pos += 7;
                   } else {
-                    var result26 = null;
+                    var result24 = null;
                     if (reportMatchFailures) {
                       matchFailed("\"default\"");
                     }
                   }
-                  if (result26 !== null) {
-                    var result3 = result26;
+                  if (result24 !== null) {
+                    var result1 = result24;
                   } else {
                     if (input.substr(pos, 6) === "delete") {
-                      var result25 = "delete";
+                      var result23 = "delete";
                       pos += 6;
                     } else {
-                      var result25 = null;
+                      var result23 = null;
                       if (reportMatchFailures) {
                         matchFailed("\"delete\"");
                       }
                     }
-                    if (result25 !== null) {
-                      var result3 = result25;
+                    if (result23 !== null) {
+                      var result1 = result23;
                     } else {
                       if (input.substr(pos, 2) === "do") {
-                        var result24 = "do";
+                        var result22 = "do";
                         pos += 2;
                       } else {
-                        var result24 = null;
+                        var result22 = null;
                         if (reportMatchFailures) {
                           matchFailed("\"do\"");
                         }
                       }
-                      if (result24 !== null) {
-                        var result3 = result24;
+                      if (result22 !== null) {
+                        var result1 = result22;
                       } else {
                         if (input.substr(pos, 4) === "else") {
-                          var result23 = "else";
+                          var result21 = "else";
                           pos += 4;
                         } else {
-                          var result23 = null;
+                          var result21 = null;
                           if (reportMatchFailures) {
                             matchFailed("\"else\"");
                           }
                         }
-                        if (result23 !== null) {
-                          var result3 = result23;
+                        if (result21 !== null) {
+                          var result1 = result21;
                         } else {
                           if (input.substr(pos, 7) === "finally") {
-                            var result22 = "finally";
+                            var result20 = "finally";
                             pos += 7;
                           } else {
-                            var result22 = null;
+                            var result20 = null;
                             if (reportMatchFailures) {
                               matchFailed("\"finally\"");
                             }
                           }
-                          if (result22 !== null) {
-                            var result3 = result22;
+                          if (result20 !== null) {
+                            var result1 = result20;
                           } else {
                             if (input.substr(pos, 3) === "for") {
-                              var result21 = "for";
+                              var result19 = "for";
                               pos += 3;
                             } else {
-                              var result21 = null;
+                              var result19 = null;
                               if (reportMatchFailures) {
                                 matchFailed("\"for\"");
                               }
                             }
-                            if (result21 !== null) {
-                              var result3 = result21;
+                            if (result19 !== null) {
+                              var result1 = result19;
                             } else {
                               if (input.substr(pos, 8) === "function") {
-                                var result20 = "function";
+                                var result18 = "function";
                                 pos += 8;
                               } else {
-                                var result20 = null;
+                                var result18 = null;
                                 if (reportMatchFailures) {
                                   matchFailed("\"function\"");
                                 }
                               }
-                              if (result20 !== null) {
-                                var result3 = result20;
+                              if (result18 !== null) {
+                                var result1 = result18;
                               } else {
                                 if (input.substr(pos, 2) === "if") {
-                                  var result19 = "if";
+                                  var result17 = "if";
                                   pos += 2;
                                 } else {
-                                  var result19 = null;
+                                  var result17 = null;
                                   if (reportMatchFailures) {
                                     matchFailed("\"if\"");
                                   }
                                 }
-                                if (result19 !== null) {
-                                  var result3 = result19;
+                                if (result17 !== null) {
+                                  var result1 = result17;
                                 } else {
                                   if (input.substr(pos, 10) === "instanceof") {
-                                    var result18 = "instanceof";
+                                    var result16 = "instanceof";
                                     pos += 10;
                                   } else {
-                                    var result18 = null;
+                                    var result16 = null;
                                     if (reportMatchFailures) {
                                       matchFailed("\"instanceof\"");
                                     }
                                   }
-                                  if (result18 !== null) {
-                                    var result3 = result18;
+                                  if (result16 !== null) {
+                                    var result1 = result16;
                                   } else {
                                     if (input.substr(pos, 2) === "in") {
-                                      var result17 = "in";
+                                      var result15 = "in";
                                       pos += 2;
                                     } else {
-                                      var result17 = null;
+                                      var result15 = null;
                                       if (reportMatchFailures) {
                                         matchFailed("\"in\"");
                                       }
                                     }
-                                    if (result17 !== null) {
-                                      var result3 = result17;
+                                    if (result15 !== null) {
+                                      var result1 = result15;
                                     } else {
                                       if (input.substr(pos, 3) === "new") {
-                                        var result16 = "new";
+                                        var result14 = "new";
                                         pos += 3;
                                       } else {
-                                        var result16 = null;
+                                        var result14 = null;
                                         if (reportMatchFailures) {
                                           matchFailed("\"new\"");
                                         }
                                       }
-                                      if (result16 !== null) {
-                                        var result3 = result16;
+                                      if (result14 !== null) {
+                                        var result1 = result14;
                                       } else {
                                         if (input.substr(pos, 6) === "return") {
-                                          var result15 = "return";
+                                          var result13 = "return";
                                           pos += 6;
                                         } else {
-                                          var result15 = null;
+                                          var result13 = null;
                                           if (reportMatchFailures) {
                                             matchFailed("\"return\"");
                                           }
                                         }
-                                        if (result15 !== null) {
-                                          var result3 = result15;
+                                        if (result13 !== null) {
+                                          var result1 = result13;
                                         } else {
                                           if (input.substr(pos, 6) === "switch") {
-                                            var result14 = "switch";
+                                            var result12 = "switch";
                                             pos += 6;
                                           } else {
-                                            var result14 = null;
+                                            var result12 = null;
                                             if (reportMatchFailures) {
                                               matchFailed("\"switch\"");
                                             }
                                           }
-                                          if (result14 !== null) {
-                                            var result3 = result14;
+                                          if (result12 !== null) {
+                                            var result1 = result12;
                                           } else {
                                             if (input.substr(pos, 4) === "this") {
-                                              var result13 = "this";
+                                              var result11 = "this";
                                               pos += 4;
                                             } else {
-                                              var result13 = null;
+                                              var result11 = null;
                                               if (reportMatchFailures) {
                                                 matchFailed("\"this\"");
                                               }
                                             }
-                                            if (result13 !== null) {
-                                              var result3 = result13;
+                                            if (result11 !== null) {
+                                              var result1 = result11;
                                             } else {
                                               if (input.substr(pos, 5) === "throw") {
-                                                var result12 = "throw";
+                                                var result10 = "throw";
                                                 pos += 5;
                                               } else {
-                                                var result12 = null;
+                                                var result10 = null;
                                                 if (reportMatchFailures) {
                                                   matchFailed("\"throw\"");
                                                 }
                                               }
-                                              if (result12 !== null) {
-                                                var result3 = result12;
+                                              if (result10 !== null) {
+                                                var result1 = result10;
                                               } else {
                                                 if (input.substr(pos, 3) === "try") {
-                                                  var result11 = "try";
+                                                  var result9 = "try";
                                                   pos += 3;
                                                 } else {
-                                                  var result11 = null;
+                                                  var result9 = null;
                                                   if (reportMatchFailures) {
                                                     matchFailed("\"try\"");
                                                   }
                                                 }
-                                                if (result11 !== null) {
-                                                  var result3 = result11;
+                                                if (result9 !== null) {
+                                                  var result1 = result9;
                                                 } else {
                                                   if (input.substr(pos, 6) === "typeof") {
-                                                    var result10 = "typeof";
+                                                    var result8 = "typeof";
                                                     pos += 6;
                                                   } else {
-                                                    var result10 = null;
+                                                    var result8 = null;
                                                     if (reportMatchFailures) {
                                                       matchFailed("\"typeof\"");
                                                     }
                                                   }
-                                                  if (result10 !== null) {
-                                                    var result3 = result10;
+                                                  if (result8 !== null) {
+                                                    var result1 = result8;
                                                   } else {
                                                     if (input.substr(pos, 3) === "var") {
-                                                      var result9 = "var";
+                                                      var result7 = "var";
                                                       pos += 3;
                                                     } else {
-                                                      var result9 = null;
+                                                      var result7 = null;
                                                       if (reportMatchFailures) {
                                                         matchFailed("\"var\"");
                                                       }
                                                     }
-                                                    if (result9 !== null) {
-                                                      var result3 = result9;
+                                                    if (result7 !== null) {
+                                                      var result1 = result7;
                                                     } else {
                                                       if (input.substr(pos, 4) === "void") {
-                                                        var result8 = "void";
+                                                        var result6 = "void";
                                                         pos += 4;
                                                       } else {
-                                                        var result8 = null;
+                                                        var result6 = null;
                                                         if (reportMatchFailures) {
                                                           matchFailed("\"void\"");
                                                         }
                                                       }
-                                                      if (result8 !== null) {
-                                                        var result3 = result8;
+                                                      if (result6 !== null) {
+                                                        var result1 = result6;
                                                       } else {
                                                         if (input.substr(pos, 5) === "while") {
-                                                          var result7 = "while";
+                                                          var result5 = "while";
                                                           pos += 5;
                                                         } else {
-                                                          var result7 = null;
+                                                          var result5 = null;
                                                           if (reportMatchFailures) {
                                                             matchFailed("\"while\"");
                                                           }
                                                         }
-                                                        if (result7 !== null) {
-                                                          var result3 = result7;
+                                                        if (result5 !== null) {
+                                                          var result1 = result5;
                                                         } else {
                                                           if (input.substr(pos, 4) === "with") {
-                                                            var result6 = "with";
+                                                            var result4 = "with";
                                                             pos += 4;
                                                           } else {
-                                                            var result6 = null;
+                                                            var result4 = null;
                                                             if (reportMatchFailures) {
                                                               matchFailed("\"with\"");
                                                             }
                                                           }
-                                                          if (result6 !== null) {
-                                                            var result3 = result6;
+                                                          if (result4 !== null) {
+                                                            var result1 = result4;
                                                           } else {
-                                                            var result3 = null;;
+                                                            var result1 = null;;
                                                           };
                                                         };
                                                       };
@@ -1812,33 +1649,24 @@ timotuominen.createParser = function (parseHandler) {
             };
           };
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Keyword'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -1863,92 +1691,91 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "class") {
-          var result12 = "class";
+          var result10 = "class";
           pos += 5;
         } else {
-          var result12 = null;
+          var result10 = null;
           if (reportMatchFailures) {
             matchFailed("\"class\"");
           }
         }
-        if (result12 !== null) {
-          var result3 = result12;
+        if (result10 !== null) {
+          var result1 = result10;
         } else {
           if (input.substr(pos, 5) === "const") {
-            var result11 = "const";
+            var result9 = "const";
             pos += 5;
           } else {
-            var result11 = null;
+            var result9 = null;
             if (reportMatchFailures) {
               matchFailed("\"const\"");
             }
           }
-          if (result11 !== null) {
-            var result3 = result11;
+          if (result9 !== null) {
+            var result1 = result9;
           } else {
             if (input.substr(pos, 4) === "enum") {
-              var result10 = "enum";
+              var result8 = "enum";
               pos += 4;
             } else {
-              var result10 = null;
+              var result8 = null;
               if (reportMatchFailures) {
                 matchFailed("\"enum\"");
               }
             }
-            if (result10 !== null) {
-              var result3 = result10;
+            if (result8 !== null) {
+              var result1 = result8;
             } else {
               if (input.substr(pos, 6) === "export") {
-                var result9 = "export";
+                var result7 = "export";
                 pos += 6;
               } else {
-                var result9 = null;
+                var result7 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"export\"");
                 }
               }
-              if (result9 !== null) {
-                var result3 = result9;
+              if (result7 !== null) {
+                var result1 = result7;
               } else {
                 if (input.substr(pos, 7) === "extends") {
-                  var result8 = "extends";
+                  var result6 = "extends";
                   pos += 7;
                 } else {
-                  var result8 = null;
+                  var result6 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"extends\"");
                   }
                 }
-                if (result8 !== null) {
-                  var result3 = result8;
+                if (result6 !== null) {
+                  var result1 = result6;
                 } else {
                   if (input.substr(pos, 6) === "import") {
-                    var result7 = "import";
+                    var result5 = "import";
                     pos += 6;
                   } else {
-                    var result7 = null;
+                    var result5 = null;
                     if (reportMatchFailures) {
                       matchFailed("\"import\"");
                     }
                   }
-                  if (result7 !== null) {
-                    var result3 = result7;
+                  if (result5 !== null) {
+                    var result1 = result5;
                   } else {
                     if (input.substr(pos, 5) === "super") {
-                      var result6 = "super";
+                      var result4 = "super";
                       pos += 5;
                     } else {
-                      var result6 = null;
+                      var result4 = null;
                       if (reportMatchFailures) {
                         matchFailed("\"super\"");
                       }
                     }
-                    if (result6 !== null) {
-                      var result3 = result6;
+                    if (result4 !== null) {
+                      var result1 = result4;
                     } else {
-                      var result3 = null;;
+                      var result1 = null;;
                     };
                   };
                 };
@@ -1956,33 +1783,24 @@ timotuominen.createParser = function (parseHandler) {
             };
           };
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('FutureReservedWord'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -2006,33 +1824,53 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result7 = parse_NullLiteral();
-        if (result7 !== null) {
-          var result0 = result7;
+        var result9 = parse_NullLiteral();
+        if (result9 !== null) {
+          var result0 = result9;
         } else {
-          var result6 = parse_BooleanLiteral();
-          if (result6 !== null) {
-            var result0 = result6;
+          var result8 = parse_BooleanLiteral();
+          if (result8 !== null) {
+            var result0 = result8;
           } else {
-            var result5 = parse_NumericLiteral();
+            var savedPos1 = pos;
+            var result6 = parse_NumericLiteral();
+            var result7 = result6 !== null
+              ? (function(value) {
+                    return {
+                      type: "NumericLiteral",
+                      value: value
+                    };
+                  })(result6)
+              : null;
+            if (result7 !== null) {
+              var result5 = result7;
+            } else {
+              var result5 = null;
+              pos = savedPos1;
+            }
             if (result5 !== null) {
               var result0 = result5;
             } else {
-              var result4 = parse_StringLiteral();
+              var savedPos0 = pos;
+              var result3 = parse_StringLiteral();
+              var result4 = result3 !== null
+                ? (function(value) {
+                      return {
+                        type: "StringLiteral",
+                        value: value
+                      };
+                    })(result3)
+                : null;
               if (result4 !== null) {
-                var result0 = result4;
+                var result2 = result4;
               } else {
-                var savedPos0 = pos;
-                var result2 = parse_RegularExpressionLiteral();
-                var result3 = result2 !== null
-                  ? (function() { parseHandler('Literal'); })()
-                  : null;
-                if (result3 !== null) {
-                  var result1 = result3;
-                } else {
-                  var result1 = null;
-                  pos = savedPos0;
-                }
+                var result2 = null;
+                pos = savedPos0;
+              }
+              if (result2 !== null) {
+                var result0 = result2;
+              } else {
+                var result1 = parse_RegularExpressionLiteral();
                 if (result1 !== null) {
                   var result0 = result1;
                 } else {
@@ -2064,7 +1902,7 @@ timotuominen.createParser = function (parseHandler) {
         var savedPos0 = pos;
         var result1 = parse_NullToken();
         var result2 = result1 !== null
-          ? (function() { parseHandler('NullLiteral'); })()
+          ? (function() { return { type: "NullLiteral" }; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2091,14 +1929,24 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result4 = parse_TrueToken();
+        var savedPos1 = pos;
+        var result5 = parse_TrueToken();
+        var result6 = result5 !== null
+          ? (function() { return { type: "BooleanLiteral", value: true }; })()
+          : null;
+        if (result6 !== null) {
+          var result4 = result6;
+        } else {
+          var result4 = null;
+          pos = savedPos1;
+        }
         if (result4 !== null) {
           var result0 = result4;
         } else {
           var savedPos0 = pos;
           var result2 = parse_FalseToken();
           var result3 = result2 !== null
-            ? (function() { parseHandler('BooleanLiteral'); })()
+            ? (function() { return { type: "BooleanLiteral", value: false }; })()
             : null;
           if (result3 !== null) {
             var result1 = result3;
@@ -2168,7 +2016,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(literal) { parseHandler('NumericLiteral'); })(result1[0])
+          ? (function(literal) {
+                return literal;
+              })(result1[0])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2197,70 +2047,94 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos3 = pos;
-        var result13 = parse_DecimalIntegerLiteral();
-        if (result13 !== null) {
+        var savedPos4 = pos;
+        var savedPos5 = pos;
+        var result17 = parse_DecimalIntegerLiteral();
+        if (result17 !== null) {
           if (input.substr(pos, 1) === ".") {
-            var result14 = ".";
+            var result18 = ".";
             pos += 1;
           } else {
-            var result14 = null;
+            var result18 = null;
             if (reportMatchFailures) {
               matchFailed("\".\"");
             }
           }
-          if (result14 !== null) {
-            var result18 = parse_DecimalDigits();
-            var result15 = result18 !== null ? result18 : '';
-            if (result15 !== null) {
-              var result17 = parse_ExponentPart();
-              var result16 = result17 !== null ? result17 : '';
-              if (result16 !== null) {
-                var result12 = [result13, result14, result15, result16];
+          if (result18 !== null) {
+            var result22 = parse_DecimalDigits();
+            var result19 = result22 !== null ? result22 : '';
+            if (result19 !== null) {
+              var result21 = parse_ExponentPart();
+              var result20 = result21 !== null ? result21 : '';
+              if (result20 !== null) {
+                var result15 = [result17, result18, result19, result20];
               } else {
-                var result12 = null;
+                var result15 = null;
+                pos = savedPos5;
+              }
+            } else {
+              var result15 = null;
+              pos = savedPos5;
+            }
+          } else {
+            var result15 = null;
+            pos = savedPos5;
+          }
+        } else {
+          var result15 = null;
+          pos = savedPos5;
+        }
+        var result16 = result15 !== null
+          ? (function(before, after, exponent) {
+                return parseFloat(before + "." + after + exponent);
+              })(result15[0], result15[2], result15[3])
+          : null;
+        if (result16 !== null) {
+          var result14 = result16;
+        } else {
+          var result14 = null;
+          pos = savedPos4;
+        }
+        if (result14 !== null) {
+          var result0 = result14;
+        } else {
+          var savedPos2 = pos;
+          var savedPos3 = pos;
+          if (input.substr(pos, 1) === ".") {
+            var result10 = ".";
+            pos += 1;
+          } else {
+            var result10 = null;
+            if (reportMatchFailures) {
+              matchFailed("\".\"");
+            }
+          }
+          if (result10 !== null) {
+            var result11 = parse_DecimalDigits();
+            if (result11 !== null) {
+              var result13 = parse_ExponentPart();
+              var result12 = result13 !== null ? result13 : '';
+              if (result12 !== null) {
+                var result8 = [result10, result11, result12];
+              } else {
+                var result8 = null;
                 pos = savedPos3;
               }
             } else {
-              var result12 = null;
+              var result8 = null;
               pos = savedPos3;
             }
           } else {
-            var result12 = null;
+            var result8 = null;
             pos = savedPos3;
           }
-        } else {
-          var result12 = null;
-          pos = savedPos3;
-        }
-        if (result12 !== null) {
-          var result0 = result12;
-        } else {
-          var savedPos2 = pos;
-          if (input.substr(pos, 1) === ".") {
-            var result8 = ".";
-            pos += 1;
-          } else {
-            var result8 = null;
-            if (reportMatchFailures) {
-              matchFailed("\".\"");
-            }
-          }
-          if (result8 !== null) {
-            var result9 = parse_DecimalDigits();
-            if (result9 !== null) {
-              var result11 = parse_ExponentPart();
-              var result10 = result11 !== null ? result11 : '';
-              if (result10 !== null) {
-                var result7 = [result8, result9, result10];
-              } else {
-                var result7 = null;
-                pos = savedPos2;
-              }
-            } else {
-              var result7 = null;
-              pos = savedPos2;
-            }
+          var result9 = result8 !== null
+            ? (function(after, exponent) {
+                  return parseFloat("." + after + exponent);
+                })(result8[1], result8[2])
+            : null;
+          if (result9 !== null) {
+            var result7 = result9;
           } else {
             var result7 = null;
             pos = savedPos2;
@@ -2285,7 +2159,9 @@ timotuominen.createParser = function (parseHandler) {
               pos = savedPos1;
             }
             var result3 = result2 !== null
-              ? (function(before, exponent) { parseHandler('DecimalLiteral'); })(result2[0], result2[1])
+              ? (function(before, exponent) {
+                    return parseFloat(before + exponent);
+                  })(result2[0], result2[1])
               : null;
             if (result3 !== null) {
               var result1 = result3;
@@ -2348,7 +2224,7 @@ timotuominen.createParser = function (parseHandler) {
             pos = savedPos1;
           }
           var result3 = result2 !== null
-            ? (function(digit, digits) { parseHandler('DecimalIntegerLiteral'); })(result2[0], result2[1])
+            ? (function(digit, digits) { return digit + digits; })(result2[0], result2[1])
             : null;
           if (result3 !== null) {
             var result1 = result3;
@@ -2393,7 +2269,7 @@ timotuominen.createParser = function (parseHandler) {
           var result1 = null;
         }
         var result2 = result1 !== null
-          ? (function(digits) { parseHandler('DecimalDigits'); })(result1)
+          ? (function(digits) { return digits.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2420,24 +2296,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('DecimalDigit'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -2458,24 +2324,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('NonZeroDigit'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -2512,7 +2368,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(indicator, integer) { parseHandler('ExponentPart'); })(result1[0], result1[1])
+          ? (function(indicator, integer) {
+                return indicator + integer;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2539,24 +2397,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ExponentIndicator'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -2602,7 +2450,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(sign, digits) { parseHandler('SignedInteger'); })(result1[0], result1[1])
+          ? (function(sign, digits) { return sign + digits; })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2676,7 +2524,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(digits) { parseHandler('HexIntegerLiteral'); })(result1[2])
+          ? (function(digits) { return parseInt("0x" + digits.join("")); })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2703,24 +2551,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('HexDigit'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -2827,7 +2665,9 @@ timotuominen.createParser = function (parseHandler) {
           };
         }
         var result2 = result1 !== null
-          ? (function(parts) { parseHandler('StringLiteral'); })(result1)
+          ? (function(parts) {
+                return parts[1];
+              })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2868,7 +2708,7 @@ timotuominen.createParser = function (parseHandler) {
           var result1 = null;
         }
         var result2 = result1 !== null
-          ? (function(chars) { parseHandler('DoubleStringCharacters'); })(result1)
+          ? (function(chars) { return chars.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2907,7 +2747,7 @@ timotuominen.createParser = function (parseHandler) {
           var result1 = null;
         }
         var result2 = result1 !== null
-          ? (function(chars) { parseHandler('SingleStringCharacters'); })(result1)
+          ? (function(chars) { return chars.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -2936,55 +2776,65 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedPos2 = pos;
         var savedPos3 = pos;
+        var savedPos4 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
         reportMatchFailures = false;
         if (input.substr(pos, 1) === "\"") {
-          var result13 = "\"";
+          var result15 = "\"";
           pos += 1;
         } else {
-          var result13 = null;
+          var result15 = null;
           if (reportMatchFailures) {
             matchFailed("\"\\\"\"");
           }
         }
-        if (result13 !== null) {
-          var result10 = result13;
+        if (result15 !== null) {
+          var result12 = result15;
         } else {
           if (input.substr(pos, 1) === "\\") {
-            var result12 = "\\";
+            var result14 = "\\";
             pos += 1;
           } else {
-            var result12 = null;
+            var result14 = null;
             if (reportMatchFailures) {
               matchFailed("\"\\\\\"");
             }
           }
-          if (result12 !== null) {
-            var result10 = result12;
+          if (result14 !== null) {
+            var result12 = result14;
           } else {
-            var result11 = parse_LineTerminator();
-            if (result11 !== null) {
-              var result10 = result11;
+            var result13 = parse_LineTerminator();
+            if (result13 !== null) {
+              var result12 = result13;
             } else {
-              var result10 = null;;
+              var result12 = null;;
             };
           };
         }
         reportMatchFailures = savedReportMatchFailuresVar0;
-        if (result10 === null) {
-          var result8 = '';
+        if (result12 === null) {
+          var result10 = '';
+        } else {
+          var result10 = null;
+          pos = savedPos4;
+        }
+        if (result10 !== null) {
+          var result11 = parse_SourceCharacter();
+          if (result11 !== null) {
+            var result8 = [result10, result11];
+          } else {
+            var result8 = null;
+            pos = savedPos3;
+          }
         } else {
           var result8 = null;
           pos = savedPos3;
         }
-        if (result8 !== null) {
-          var result9 = parse_SourceCharacter();
-          if (result9 !== null) {
-            var result7 = [result8, result9];
-          } else {
-            var result7 = null;
-            pos = savedPos2;
-          }
+        var result9 = result8 !== null
+          ? (function(char_) { return char_; })(result8[1])
+          : null;
+        if (result9 !== null) {
+          var result7 = result9;
         } else {
           var result7 = null;
           pos = savedPos2;
@@ -2992,6 +2842,7 @@ timotuominen.createParser = function (parseHandler) {
         if (result7 !== null) {
           var result0 = result7;
         } else {
+          var savedPos0 = pos;
           var savedPos1 = pos;
           if (input.substr(pos, 1) === "\\") {
             var result5 = "\\";
@@ -3005,29 +2856,28 @@ timotuominen.createParser = function (parseHandler) {
           if (result5 !== null) {
             var result6 = parse_EscapeSequence();
             if (result6 !== null) {
-              var result4 = [result5, result6];
+              var result3 = [result5, result6];
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
+          var result4 = result3 !== null
+            ? (function(sequence) { return sequence; })(result3[1])
+            : null;
           if (result4 !== null) {
-            var result0 = result4;
+            var result2 = result4;
           } else {
-            var savedPos0 = pos;
-            var result2 = parse_LineContinuation();
-            var result3 = result2 !== null
-              ? (function() { parseHandler('DoubleStringCharacter'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
-            }
+            var result2 = null;
+            pos = savedPos0;
+          }
+          if (result2 !== null) {
+            var result0 = result2;
+          } else {
+            var result1 = parse_LineContinuation();
             if (result1 !== null) {
               var result0 = result1;
             } else {
@@ -3056,55 +2906,65 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedPos2 = pos;
         var savedPos3 = pos;
+        var savedPos4 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
         reportMatchFailures = false;
         if (input.substr(pos, 1) === "'") {
-          var result13 = "'";
+          var result15 = "'";
           pos += 1;
         } else {
-          var result13 = null;
+          var result15 = null;
           if (reportMatchFailures) {
             matchFailed("\"'\"");
           }
         }
-        if (result13 !== null) {
-          var result10 = result13;
+        if (result15 !== null) {
+          var result12 = result15;
         } else {
           if (input.substr(pos, 1) === "\\") {
-            var result12 = "\\";
+            var result14 = "\\";
             pos += 1;
           } else {
-            var result12 = null;
+            var result14 = null;
             if (reportMatchFailures) {
               matchFailed("\"\\\\\"");
             }
           }
-          if (result12 !== null) {
-            var result10 = result12;
+          if (result14 !== null) {
+            var result12 = result14;
           } else {
-            var result11 = parse_LineTerminator();
-            if (result11 !== null) {
-              var result10 = result11;
+            var result13 = parse_LineTerminator();
+            if (result13 !== null) {
+              var result12 = result13;
             } else {
-              var result10 = null;;
+              var result12 = null;;
             };
           };
         }
         reportMatchFailures = savedReportMatchFailuresVar0;
-        if (result10 === null) {
-          var result8 = '';
+        if (result12 === null) {
+          var result10 = '';
+        } else {
+          var result10 = null;
+          pos = savedPos4;
+        }
+        if (result10 !== null) {
+          var result11 = parse_SourceCharacter();
+          if (result11 !== null) {
+            var result8 = [result10, result11];
+          } else {
+            var result8 = null;
+            pos = savedPos3;
+          }
         } else {
           var result8 = null;
           pos = savedPos3;
         }
-        if (result8 !== null) {
-          var result9 = parse_SourceCharacter();
-          if (result9 !== null) {
-            var result7 = [result8, result9];
-          } else {
-            var result7 = null;
-            pos = savedPos2;
-          }
+        var result9 = result8 !== null
+          ? (function(char_) { return char_; })(result8[1])
+          : null;
+        if (result9 !== null) {
+          var result7 = result9;
         } else {
           var result7 = null;
           pos = savedPos2;
@@ -3112,6 +2972,7 @@ timotuominen.createParser = function (parseHandler) {
         if (result7 !== null) {
           var result0 = result7;
         } else {
+          var savedPos0 = pos;
           var savedPos1 = pos;
           if (input.substr(pos, 1) === "\\") {
             var result5 = "\\";
@@ -3125,29 +2986,28 @@ timotuominen.createParser = function (parseHandler) {
           if (result5 !== null) {
             var result6 = parse_EscapeSequence();
             if (result6 !== null) {
-              var result4 = [result5, result6];
+              var result3 = [result5, result6];
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
+          var result4 = result3 !== null
+            ? (function(sequence) { return sequence; })(result3[1])
+            : null;
           if (result4 !== null) {
-            var result0 = result4;
+            var result2 = result4;
           } else {
-            var savedPos0 = pos;
-            var result2 = parse_LineContinuation();
-            var result3 = result2 !== null
-              ? (function() { parseHandler('SingleStringCharacter'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
-            }
+            var result2 = null;
+            pos = savedPos0;
+          }
+          if (result2 !== null) {
+            var result0 = result2;
+          } else {
+            var result1 = parse_LineContinuation();
             if (result1 !== null) {
               var result0 = result1;
             } else {
@@ -3198,7 +3058,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(sequence) { parseHandler('LineContinuation'); })(result1[1])
+          ? (function(sequence) { return sequence; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3229,6 +3089,7 @@ timotuominen.createParser = function (parseHandler) {
         if (result9 !== null) {
           var result0 = result9;
         } else {
+          var savedPos0 = pos;
           var savedPos1 = pos;
           if (input.substr(pos, 1) === "0") {
             var result6 = "0";
@@ -3252,33 +3113,32 @@ timotuominen.createParser = function (parseHandler) {
               pos = savedPos2;
             }
             if (result7 !== null) {
-              var result5 = [result6, result7];
+              var result4 = [result6, result7];
             } else {
-              var result5 = null;
+              var result4 = null;
               pos = savedPos1;
             }
           } else {
-            var result5 = null;
+            var result4 = null;
             pos = savedPos1;
           }
+          var result5 = result4 !== null
+            ? (function() { return "\0"; })()
+            : null;
           if (result5 !== null) {
-            var result0 = result5;
+            var result3 = result5;
           } else {
-            var result4 = parse_HexEscapeSequence();
-            if (result4 !== null) {
-              var result0 = result4;
+            var result3 = null;
+            pos = savedPos0;
+          }
+          if (result3 !== null) {
+            var result0 = result3;
+          } else {
+            var result2 = parse_HexEscapeSequence();
+            if (result2 !== null) {
+              var result0 = result2;
             } else {
-              var savedPos0 = pos;
-              var result2 = parse_UnicodeEscapeSequence();
-              var result3 = result2 !== null
-                ? (function() { parseHandler('EscapeSequence'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
-              } else {
-                var result1 = null;
-                pos = savedPos0;
-              }
+              var result1 = parse_UnicodeEscapeSequence();
               if (result1 !== null) {
                 var result0 = result1;
               } else {
@@ -3306,21 +3166,11 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result4 = parse_SingleEscapeCharacter();
-        if (result4 !== null) {
-          var result0 = result4;
+        var result2 = parse_SingleEscapeCharacter();
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_NonEscapeCharacter();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('CharacterEscapeSequence'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result1 = parse_NonEscapeCharacter();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -3357,7 +3207,15 @@ timotuominen.createParser = function (parseHandler) {
           }
         }
         var result2 = result1 !== null
-          ? (function(char_) { parseHandler('SingleEscapeCharacter'); })(result1)
+          ? (function(char_) {
+                return char_
+                  .replace("b", "\b")
+                  .replace("f", "\f")
+                  .replace("n", "\n")
+                  .replace("r", "\r")
+                  .replace("t", "\t")
+                  .replace("v", "\x0B") // IE does not recognize "\v".
+              })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3420,7 +3278,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(char_) { parseHandler('NonEscapeCharacter'); })(result1[1])
+          ? (function(char_) { return char_; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3447,44 +3305,34 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result6 = parse_SingleEscapeCharacter();
-        if (result6 !== null) {
-          var result0 = result6;
+        var result4 = parse_SingleEscapeCharacter();
+        if (result4 !== null) {
+          var result0 = result4;
         } else {
-          var result5 = parse_DecimalDigit();
-          if (result5 !== null) {
-            var result0 = result5;
+          var result3 = parse_DecimalDigit();
+          if (result3 !== null) {
+            var result0 = result3;
           } else {
             if (input.substr(pos, 1) === "x") {
-              var result4 = "x";
+              var result2 = "x";
               pos += 1;
             } else {
-              var result4 = null;
+              var result2 = null;
               if (reportMatchFailures) {
                 matchFailed("\"x\"");
               }
             }
-            if (result4 !== null) {
-              var result0 = result4;
+            if (result2 !== null) {
+              var result0 = result2;
             } else {
-              var savedPos0 = pos;
               if (input.substr(pos, 1) === "u") {
-                var result2 = "u";
+                var result1 = "u";
                 pos += 1;
               } else {
-                var result2 = null;
+                var result1 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"u\"");
                 }
-              }
-              var result3 = result2 !== null
-                ? (function() { parseHandler('EscapeCharacter'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
-              } else {
-                var result1 = null;
-                pos = savedPos0;
               }
               if (result1 !== null) {
                 var result0 = result1;
@@ -3543,7 +3391,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(h1, h2) { parseHandler('HexEscapeSequence'); })(result1[1], result1[2])
+          ? (function(h1, h2) {
+                return String.fromCharCode(parseInt("0x" + h1 + h2));
+              })(result1[1], result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3612,7 +3462,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(h1, h2, h3, h4) { parseHandler('UnicodeEscapeSequence'); })(result1[1], result1[2], result1[3], result1[4])
+          ? (function(h1, h2, h3, h4) {
+                return String.fromCharCode(parseInt("0x" + h1 + h2 + h3 + h4));
+              })(result1[1], result1[2], result1[3], result1[4])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3684,7 +3536,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(body, flags) { parseHandler('RegularExpressionLiteral'); })(result1[1], result1[3])
+          ? (function(body, flags) {
+                return {
+                  type: "RegularExpressionLiteral",
+                  body: body,
+                  flags: flags
+                };
+              })(result1[1], result1[3])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3729,7 +3587,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(char_, chars) { parseHandler('RegularExpressionBody'); })(result1[0], result1[1])
+          ? (function(char_, chars) {
+                return char_ + chars;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3764,7 +3624,7 @@ timotuominen.createParser = function (parseHandler) {
           var result3 = parse_RegularExpressionChar();
         }
         var result2 = result1 !== null
-          ? (function(chars) { parseHandler('RegularExpressionChars'); })(result1)
+          ? (function(chars) { return chars.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -3791,6 +3651,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var savedPos2 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
@@ -3814,33 +3675,32 @@ timotuominen.createParser = function (parseHandler) {
         if (result6 !== null) {
           var result7 = parse_RegularExpressionNonTerminator();
           if (result7 !== null) {
-            var result5 = [result6, result7];
+            var result4 = [result6, result7];
           } else {
-            var result5 = null;
+            var result4 = null;
             pos = savedPos1;
           }
         } else {
-          var result5 = null;
+          var result4 = null;
           pos = savedPos1;
         }
+        var result5 = result4 !== null
+          ? (function(char_) { return char_; })(result4[1])
+          : null;
         if (result5 !== null) {
-          var result0 = result5;
+          var result3 = result5;
         } else {
-          var result4 = parse_RegularExpressionBackslashSequence();
-          if (result4 !== null) {
-            var result0 = result4;
+          var result3 = null;
+          pos = savedPos0;
+        }
+        if (result3 !== null) {
+          var result0 = result3;
+        } else {
+          var result2 = parse_RegularExpressionBackslashSequence();
+          if (result2 !== null) {
+            var result0 = result2;
           } else {
-            var savedPos0 = pos;
-            var result2 = parse_RegularExpressionClass();
-            var result3 = result2 !== null
-              ? (function() { parseHandler('RegularExpressionFirstChar'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
-            }
+            var result1 = parse_RegularExpressionClass();
             if (result1 !== null) {
               var result0 = result1;
             } else {
@@ -3867,6 +3727,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var savedPos2 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
@@ -3890,33 +3751,32 @@ timotuominen.createParser = function (parseHandler) {
         if (result6 !== null) {
           var result7 = parse_RegularExpressionNonTerminator();
           if (result7 !== null) {
-            var result5 = [result6, result7];
+            var result4 = [result6, result7];
           } else {
-            var result5 = null;
+            var result4 = null;
             pos = savedPos1;
           }
         } else {
-          var result5 = null;
+          var result4 = null;
           pos = savedPos1;
         }
+        var result5 = result4 !== null
+          ? (function(char_) { return char_; })(result4[1])
+          : null;
         if (result5 !== null) {
-          var result0 = result5;
+          var result3 = result5;
         } else {
-          var result4 = parse_RegularExpressionBackslashSequence();
-          if (result4 !== null) {
-            var result0 = result4;
+          var result3 = null;
+          pos = savedPos0;
+        }
+        if (result3 !== null) {
+          var result0 = result3;
+        } else {
+          var result2 = parse_RegularExpressionBackslashSequence();
+          if (result2 !== null) {
+            var result0 = result2;
           } else {
-            var savedPos0 = pos;
-            var result2 = parse_RegularExpressionClass();
-            var result3 = result2 !== null
-              ? (function() { parseHandler('RegularExpressionChar'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
-            }
+            var result1 = parse_RegularExpressionClass();
             if (result1 !== null) {
               var result0 = result1;
             } else {
@@ -3967,7 +3827,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(char_) { parseHandler('RegularExpressionBackslashSequence'); })(result1[1])
+          ? (function(char_) { return "\\" + char_; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4020,7 +3880,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(char_) { parseHandler('RegularExpressionNonTerminator'); })(result1[1])
+          ? (function(char_) { return char_; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4085,7 +3945,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(chars) { parseHandler('RegularExpressionClass'); })(result1[1])
+          ? (function(chars) { return "[" + chars + "]"; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4120,7 +3980,7 @@ timotuominen.createParser = function (parseHandler) {
           var result3 = parse_RegularExpressionClassChar();
         }
         var result2 = result1 !== null
-          ? (function(chars) { parseHandler('RegularExpressionClassChars'); })(result1)
+          ? (function(chars) { return chars.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4147,6 +4007,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var savedPos2 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
@@ -4170,29 +4031,28 @@ timotuominen.createParser = function (parseHandler) {
         if (result5 !== null) {
           var result6 = parse_RegularExpressionNonTerminator();
           if (result6 !== null) {
-            var result4 = [result5, result6];
+            var result3 = [result5, result6];
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(char_) { return char_; })(result3[1])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_RegularExpressionBackslashSequence();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('RegularExpressionClassChar'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_RegularExpressionBackslashSequence();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -4226,7 +4086,7 @@ timotuominen.createParser = function (parseHandler) {
           var result3 = parse_IdentifierPart();
         }
         var result2 = result1 !== null
-          ? (function(parts) { parseHandler('RegularExpressionFlags'); })(result1)
+          ? (function(parts) { return parts.join(""); })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4254,43 +4114,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "break") {
-          var result3 = "break";
+          var result1 = "break";
           pos += 5;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"break\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('BreakToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4315,43 +4165,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "case") {
-          var result3 = "case";
+          var result1 = "case";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"case\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('CaseToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4376,43 +4216,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "catch") {
-          var result3 = "catch";
+          var result1 = "catch";
           pos += 5;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"catch\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('CatchToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4437,43 +4267,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 8) === "continue") {
-          var result3 = "continue";
+          var result1 = "continue";
           pos += 8;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"continue\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ContinueToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4498,43 +4318,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 8) === "debugger") {
-          var result3 = "debugger";
+          var result1 = "debugger";
           pos += 8;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"debugger\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('DebuggerToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4559,43 +4369,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 7) === "default") {
-          var result3 = "default";
+          var result1 = "default";
           pos += 7;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"default\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('DefaultToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4653,7 +4453,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('DeleteToken'); })()
+          ? (function() { return "delete"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -4681,43 +4481,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 2) === "do") {
-          var result3 = "do";
+          var result1 = "do";
           pos += 2;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"do\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('DoToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4742,43 +4532,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "else") {
-          var result3 = "else";
+          var result1 = "else";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"else\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ElseToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4803,43 +4583,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "false") {
-          var result3 = "false";
+          var result1 = "false";
           pos += 5;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"false\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('FalseToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4864,43 +4634,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 7) === "finally") {
-          var result3 = "finally";
+          var result1 = "finally";
           pos += 7;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"finally\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('FinallyToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4925,43 +4685,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "for") {
-          var result3 = "for";
+          var result1 = "for";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"for\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ForToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -4986,43 +4736,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 8) === "function") {
-          var result3 = "function";
+          var result1 = "function";
           pos += 8;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"function\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('FunctionToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5047,43 +4787,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "get") {
-          var result3 = "get";
+          var result1 = "get";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"get\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('GetToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5108,43 +4838,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 2) === "if") {
-          var result3 = "if";
+          var result1 = "if";
           pos += 2;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"if\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('IfToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5202,7 +4922,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('InstanceofToken'); })()
+          ? (function() { return "instanceof"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -5263,7 +4983,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('InToken'); })()
+          ? (function() { return "in"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -5291,43 +5011,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "new") {
-          var result3 = "new";
+          var result1 = "new";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"new\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('NewToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5352,43 +5062,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "null") {
-          var result3 = "null";
+          var result1 = "null";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"null\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('NullToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5413,43 +5113,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 6) === "return") {
-          var result3 = "return";
+          var result1 = "return";
           pos += 6;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"return\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ReturnToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5474,43 +5164,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "set") {
-          var result3 = "set";
+          var result1 = "set";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"set\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('SetToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5535,43 +5215,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 6) === "switch") {
-          var result3 = "switch";
+          var result1 = "switch";
           pos += 6;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"switch\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('SwitchToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5596,43 +5266,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "this") {
-          var result3 = "this";
+          var result1 = "this";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"this\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ThisToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5657,43 +5317,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "throw") {
-          var result3 = "throw";
+          var result1 = "throw";
           pos += 5;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"throw\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('ThrowToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5718,43 +5368,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "true") {
-          var result3 = "true";
+          var result1 = "true";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"true\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('TrueToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5779,43 +5419,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "try") {
-          var result3 = "try";
+          var result1 = "try";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"try\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('TryToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5873,7 +5503,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('TypeofToken'); })()
+          ? (function() { return "typeof"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -5901,43 +5531,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 3) === "var") {
-          var result3 = "var";
+          var result1 = "var";
           pos += 3;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"var\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('VarToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -5995,7 +5615,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('VoidToken'); })()
+          ? (function() { return "void"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -6023,43 +5643,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 5) === "while") {
-          var result3 = "while";
+          var result1 = "while";
           pos += 5;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"while\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('WhileToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -6084,43 +5694,33 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 4) === "with") {
-          var result3 = "with";
+          var result1 = "with";
           pos += 4;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\"with\"");
           }
         }
-        if (result3 !== null) {
-          var savedPos2 = pos;
+        if (result1 !== null) {
+          var savedPos1 = pos;
           var savedReportMatchFailuresVar0 = reportMatchFailures;
           reportMatchFailures = false;
-          var result5 = parse_IdentifierPart();
+          var result3 = parse_IdentifierPart();
           reportMatchFailures = savedReportMatchFailuresVar0;
-          if (result5 === null) {
-            var result4 = '';
+          if (result3 === null) {
+            var result2 = '';
           } else {
-            var result4 = null;
-            pos = savedPos2;
-          }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
-          } else {
-            var result1 = null;
+            var result2 = null;
             pos = savedPos1;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('WithToken'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+          if (result2 !== null) {
+            var result0 = [result1, result2];
+          } else {
+            var result0 = null;
+            pos = savedPos0;
+          }
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -6144,24 +5744,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Ll'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6182,24 +5772,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Lm'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6220,24 +5800,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Lo'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6258,24 +5828,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Lt'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6296,24 +5856,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Lu'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6334,24 +5884,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Mc'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6372,24 +5912,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Mn'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6410,24 +5940,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Nd'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6448,24 +5968,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Nl'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6486,24 +5996,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Pc'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6524,24 +6024,14 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
         if (input.substr(pos).match(/^(?!)/) !== null) {
-          var result1 = input.charAt(pos);
+          var result0 = input.charAt(pos);
           pos++;
         } else {
-          var result1 = null;
+          var result0 = null;
           if (reportMatchFailures) {
             matchFailed("[]");
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Zs'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6562,103 +6052,93 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos5 = pos;
-        var result14 = parse___();
-        if (result14 !== null) {
+        var savedPos4 = pos;
+        var result12 = parse___();
+        if (result12 !== null) {
           if (input.substr(pos, 1) === ";") {
-            var result15 = ";";
+            var result13 = ";";
             pos += 1;
           } else {
-            var result15 = null;
+            var result13 = null;
             if (reportMatchFailures) {
               matchFailed("\";\"");
             }
           }
-          if (result15 !== null) {
-            var result13 = [result14, result15];
+          if (result13 !== null) {
+            var result11 = [result12, result13];
           } else {
-            var result13 = null;
-            pos = savedPos5;
-          }
-        } else {
-          var result13 = null;
-          pos = savedPos5;
-        }
-        if (result13 !== null) {
-          var result0 = result13;
-        } else {
-          var savedPos4 = pos;
-          var result11 = parse__();
-          if (result11 !== null) {
-            var result12 = parse_LineTerminatorSequence();
-            if (result12 !== null) {
-              var result10 = [result11, result12];
-            } else {
-              var result10 = null;
-              pos = savedPos4;
-            }
-          } else {
-            var result10 = null;
+            var result11 = null;
             pos = savedPos4;
           }
-          if (result10 !== null) {
-            var result0 = result10;
+        } else {
+          var result11 = null;
+          pos = savedPos4;
+        }
+        if (result11 !== null) {
+          var result0 = result11;
+        } else {
+          var savedPos3 = pos;
+          var result9 = parse__();
+          if (result9 !== null) {
+            var result10 = parse_LineTerminatorSequence();
+            if (result10 !== null) {
+              var result8 = [result9, result10];
+            } else {
+              var result8 = null;
+              pos = savedPos3;
+            }
           } else {
-            var savedPos2 = pos;
-            var result7 = parse__();
-            if (result7 !== null) {
-              var savedPos3 = pos;
+            var result8 = null;
+            pos = savedPos3;
+          }
+          if (result8 !== null) {
+            var result0 = result8;
+          } else {
+            var savedPos1 = pos;
+            var result5 = parse__();
+            if (result5 !== null) {
+              var savedPos2 = pos;
               var savedReportMatchFailuresVar0 = reportMatchFailures;
               reportMatchFailures = false;
               if (input.substr(pos, 1) === "}") {
-                var result9 = "}";
+                var result7 = "}";
                 pos += 1;
               } else {
-                var result9 = null;
+                var result7 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"}\"");
                 }
               }
               reportMatchFailures = savedReportMatchFailuresVar0;
-              if (result9 !== null) {
-                var result8 = '';
-                pos = savedPos3;
-              } else {
-                var result8 = null;
-              }
-              if (result8 !== null) {
-                var result6 = [result7, result8];
+              if (result7 !== null) {
+                var result6 = '';
+                pos = savedPos2;
               } else {
                 var result6 = null;
-                pos = savedPos2;
               }
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-            if (result6 !== null) {
-              var result0 = result6;
-            } else {
-              var savedPos0 = pos;
-              var savedPos1 = pos;
-              var result4 = parse___();
-              if (result4 !== null) {
-                var result5 = parse_EOF();
-                if (result5 !== null) {
-                  var result2 = [result4, result5];
-                } else {
-                  var result2 = null;
-                  pos = savedPos1;
-                }
+              if (result6 !== null) {
+                var result4 = [result5, result6];
               } else {
-                var result2 = null;
+                var result4 = null;
                 pos = savedPos1;
               }
-              var result3 = result2 !== null
-                ? (function() { parseHandler('EOS'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
+            } else {
+              var result4 = null;
+              pos = savedPos1;
+            }
+            if (result4 !== null) {
+              var result0 = result4;
+            } else {
+              var savedPos0 = pos;
+              var result2 = parse___();
+              if (result2 !== null) {
+                var result3 = parse_EOF();
+                if (result3 !== null) {
+                  var result1 = [result2, result3];
+                } else {
+                  var result1 = null;
+                  pos = savedPos0;
+                }
               } else {
                 var result1 = null;
                 pos = savedPos0;
@@ -6690,103 +6170,93 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos5 = pos;
-        var result14 = parse__();
-        if (result14 !== null) {
+        var savedPos4 = pos;
+        var result12 = parse__();
+        if (result12 !== null) {
           if (input.substr(pos, 1) === ";") {
-            var result15 = ";";
+            var result13 = ";";
             pos += 1;
           } else {
-            var result15 = null;
+            var result13 = null;
             if (reportMatchFailures) {
               matchFailed("\";\"");
             }
           }
-          if (result15 !== null) {
-            var result13 = [result14, result15];
+          if (result13 !== null) {
+            var result11 = [result12, result13];
           } else {
-            var result13 = null;
-            pos = savedPos5;
-          }
-        } else {
-          var result13 = null;
-          pos = savedPos5;
-        }
-        if (result13 !== null) {
-          var result0 = result13;
-        } else {
-          var savedPos4 = pos;
-          var result11 = parse__();
-          if (result11 !== null) {
-            var result12 = parse_LineTerminatorSequence();
-            if (result12 !== null) {
-              var result10 = [result11, result12];
-            } else {
-              var result10 = null;
-              pos = savedPos4;
-            }
-          } else {
-            var result10 = null;
+            var result11 = null;
             pos = savedPos4;
           }
-          if (result10 !== null) {
-            var result0 = result10;
+        } else {
+          var result11 = null;
+          pos = savedPos4;
+        }
+        if (result11 !== null) {
+          var result0 = result11;
+        } else {
+          var savedPos3 = pos;
+          var result9 = parse__();
+          if (result9 !== null) {
+            var result10 = parse_LineTerminatorSequence();
+            if (result10 !== null) {
+              var result8 = [result9, result10];
+            } else {
+              var result8 = null;
+              pos = savedPos3;
+            }
           } else {
-            var savedPos2 = pos;
-            var result7 = parse__();
-            if (result7 !== null) {
-              var savedPos3 = pos;
+            var result8 = null;
+            pos = savedPos3;
+          }
+          if (result8 !== null) {
+            var result0 = result8;
+          } else {
+            var savedPos1 = pos;
+            var result5 = parse__();
+            if (result5 !== null) {
+              var savedPos2 = pos;
               var savedReportMatchFailuresVar0 = reportMatchFailures;
               reportMatchFailures = false;
               if (input.substr(pos, 1) === "}") {
-                var result9 = "}";
+                var result7 = "}";
                 pos += 1;
               } else {
-                var result9 = null;
+                var result7 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"}\"");
                 }
               }
               reportMatchFailures = savedReportMatchFailuresVar0;
-              if (result9 !== null) {
-                var result8 = '';
-                pos = savedPos3;
-              } else {
-                var result8 = null;
-              }
-              if (result8 !== null) {
-                var result6 = [result7, result8];
+              if (result7 !== null) {
+                var result6 = '';
+                pos = savedPos2;
               } else {
                 var result6 = null;
-                pos = savedPos2;
               }
-            } else {
-              var result6 = null;
-              pos = savedPos2;
-            }
-            if (result6 !== null) {
-              var result0 = result6;
-            } else {
-              var savedPos0 = pos;
-              var savedPos1 = pos;
-              var result4 = parse__();
-              if (result4 !== null) {
-                var result5 = parse_EOF();
-                if (result5 !== null) {
-                  var result2 = [result4, result5];
-                } else {
-                  var result2 = null;
-                  pos = savedPos1;
-                }
+              if (result6 !== null) {
+                var result4 = [result5, result6];
               } else {
-                var result2 = null;
+                var result4 = null;
                 pos = savedPos1;
               }
-              var result3 = result2 !== null
-                ? (function() { parseHandler('EOSNoLineTerminator'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
+            } else {
+              var result4 = null;
+              pos = savedPos1;
+            }
+            if (result4 !== null) {
+              var result0 = result4;
+            } else {
+              var savedPos0 = pos;
+              var result2 = parse__();
+              if (result2 !== null) {
+                var result3 = parse_EOF();
+                if (result3 !== null) {
+                  var result1 = [result2, result3];
+                } else {
+                  var result1 = null;
+                  pos = savedPos0;
+                }
               } else {
                 var result1 = null;
                 pos = savedPos0;
@@ -6819,30 +6289,20 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         var savedReportMatchFailuresVar0 = reportMatchFailures;
         reportMatchFailures = false;
         if (input.length > pos) {
-          var result3 = input.charAt(pos);
+          var result1 = input.charAt(pos);
           pos++;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed('any character');
           }
         }
         reportMatchFailures = savedReportMatchFailuresVar0;
-        if (result3 === null) {
-          var result1 = '';
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('EOF'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
+        if (result1 === null) {
+          var result0 = '';
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -6866,51 +6326,41 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
-        var result1 = [];
-        var result6 = parse_WhiteSpace();
-        if (result6 !== null) {
-          var result3 = result6;
+        var result0 = [];
+        var result4 = parse_WhiteSpace();
+        if (result4 !== null) {
+          var result1 = result4;
         } else {
-          var result5 = parse_MultiLineCommentNoLineTerminator();
-          if (result5 !== null) {
-            var result3 = result5;
+          var result3 = parse_MultiLineCommentNoLineTerminator();
+          if (result3 !== null) {
+            var result1 = result3;
           } else {
-            var result4 = parse_SingleLineComment();
-            if (result4 !== null) {
-              var result3 = result4;
+            var result2 = parse_SingleLineComment();
+            if (result2 !== null) {
+              var result1 = result2;
             } else {
-              var result3 = null;;
+              var result1 = null;;
             };
           };
         }
-        while (result3 !== null) {
-          result1.push(result3);
-          var result6 = parse_WhiteSpace();
-          if (result6 !== null) {
-            var result3 = result6;
+        while (result1 !== null) {
+          result0.push(result1);
+          var result4 = parse_WhiteSpace();
+          if (result4 !== null) {
+            var result1 = result4;
           } else {
-            var result5 = parse_MultiLineCommentNoLineTerminator();
-            if (result5 !== null) {
-              var result3 = result5;
+            var result3 = parse_MultiLineCommentNoLineTerminator();
+            if (result3 !== null) {
+              var result1 = result3;
             } else {
-              var result4 = parse_SingleLineComment();
-              if (result4 !== null) {
-                var result3 = result4;
+              var result2 = parse_SingleLineComment();
+              if (result2 !== null) {
+                var result1 = result2;
               } else {
-                var result3 = null;;
+                var result1 = null;;
               };
             };
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('_'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6931,51 +6381,41 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos0 = pos;
-        var result1 = [];
-        var result6 = parse_WhiteSpace();
-        if (result6 !== null) {
-          var result3 = result6;
+        var result0 = [];
+        var result4 = parse_WhiteSpace();
+        if (result4 !== null) {
+          var result1 = result4;
         } else {
-          var result5 = parse_LineTerminatorSequence();
-          if (result5 !== null) {
-            var result3 = result5;
+          var result3 = parse_LineTerminatorSequence();
+          if (result3 !== null) {
+            var result1 = result3;
           } else {
-            var result4 = parse_Comment();
-            if (result4 !== null) {
-              var result3 = result4;
+            var result2 = parse_Comment();
+            if (result2 !== null) {
+              var result1 = result2;
             } else {
-              var result3 = null;;
+              var result1 = null;;
             };
           };
         }
-        while (result3 !== null) {
-          result1.push(result3);
-          var result6 = parse_WhiteSpace();
-          if (result6 !== null) {
-            var result3 = result6;
+        while (result1 !== null) {
+          result0.push(result1);
+          var result4 = parse_WhiteSpace();
+          if (result4 !== null) {
+            var result1 = result4;
           } else {
-            var result5 = parse_LineTerminatorSequence();
-            if (result5 !== null) {
-              var result3 = result5;
+            var result3 = parse_LineTerminatorSequence();
+            if (result3 !== null) {
+              var result1 = result3;
             } else {
-              var result4 = parse_Comment();
-              if (result4 !== null) {
-                var result3 = result4;
+              var result2 = parse_Comment();
+              if (result2 !== null) {
+                var result1 = result2;
               } else {
-                var result3 = null;;
+                var result1 = null;;
               };
             };
           }
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('__'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -6996,11 +6436,31 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result13 = parse_ThisToken();
-        if (result13 !== null) {
-          var result0 = result13;
+        var savedPos3 = pos;
+        var result16 = parse_ThisToken();
+        var result17 = result16 !== null
+          ? (function() { return { type: "This" }; })()
+          : null;
+        if (result17 !== null) {
+          var result15 = result17;
         } else {
-          var result12 = parse_Identifier();
+          var result15 = null;
+          pos = savedPos3;
+        }
+        if (result15 !== null) {
+          var result0 = result15;
+        } else {
+          var savedPos2 = pos;
+          var result13 = parse_Identifier();
+          var result14 = result13 !== null
+            ? (function(name) { return { type: "Variable", name: name }; })(result13)
+            : null;
+          if (result14 !== null) {
+            var result12 = result14;
+          } else {
+            var result12 = null;
+            pos = savedPos2;
+          }
           if (result12 !== null) {
             var result0 = result12;
           } else {
@@ -7066,7 +6526,7 @@ timotuominen.createParser = function (parseHandler) {
                     pos = savedPos1;
                   }
                   var result3 = result2 !== null
-                    ? (function(expression) { parseHandler('PrimaryExpression'); })(result2[2])
+                    ? (function(expression) { return expression; })(result2[2])
                     : null;
                   if (result3 !== null) {
                     var result1 = result3;
@@ -7174,7 +6634,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(elements) { parseHandler('ArrayLiteral'); })(result1[2])
+          ? (function(elements) {
+                return {
+                  type: "ArrayLiteral",
+                  elements: elements !== "" ? elements : []
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -7334,7 +6799,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('ElementList'); })(result1[1], result1[2])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][5]);
+                }
+                return result;
+              })(result1[1], result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -7362,80 +6833,70 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos0 = pos;
-        var savedPos1 = pos;
         if (input.substr(pos, 1) === ",") {
-          var result3 = ",";
+          var result1 = ",";
           pos += 1;
         } else {
-          var result3 = null;
+          var result1 = null;
           if (reportMatchFailures) {
             matchFailed("\",\"");
           }
         }
-        if (result3 !== null) {
-          var result4 = [];
-          var savedPos2 = pos;
-          var result6 = parse___();
-          if (result6 !== null) {
+        if (result1 !== null) {
+          var result2 = [];
+          var savedPos1 = pos;
+          var result4 = parse___();
+          if (result4 !== null) {
             if (input.substr(pos, 1) === ",") {
-              var result7 = ",";
+              var result5 = ",";
               pos += 1;
             } else {
-              var result7 = null;
+              var result5 = null;
               if (reportMatchFailures) {
                 matchFailed("\",\"");
               }
             }
-            if (result7 !== null) {
-              var result5 = [result6, result7];
+            if (result5 !== null) {
+              var result3 = [result4, result5];
             } else {
-              var result5 = null;
-              pos = savedPos2;
+              var result3 = null;
+              pos = savedPos1;
             }
           } else {
-            var result5 = null;
-            pos = savedPos2;
+            var result3 = null;
+            pos = savedPos1;
           }
-          while (result5 !== null) {
-            result4.push(result5);
-            var savedPos2 = pos;
-            var result6 = parse___();
-            if (result6 !== null) {
+          while (result3 !== null) {
+            result2.push(result3);
+            var savedPos1 = pos;
+            var result4 = parse___();
+            if (result4 !== null) {
               if (input.substr(pos, 1) === ",") {
-                var result7 = ",";
+                var result5 = ",";
                 pos += 1;
               } else {
-                var result7 = null;
+                var result5 = null;
                 if (reportMatchFailures) {
                   matchFailed("\",\"");
                 }
               }
-              if (result7 !== null) {
-                var result5 = [result6, result7];
+              if (result5 !== null) {
+                var result3 = [result4, result5];
               } else {
-                var result5 = null;
-                pos = savedPos2;
+                var result3 = null;
+                pos = savedPos1;
               }
             } else {
-              var result5 = null;
-              pos = savedPos2;
+              var result3 = null;
+              pos = savedPos1;
             }
           }
-          if (result4 !== null) {
-            var result1 = [result3, result4];
+          if (result2 !== null) {
+            var result0 = [result1, result2];
           } else {
-            var result1 = null;
-            pos = savedPos1;
+            var result0 = null;
+            pos = savedPos0;
           }
-        } else {
-          var result1 = null;
-          pos = savedPos1;
-        }
-        var result2 = result1 !== null
-          ? (function() { parseHandler('Elision'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
         } else {
           var result0 = null;
           pos = savedPos0;
@@ -7545,7 +7006,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(properties) { parseHandler('ObjectLiteral'); })(result1[2])
+          ? (function(properties) {
+                return {
+                  type: "ObjectLiteral",
+                  properties: properties !== "" ? properties[0] : []
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -7659,7 +7125,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('PropertyNameAndValueList'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][3]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -7686,157 +7158,189 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos3 = pos;
-        var result34 = parse_PropertyName();
-        if (result34 !== null) {
-          var result35 = parse___();
-          if (result35 !== null) {
+        var savedPos4 = pos;
+        var savedPos5 = pos;
+        var result38 = parse_PropertyName();
+        if (result38 !== null) {
+          var result39 = parse___();
+          if (result39 !== null) {
             if (input.substr(pos, 1) === ":") {
-              var result36 = ":";
+              var result40 = ":";
               pos += 1;
             } else {
-              var result36 = null;
+              var result40 = null;
               if (reportMatchFailures) {
                 matchFailed("\":\"");
               }
             }
-            if (result36 !== null) {
-              var result37 = parse___();
-              if (result37 !== null) {
-                var result38 = parse_AssignmentExpression();
-                if (result38 !== null) {
-                  var result33 = [result34, result35, result36, result37, result38];
+            if (result40 !== null) {
+              var result41 = parse___();
+              if (result41 !== null) {
+                var result42 = parse_AssignmentExpression();
+                if (result42 !== null) {
+                  var result36 = [result38, result39, result40, result41, result42];
                 } else {
-                  var result33 = null;
-                  pos = savedPos3;
+                  var result36 = null;
+                  pos = savedPos5;
                 }
               } else {
-                var result33 = null;
-                pos = savedPos3;
+                var result36 = null;
+                pos = savedPos5;
               }
             } else {
-              var result33 = null;
-              pos = savedPos3;
+              var result36 = null;
+              pos = savedPos5;
             }
           } else {
-            var result33 = null;
-            pos = savedPos3;
+            var result36 = null;
+            pos = savedPos5;
           }
         } else {
-          var result33 = null;
-          pos = savedPos3;
+          var result36 = null;
+          pos = savedPos5;
         }
-        if (result33 !== null) {
-          var result0 = result33;
+        var result37 = result36 !== null
+          ? (function(name, value) {
+                return {
+                  type: "PropertyAssignment",
+                  name: name,
+                  value: value
+                };
+              })(result36[0], result36[4])
+          : null;
+        if (result37 !== null) {
+          var result35 = result37;
+        } else {
+          var result35 = null;
+          pos = savedPos4;
+        }
+        if (result35 !== null) {
+          var result0 = result35;
         } else {
           var savedPos2 = pos;
-          var result20 = parse_GetToken();
-          if (result20 !== null) {
-            var result21 = parse___();
-            if (result21 !== null) {
-              var result22 = parse_PropertyName();
-              if (result22 !== null) {
-                var result23 = parse___();
-                if (result23 !== null) {
+          var savedPos3 = pos;
+          var result22 = parse_GetToken();
+          if (result22 !== null) {
+            var result23 = parse___();
+            if (result23 !== null) {
+              var result24 = parse_PropertyName();
+              if (result24 !== null) {
+                var result25 = parse___();
+                if (result25 !== null) {
                   if (input.substr(pos, 1) === "(") {
-                    var result24 = "(";
+                    var result26 = "(";
                     pos += 1;
                   } else {
-                    var result24 = null;
+                    var result26 = null;
                     if (reportMatchFailures) {
                       matchFailed("\"(\"");
                     }
                   }
-                  if (result24 !== null) {
-                    var result25 = parse___();
-                    if (result25 !== null) {
+                  if (result26 !== null) {
+                    var result27 = parse___();
+                    if (result27 !== null) {
                       if (input.substr(pos, 1) === ")") {
-                        var result26 = ")";
+                        var result28 = ")";
                         pos += 1;
                       } else {
-                        var result26 = null;
+                        var result28 = null;
                         if (reportMatchFailures) {
                           matchFailed("\")\"");
                         }
                       }
-                      if (result26 !== null) {
-                        var result27 = parse___();
-                        if (result27 !== null) {
+                      if (result28 !== null) {
+                        var result29 = parse___();
+                        if (result29 !== null) {
                           if (input.substr(pos, 1) === "{") {
-                            var result28 = "{";
+                            var result30 = "{";
                             pos += 1;
                           } else {
-                            var result28 = null;
+                            var result30 = null;
                             if (reportMatchFailures) {
                               matchFailed("\"{\"");
                             }
                           }
-                          if (result28 !== null) {
-                            var result29 = parse___();
-                            if (result29 !== null) {
-                              var result30 = parse_FunctionBody();
-                              if (result30 !== null) {
-                                var result31 = parse___();
-                                if (result31 !== null) {
+                          if (result30 !== null) {
+                            var result31 = parse___();
+                            if (result31 !== null) {
+                              var result32 = parse_FunctionBody();
+                              if (result32 !== null) {
+                                var result33 = parse___();
+                                if (result33 !== null) {
                                   if (input.substr(pos, 1) === "}") {
-                                    var result32 = "}";
+                                    var result34 = "}";
                                     pos += 1;
                                   } else {
-                                    var result32 = null;
+                                    var result34 = null;
                                     if (reportMatchFailures) {
                                       matchFailed("\"}\"");
                                     }
                                   }
-                                  if (result32 !== null) {
-                                    var result19 = [result20, result21, result22, result23, result24, result25, result26, result27, result28, result29, result30, result31, result32];
+                                  if (result34 !== null) {
+                                    var result20 = [result22, result23, result24, result25, result26, result27, result28, result29, result30, result31, result32, result33, result34];
                                   } else {
-                                    var result19 = null;
-                                    pos = savedPos2;
+                                    var result20 = null;
+                                    pos = savedPos3;
                                   }
                                 } else {
-                                  var result19 = null;
-                                  pos = savedPos2;
+                                  var result20 = null;
+                                  pos = savedPos3;
                                 }
                               } else {
-                                var result19 = null;
-                                pos = savedPos2;
+                                var result20 = null;
+                                pos = savedPos3;
                               }
                             } else {
-                              var result19 = null;
-                              pos = savedPos2;
+                              var result20 = null;
+                              pos = savedPos3;
                             }
                           } else {
-                            var result19 = null;
-                            pos = savedPos2;
+                            var result20 = null;
+                            pos = savedPos3;
                           }
                         } else {
-                          var result19 = null;
-                          pos = savedPos2;
+                          var result20 = null;
+                          pos = savedPos3;
                         }
                       } else {
-                        var result19 = null;
-                        pos = savedPos2;
+                        var result20 = null;
+                        pos = savedPos3;
                       }
                     } else {
-                      var result19 = null;
-                      pos = savedPos2;
+                      var result20 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result19 = null;
-                    pos = savedPos2;
+                    var result20 = null;
+                    pos = savedPos3;
                   }
                 } else {
-                  var result19 = null;
-                  pos = savedPos2;
+                  var result20 = null;
+                  pos = savedPos3;
                 }
               } else {
-                var result19 = null;
-                pos = savedPos2;
+                var result20 = null;
+                pos = savedPos3;
               }
             } else {
-              var result19 = null;
-              pos = savedPos2;
+              var result20 = null;
+              pos = savedPos3;
             }
+          } else {
+            var result20 = null;
+            pos = savedPos3;
+          }
+          var result21 = result20 !== null
+            ? (function(name, body) {
+                  return {
+                    type: "GetterDefinition",
+                    name: name,
+                    body: body
+                  };
+                })(result20[2], result20[10])
+            : null;
+          if (result21 !== null) {
+            var result19 = result21;
           } else {
             var result19 = null;
             pos = savedPos2;
@@ -7866,7 +7370,7 @@ timotuominen.createParser = function (parseHandler) {
                     if (result8 !== null) {
                       var result9 = parse___();
                       if (result9 !== null) {
-                        var result10 = parse_PropertySetParameterList();
+                        var result10 = parse_Identifier();
                         if (result10 !== null) {
                           var result11 = parse___();
                           if (result11 !== null) {
@@ -7970,7 +7474,14 @@ timotuominen.createParser = function (parseHandler) {
               pos = savedPos1;
             }
             var result3 = result2 !== null
-              ? (function(name, param, body) { parseHandler('PropertyAssignment'); })(result2[2], result2[6], result2[12])
+              ? (function(name, param, body) {
+                    return {
+                      type: "SetterDefinition",
+                      name: name,
+                      param: param,
+                      body: body
+                    };
+                  })(result2[2], result2[6], result2[12])
               : null;
             if (result3 !== null) {
               var result1 = result3;
@@ -8004,61 +7515,21 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result5 = parse_IdentifierName();
-        if (result5 !== null) {
-          var result0 = result5;
+        var result3 = parse_IdentifierName();
+        if (result3 !== null) {
+          var result0 = result3;
         } else {
-          var result4 = parse_StringLiteral();
-          if (result4 !== null) {
-            var result0 = result4;
+          var result2 = parse_StringLiteral();
+          if (result2 !== null) {
+            var result0 = result2;
           } else {
-            var savedPos0 = pos;
-            var result2 = parse_NumericLiteral();
-            var result3 = result2 !== null
-              ? (function() { parseHandler('PropertyName'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
-            }
+            var result1 = parse_NumericLiteral();
             if (result1 !== null) {
               var result0 = result1;
             } else {
               var result0 = null;;
             };
           };
-        }
-        
-        
-        
-        cache[cacheKey] = {
-          nextPos: pos,
-          result:  result0
-        };
-        return result0;
-      }
-      
-      function parse_PropertySetParameterList() {
-        var cacheKey = 'PropertySetParameterList@' + pos;
-        var cachedResult = cache[cacheKey];
-        if (cachedResult) {
-          pos = cachedResult.nextPos;
-          return cachedResult.result;
-        }
-        
-        
-        var savedPos0 = pos;
-        var result1 = parse_Identifier();
-        var result2 = result1 !== null
-          ? (function() { parseHandler('PropertySetParameterList'); })()
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
         }
         
         
@@ -8081,48 +7552,64 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedPos0 = pos;
         var savedPos1 = pos;
-        var result25 = parse_PrimaryExpression();
-        if (result25 !== null) {
-          var result3 = result25;
+        var result31 = parse_PrimaryExpression();
+        if (result31 !== null) {
+          var result3 = result31;
         } else {
-          var result24 = parse_FunctionExpression();
-          if (result24 !== null) {
-            var result3 = result24;
+          var result30 = parse_FunctionExpression();
+          if (result30 !== null) {
+            var result3 = result30;
           } else {
-            var savedPos4 = pos;
-            var result19 = parse_NewToken();
-            if (result19 !== null) {
-              var result20 = parse___();
-              if (result20 !== null) {
-                var result21 = parse_MemberExpression();
-                if (result21 !== null) {
-                  var result22 = parse___();
-                  if (result22 !== null) {
-                    var result23 = parse_Arguments();
-                    if (result23 !== null) {
-                      var result18 = [result19, result20, result21, result22, result23];
+            var savedPos6 = pos;
+            var savedPos7 = pos;
+            var result25 = parse_NewToken();
+            if (result25 !== null) {
+              var result26 = parse___();
+              if (result26 !== null) {
+                var result27 = parse_MemberExpression();
+                if (result27 !== null) {
+                  var result28 = parse___();
+                  if (result28 !== null) {
+                    var result29 = parse_Arguments();
+                    if (result29 !== null) {
+                      var result23 = [result25, result26, result27, result28, result29];
                     } else {
-                      var result18 = null;
-                      pos = savedPos4;
+                      var result23 = null;
+                      pos = savedPos7;
                     }
                   } else {
-                    var result18 = null;
-                    pos = savedPos4;
+                    var result23 = null;
+                    pos = savedPos7;
                   }
                 } else {
-                  var result18 = null;
-                  pos = savedPos4;
+                  var result23 = null;
+                  pos = savedPos7;
                 }
               } else {
-                var result18 = null;
-                pos = savedPos4;
+                var result23 = null;
+                pos = savedPos7;
               }
             } else {
-              var result18 = null;
-              pos = savedPos4;
+              var result23 = null;
+              pos = savedPos7;
             }
-            if (result18 !== null) {
-              var result3 = result18;
+            var result24 = result23 !== null
+              ? (function(constructor, arguments) {
+                        return {
+                          type: "NewOperator",
+                          constructor: constructor,
+                          arguments: arguments
+                        };
+                      })(result23[2], result23[4])
+              : null;
+            if (result24 !== null) {
+              var result22 = result24;
+            } else {
+              var result22 = null;
+              pos = savedPos6;
+            }
+            if (result22 !== null) {
+              var result3 = result22;
             } else {
               var result3 = null;;
             };
@@ -8130,93 +7617,113 @@ timotuominen.createParser = function (parseHandler) {
         }
         if (result3 !== null) {
           var result4 = [];
-          var savedPos3 = pos;
-          var result12 = parse___();
-          if (result12 !== null) {
+          var savedPos4 = pos;
+          var savedPos5 = pos;
+          var result16 = parse___();
+          if (result16 !== null) {
             if (input.substr(pos, 1) === "[") {
-              var result13 = "[";
+              var result17 = "[";
               pos += 1;
             } else {
-              var result13 = null;
+              var result17 = null;
               if (reportMatchFailures) {
                 matchFailed("\"[\"");
               }
             }
-            if (result13 !== null) {
-              var result14 = parse___();
-              if (result14 !== null) {
-                var result15 = parse_Expression();
-                if (result15 !== null) {
-                  var result16 = parse___();
-                  if (result16 !== null) {
+            if (result17 !== null) {
+              var result18 = parse___();
+              if (result18 !== null) {
+                var result19 = parse_Expression();
+                if (result19 !== null) {
+                  var result20 = parse___();
+                  if (result20 !== null) {
                     if (input.substr(pos, 1) === "]") {
-                      var result17 = "]";
+                      var result21 = "]";
                       pos += 1;
                     } else {
-                      var result17 = null;
+                      var result21 = null;
                       if (reportMatchFailures) {
                         matchFailed("\"]\"");
                       }
                     }
-                    if (result17 !== null) {
-                      var result11 = [result12, result13, result14, result15, result16, result17];
+                    if (result21 !== null) {
+                      var result14 = [result16, result17, result18, result19, result20, result21];
                     } else {
-                      var result11 = null;
-                      pos = savedPos3;
+                      var result14 = null;
+                      pos = savedPos5;
                     }
                   } else {
-                    var result11 = null;
-                    pos = savedPos3;
+                    var result14 = null;
+                    pos = savedPos5;
                   }
                 } else {
-                  var result11 = null;
-                  pos = savedPos3;
+                  var result14 = null;
+                  pos = savedPos5;
                 }
               } else {
-                var result11 = null;
-                pos = savedPos3;
+                var result14 = null;
+                pos = savedPos5;
               }
             } else {
-              var result11 = null;
-              pos = savedPos3;
+              var result14 = null;
+              pos = savedPos5;
             }
           } else {
-            var result11 = null;
-            pos = savedPos3;
+            var result14 = null;
+            pos = savedPos5;
           }
-          if (result11 !== null) {
-            var result5 = result11;
+          var result15 = result14 !== null
+            ? (function(name) { return name; })(result14[3])
+            : null;
+          if (result15 !== null) {
+            var result13 = result15;
+          } else {
+            var result13 = null;
+            pos = savedPos4;
+          }
+          if (result13 !== null) {
+            var result5 = result13;
           } else {
             var savedPos2 = pos;
-            var result7 = parse___();
-            if (result7 !== null) {
+            var savedPos3 = pos;
+            var result9 = parse___();
+            if (result9 !== null) {
               if (input.substr(pos, 1) === ".") {
-                var result8 = ".";
+                var result10 = ".";
                 pos += 1;
               } else {
-                var result8 = null;
+                var result10 = null;
                 if (reportMatchFailures) {
                   matchFailed("\".\"");
                 }
               }
-              if (result8 !== null) {
-                var result9 = parse___();
-                if (result9 !== null) {
-                  var result10 = parse_IdentifierName();
-                  if (result10 !== null) {
-                    var result6 = [result7, result8, result9, result10];
+              if (result10 !== null) {
+                var result11 = parse___();
+                if (result11 !== null) {
+                  var result12 = parse_IdentifierName();
+                  if (result12 !== null) {
+                    var result7 = [result9, result10, result11, result12];
                   } else {
-                    var result6 = null;
-                    pos = savedPos2;
+                    var result7 = null;
+                    pos = savedPos3;
                   }
                 } else {
-                  var result6 = null;
-                  pos = savedPos2;
+                  var result7 = null;
+                  pos = savedPos3;
                 }
               } else {
-                var result6 = null;
-                pos = savedPos2;
+                var result7 = null;
+                pos = savedPos3;
               }
+            } else {
+              var result7 = null;
+              pos = savedPos3;
+            }
+            var result8 = result7 !== null
+              ? (function(name) { return name; })(result7[3])
+              : null;
+            if (result8 !== null) {
+              var result6 = result8;
             } else {
               var result6 = null;
               pos = savedPos2;
@@ -8229,93 +7736,113 @@ timotuominen.createParser = function (parseHandler) {
           }
           while (result5 !== null) {
             result4.push(result5);
-            var savedPos3 = pos;
-            var result12 = parse___();
-            if (result12 !== null) {
+            var savedPos4 = pos;
+            var savedPos5 = pos;
+            var result16 = parse___();
+            if (result16 !== null) {
               if (input.substr(pos, 1) === "[") {
-                var result13 = "[";
+                var result17 = "[";
                 pos += 1;
               } else {
-                var result13 = null;
+                var result17 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"[\"");
                 }
               }
-              if (result13 !== null) {
-                var result14 = parse___();
-                if (result14 !== null) {
-                  var result15 = parse_Expression();
-                  if (result15 !== null) {
-                    var result16 = parse___();
-                    if (result16 !== null) {
+              if (result17 !== null) {
+                var result18 = parse___();
+                if (result18 !== null) {
+                  var result19 = parse_Expression();
+                  if (result19 !== null) {
+                    var result20 = parse___();
+                    if (result20 !== null) {
                       if (input.substr(pos, 1) === "]") {
-                        var result17 = "]";
+                        var result21 = "]";
                         pos += 1;
                       } else {
-                        var result17 = null;
+                        var result21 = null;
                         if (reportMatchFailures) {
                           matchFailed("\"]\"");
                         }
                       }
-                      if (result17 !== null) {
-                        var result11 = [result12, result13, result14, result15, result16, result17];
+                      if (result21 !== null) {
+                        var result14 = [result16, result17, result18, result19, result20, result21];
                       } else {
-                        var result11 = null;
-                        pos = savedPos3;
+                        var result14 = null;
+                        pos = savedPos5;
                       }
                     } else {
-                      var result11 = null;
-                      pos = savedPos3;
+                      var result14 = null;
+                      pos = savedPos5;
                     }
                   } else {
-                    var result11 = null;
-                    pos = savedPos3;
+                    var result14 = null;
+                    pos = savedPos5;
                   }
                 } else {
-                  var result11 = null;
-                  pos = savedPos3;
+                  var result14 = null;
+                  pos = savedPos5;
                 }
               } else {
-                var result11 = null;
-                pos = savedPos3;
+                var result14 = null;
+                pos = savedPos5;
               }
             } else {
-              var result11 = null;
-              pos = savedPos3;
+              var result14 = null;
+              pos = savedPos5;
             }
-            if (result11 !== null) {
-              var result5 = result11;
+            var result15 = result14 !== null
+              ? (function(name) { return name; })(result14[3])
+              : null;
+            if (result15 !== null) {
+              var result13 = result15;
+            } else {
+              var result13 = null;
+              pos = savedPos4;
+            }
+            if (result13 !== null) {
+              var result5 = result13;
             } else {
               var savedPos2 = pos;
-              var result7 = parse___();
-              if (result7 !== null) {
+              var savedPos3 = pos;
+              var result9 = parse___();
+              if (result9 !== null) {
                 if (input.substr(pos, 1) === ".") {
-                  var result8 = ".";
+                  var result10 = ".";
                   pos += 1;
                 } else {
-                  var result8 = null;
+                  var result10 = null;
                   if (reportMatchFailures) {
                     matchFailed("\".\"");
                   }
                 }
-                if (result8 !== null) {
-                  var result9 = parse___();
-                  if (result9 !== null) {
-                    var result10 = parse_IdentifierName();
-                    if (result10 !== null) {
-                      var result6 = [result7, result8, result9, result10];
+                if (result10 !== null) {
+                  var result11 = parse___();
+                  if (result11 !== null) {
+                    var result12 = parse_IdentifierName();
+                    if (result12 !== null) {
+                      var result7 = [result9, result10, result11, result12];
                     } else {
-                      var result6 = null;
-                      pos = savedPos2;
+                      var result7 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result6 = null;
-                    pos = savedPos2;
+                    var result7 = null;
+                    pos = savedPos3;
                   }
                 } else {
-                  var result6 = null;
-                  pos = savedPos2;
+                  var result7 = null;
+                  pos = savedPos3;
                 }
+              } else {
+                var result7 = null;
+                pos = savedPos3;
+              }
+              var result8 = result7 !== null
+                ? (function(name) { return name; })(result7[3])
+                : null;
+              if (result8 !== null) {
+                var result6 = result8;
               } else {
                 var result6 = null;
                 pos = savedPos2;
@@ -8338,7 +7865,17 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(base, accessors) { parseHandler('MemberExpression'); })(result1[0], result1[1])
+          ? (function(base, accessors) {
+                var result = base;
+                for (var i = 0; i < accessors.length; i++) {
+                  result = {
+                    type: "PropertyAccess",
+                    base: result,
+                    name: accessors[i]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -8391,7 +7928,13 @@ timotuominen.createParser = function (parseHandler) {
             pos = savedPos1;
           }
           var result3 = result2 !== null
-            ? (function(constructor) { parseHandler('NewExpression'); })(result2[2])
+            ? (function(constructor) {
+                  return {
+                    type: "NewOperator",
+                    constructor: constructor,
+                    arguments: []
+                  };
+                })(result2[2])
             : null;
           if (result3 !== null) {
             var result1 = result3;
@@ -8426,132 +7969,193 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedPos0 = pos;
         var savedPos1 = pos;
-        var savedPos5 = pos;
-        var result21 = parse_MemberExpression();
-        if (result21 !== null) {
-          var result22 = parse___();
-          if (result22 !== null) {
-            var result23 = parse_Arguments();
-            if (result23 !== null) {
-              var result3 = [result21, result22, result23];
+        var savedPos8 = pos;
+        var savedPos9 = pos;
+        var result29 = parse_MemberExpression();
+        if (result29 !== null) {
+          var result30 = parse___();
+          if (result30 !== null) {
+            var result31 = parse_Arguments();
+            if (result31 !== null) {
+              var result27 = [result29, result30, result31];
             } else {
-              var result3 = null;
-              pos = savedPos5;
+              var result27 = null;
+              pos = savedPos9;
             }
           } else {
-            var result3 = null;
-            pos = savedPos5;
+            var result27 = null;
+            pos = savedPos9;
           }
         } else {
+          var result27 = null;
+          pos = savedPos9;
+        }
+        var result28 = result27 !== null
+          ? (function(name, arguments) {
+                  return {
+                    type: "FunctionCall",
+                    name: name,
+                    arguments: arguments
+                  };
+                })(result27[0], result27[2])
+          : null;
+        if (result28 !== null) {
+          var result3 = result28;
+        } else {
           var result3 = null;
-          pos = savedPos5;
+          pos = savedPos8;
         }
         if (result3 !== null) {
           var result4 = [];
-          var savedPos4 = pos;
-          var result19 = parse___();
-          if (result19 !== null) {
-            var result20 = parse_Arguments();
-            if (result20 !== null) {
-              var result18 = [result19, result20];
+          var savedPos6 = pos;
+          var savedPos7 = pos;
+          var result25 = parse___();
+          if (result25 !== null) {
+            var result26 = parse_Arguments();
+            if (result26 !== null) {
+              var result23 = [result25, result26];
             } else {
-              var result18 = null;
-              pos = savedPos4;
+              var result23 = null;
+              pos = savedPos7;
             }
           } else {
-            var result18 = null;
-            pos = savedPos4;
+            var result23 = null;
+            pos = savedPos7;
           }
-          if (result18 !== null) {
-            var result5 = result18;
+          var result24 = result23 !== null
+            ? (function(arguments) {
+                      return {
+                        type: "FunctionCallArguments",
+                        arguments: arguments
+                      };
+                    })(result23[1])
+            : null;
+          if (result24 !== null) {
+            var result22 = result24;
           } else {
-            var savedPos3 = pos;
-            var result12 = parse___();
-            if (result12 !== null) {
+            var result22 = null;
+            pos = savedPos6;
+          }
+          if (result22 !== null) {
+            var result5 = result22;
+          } else {
+            var savedPos4 = pos;
+            var savedPos5 = pos;
+            var result16 = parse___();
+            if (result16 !== null) {
               if (input.substr(pos, 1) === "[") {
-                var result13 = "[";
+                var result17 = "[";
                 pos += 1;
               } else {
-                var result13 = null;
+                var result17 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"[\"");
                 }
               }
-              if (result13 !== null) {
-                var result14 = parse___();
-                if (result14 !== null) {
-                  var result15 = parse_Expression();
-                  if (result15 !== null) {
-                    var result16 = parse___();
-                    if (result16 !== null) {
+              if (result17 !== null) {
+                var result18 = parse___();
+                if (result18 !== null) {
+                  var result19 = parse_Expression();
+                  if (result19 !== null) {
+                    var result20 = parse___();
+                    if (result20 !== null) {
                       if (input.substr(pos, 1) === "]") {
-                        var result17 = "]";
+                        var result21 = "]";
                         pos += 1;
                       } else {
-                        var result17 = null;
+                        var result21 = null;
                         if (reportMatchFailures) {
                           matchFailed("\"]\"");
                         }
                       }
-                      if (result17 !== null) {
-                        var result11 = [result12, result13, result14, result15, result16, result17];
+                      if (result21 !== null) {
+                        var result14 = [result16, result17, result18, result19, result20, result21];
                       } else {
-                        var result11 = null;
-                        pos = savedPos3;
+                        var result14 = null;
+                        pos = savedPos5;
                       }
                     } else {
-                      var result11 = null;
-                      pos = savedPos3;
+                      var result14 = null;
+                      pos = savedPos5;
                     }
                   } else {
-                    var result11 = null;
-                    pos = savedPos3;
+                    var result14 = null;
+                    pos = savedPos5;
                   }
                 } else {
-                  var result11 = null;
-                  pos = savedPos3;
+                  var result14 = null;
+                  pos = savedPos5;
                 }
               } else {
-                var result11 = null;
-                pos = savedPos3;
+                var result14 = null;
+                pos = savedPos5;
               }
             } else {
-              var result11 = null;
-              pos = savedPos3;
+              var result14 = null;
+              pos = savedPos5;
             }
-            if (result11 !== null) {
-              var result5 = result11;
+            var result15 = result14 !== null
+              ? (function(name) {
+                        return {
+                          type: "PropertyAccessProperty",
+                          name: name
+                        };
+                      })(result14[3])
+              : null;
+            if (result15 !== null) {
+              var result13 = result15;
+            } else {
+              var result13 = null;
+              pos = savedPos4;
+            }
+            if (result13 !== null) {
+              var result5 = result13;
             } else {
               var savedPos2 = pos;
-              var result7 = parse___();
-              if (result7 !== null) {
+              var savedPos3 = pos;
+              var result9 = parse___();
+              if (result9 !== null) {
                 if (input.substr(pos, 1) === ".") {
-                  var result8 = ".";
+                  var result10 = ".";
                   pos += 1;
                 } else {
-                  var result8 = null;
+                  var result10 = null;
                   if (reportMatchFailures) {
                     matchFailed("\".\"");
                   }
                 }
-                if (result8 !== null) {
-                  var result9 = parse___();
-                  if (result9 !== null) {
-                    var result10 = parse_IdentifierName();
-                    if (result10 !== null) {
-                      var result6 = [result7, result8, result9, result10];
+                if (result10 !== null) {
+                  var result11 = parse___();
+                  if (result11 !== null) {
+                    var result12 = parse_IdentifierName();
+                    if (result12 !== null) {
+                      var result7 = [result9, result10, result11, result12];
                     } else {
-                      var result6 = null;
-                      pos = savedPos2;
+                      var result7 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result6 = null;
-                    pos = savedPos2;
+                    var result7 = null;
+                    pos = savedPos3;
                   }
                 } else {
-                  var result6 = null;
-                  pos = savedPos2;
+                  var result7 = null;
+                  pos = savedPos3;
                 }
+              } else {
+                var result7 = null;
+                pos = savedPos3;
+              }
+              var result8 = result7 !== null
+                ? (function(name) {
+                          return {
+                            type: "PropertyAccessProperty",
+                            name: name
+                          };
+                        })(result7[3])
+                : null;
+              if (result8 !== null) {
+                var result6 = result8;
               } else {
                 var result6 = null;
                 pos = savedPos2;
@@ -8565,110 +8169,155 @@ timotuominen.createParser = function (parseHandler) {
           }
           while (result5 !== null) {
             result4.push(result5);
-            var savedPos4 = pos;
-            var result19 = parse___();
-            if (result19 !== null) {
-              var result20 = parse_Arguments();
-              if (result20 !== null) {
-                var result18 = [result19, result20];
+            var savedPos6 = pos;
+            var savedPos7 = pos;
+            var result25 = parse___();
+            if (result25 !== null) {
+              var result26 = parse_Arguments();
+              if (result26 !== null) {
+                var result23 = [result25, result26];
               } else {
-                var result18 = null;
-                pos = savedPos4;
+                var result23 = null;
+                pos = savedPos7;
               }
             } else {
-              var result18 = null;
-              pos = savedPos4;
+              var result23 = null;
+              pos = savedPos7;
             }
-            if (result18 !== null) {
-              var result5 = result18;
+            var result24 = result23 !== null
+              ? (function(arguments) {
+                        return {
+                          type: "FunctionCallArguments",
+                          arguments: arguments
+                        };
+                      })(result23[1])
+              : null;
+            if (result24 !== null) {
+              var result22 = result24;
             } else {
-              var savedPos3 = pos;
-              var result12 = parse___();
-              if (result12 !== null) {
+              var result22 = null;
+              pos = savedPos6;
+            }
+            if (result22 !== null) {
+              var result5 = result22;
+            } else {
+              var savedPos4 = pos;
+              var savedPos5 = pos;
+              var result16 = parse___();
+              if (result16 !== null) {
                 if (input.substr(pos, 1) === "[") {
-                  var result13 = "[";
+                  var result17 = "[";
                   pos += 1;
                 } else {
-                  var result13 = null;
+                  var result17 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"[\"");
                   }
                 }
-                if (result13 !== null) {
-                  var result14 = parse___();
-                  if (result14 !== null) {
-                    var result15 = parse_Expression();
-                    if (result15 !== null) {
-                      var result16 = parse___();
-                      if (result16 !== null) {
+                if (result17 !== null) {
+                  var result18 = parse___();
+                  if (result18 !== null) {
+                    var result19 = parse_Expression();
+                    if (result19 !== null) {
+                      var result20 = parse___();
+                      if (result20 !== null) {
                         if (input.substr(pos, 1) === "]") {
-                          var result17 = "]";
+                          var result21 = "]";
                           pos += 1;
                         } else {
-                          var result17 = null;
+                          var result21 = null;
                           if (reportMatchFailures) {
                             matchFailed("\"]\"");
                           }
                         }
-                        if (result17 !== null) {
-                          var result11 = [result12, result13, result14, result15, result16, result17];
+                        if (result21 !== null) {
+                          var result14 = [result16, result17, result18, result19, result20, result21];
                         } else {
-                          var result11 = null;
-                          pos = savedPos3;
+                          var result14 = null;
+                          pos = savedPos5;
                         }
                       } else {
-                        var result11 = null;
-                        pos = savedPos3;
+                        var result14 = null;
+                        pos = savedPos5;
                       }
                     } else {
-                      var result11 = null;
-                      pos = savedPos3;
+                      var result14 = null;
+                      pos = savedPos5;
                     }
                   } else {
-                    var result11 = null;
-                    pos = savedPos3;
+                    var result14 = null;
+                    pos = savedPos5;
                   }
                 } else {
-                  var result11 = null;
-                  pos = savedPos3;
+                  var result14 = null;
+                  pos = savedPos5;
                 }
               } else {
-                var result11 = null;
-                pos = savedPos3;
+                var result14 = null;
+                pos = savedPos5;
               }
-              if (result11 !== null) {
-                var result5 = result11;
+              var result15 = result14 !== null
+                ? (function(name) {
+                          return {
+                            type: "PropertyAccessProperty",
+                            name: name
+                          };
+                        })(result14[3])
+                : null;
+              if (result15 !== null) {
+                var result13 = result15;
+              } else {
+                var result13 = null;
+                pos = savedPos4;
+              }
+              if (result13 !== null) {
+                var result5 = result13;
               } else {
                 var savedPos2 = pos;
-                var result7 = parse___();
-                if (result7 !== null) {
+                var savedPos3 = pos;
+                var result9 = parse___();
+                if (result9 !== null) {
                   if (input.substr(pos, 1) === ".") {
-                    var result8 = ".";
+                    var result10 = ".";
                     pos += 1;
                   } else {
-                    var result8 = null;
+                    var result10 = null;
                     if (reportMatchFailures) {
                       matchFailed("\".\"");
                     }
                   }
-                  if (result8 !== null) {
-                    var result9 = parse___();
-                    if (result9 !== null) {
-                      var result10 = parse_IdentifierName();
-                      if (result10 !== null) {
-                        var result6 = [result7, result8, result9, result10];
+                  if (result10 !== null) {
+                    var result11 = parse___();
+                    if (result11 !== null) {
+                      var result12 = parse_IdentifierName();
+                      if (result12 !== null) {
+                        var result7 = [result9, result10, result11, result12];
                       } else {
-                        var result6 = null;
-                        pos = savedPos2;
+                        var result7 = null;
+                        pos = savedPos3;
                       }
                     } else {
-                      var result6 = null;
-                      pos = savedPos2;
+                      var result7 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result6 = null;
-                    pos = savedPos2;
+                    var result7 = null;
+                    pos = savedPos3;
                   }
+                } else {
+                  var result7 = null;
+                  pos = savedPos3;
+                }
+                var result8 = result7 !== null
+                  ? (function(name) {
+                            return {
+                              type: "PropertyAccessProperty",
+                              name: name
+                            };
+                          })(result7[3])
+                  : null;
+                if (result8 !== null) {
+                  var result6 = result8;
                 } else {
                   var result6 = null;
                   pos = savedPos2;
@@ -8692,7 +8341,32 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(base, argumentsOrAccessors) { parseHandler('CallExpression'); })(result1[0], result1[1])
+          ? (function(base, argumentsOrAccessors) {
+                var result = base;
+                for (var i = 0; i < argumentsOrAccessors.length; i++) {
+                  switch (argumentsOrAccessors[i].type) {
+                    case "FunctionCallArguments":
+                      result = {
+                        type: "FuctionCall",
+                        name: result,
+                        arguments: argumentsOrAccessors[i].arguments
+                      };
+                      break;
+                    case "PropertyAccessProperty":
+                      result = {
+                        type: "PropertyAccess",
+                        base: result,
+                        name: argumentsOrAccessors[i].name
+                      };
+                      break;
+                    default:
+                      throw new Error(
+                        "Invalid expression type: " + argumentsOrAccessors[i].type
+                      );
+                  }
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -8770,7 +8444,9 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(arguments) { parseHandler('Arguments'); })(result1[2])
+          ? (function(arguments) {
+              return arguments !== "" ? arguments : [];
+            })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -8884,7 +8560,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('ArgumentList'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+              var result = [head];
+              for (var i = 0; i < tail.length; i++) {
+                result.push(tail[i][3]);
+              }
+              return result;
+            })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -8911,21 +8593,11 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result4 = parse_CallExpression();
-        if (result4 !== null) {
-          var result0 = result4;
+        var result2 = parse_CallExpression();
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_NewExpression();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('LeftHandSideExpression'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result1 = parse_NewExpression();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -8951,6 +8623,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var result5 = parse_LeftHandSideExpression();
         if (result5 !== null) {
@@ -8958,33 +8631,38 @@ timotuominen.createParser = function (parseHandler) {
           if (result6 !== null) {
             var result7 = parse_PostfixOperator();
             if (result7 !== null) {
-              var result4 = [result5, result6, result7];
+              var result3 = [result5, result6, result7];
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(expression, operator) {
+                return {
+                  type: "PostfixExpression",
+                  operator: operator,
+                  expression: expression
+                };
+              })(result3[0], result3[2])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_LeftHandSideExpression();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('PostfixExpression'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_LeftHandSideExpression();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -9011,35 +8689,25 @@ timotuominen.createParser = function (parseHandler) {
         
         
         if (input.substr(pos, 2) === "++") {
-          var result4 = "++";
+          var result2 = "++";
           pos += 2;
         } else {
-          var result4 = null;
+          var result2 = null;
           if (reportMatchFailures) {
             matchFailed("\"++\"");
           }
         }
-        if (result4 !== null) {
-          var result0 = result4;
+        if (result2 !== null) {
+          var result0 = result2;
         } else {
-          var savedPos0 = pos;
           if (input.substr(pos, 2) === "--") {
-            var result2 = "--";
+            var result1 = "--";
             pos += 2;
           } else {
-            var result2 = null;
+            var result1 = null;
             if (reportMatchFailures) {
               matchFailed("\"--\"");
             }
-          }
-          var result3 = result2 !== null
-            ? (function() { parseHandler('PostfixOperator'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
           }
           if (result1 !== null) {
             var result0 = result1;
@@ -9092,7 +8760,13 @@ timotuominen.createParser = function (parseHandler) {
             pos = savedPos1;
           }
           var result3 = result2 !== null
-            ? (function(operator, expression) { parseHandler('UnaryExpression'); })(result2[0], result2[2])
+            ? (function(operator, expression) {
+                  return {
+                    type: "UnaryExpression",
+                    operator: operator,
+                    expression: expression
+                  };
+                })(result2[0], result2[2])
             : null;
           if (result3 !== null) {
             var result1 = result3;
@@ -9125,96 +8799,86 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result11 = parse_DeleteToken();
-        if (result11 !== null) {
-          var result0 = result11;
+        var result9 = parse_DeleteToken();
+        if (result9 !== null) {
+          var result0 = result9;
         } else {
-          var result10 = parse_VoidToken();
-          if (result10 !== null) {
-            var result0 = result10;
+          var result8 = parse_VoidToken();
+          if (result8 !== null) {
+            var result0 = result8;
           } else {
-            var result9 = parse_TypeofToken();
-            if (result9 !== null) {
-              var result0 = result9;
+            var result7 = parse_TypeofToken();
+            if (result7 !== null) {
+              var result0 = result7;
             } else {
               if (input.substr(pos, 2) === "++") {
-                var result8 = "++";
+                var result6 = "++";
                 pos += 2;
               } else {
-                var result8 = null;
+                var result6 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"++\"");
                 }
               }
-              if (result8 !== null) {
-                var result0 = result8;
+              if (result6 !== null) {
+                var result0 = result6;
               } else {
                 if (input.substr(pos, 2) === "--") {
-                  var result7 = "--";
+                  var result5 = "--";
                   pos += 2;
                 } else {
-                  var result7 = null;
+                  var result5 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"--\"");
                   }
                 }
-                if (result7 !== null) {
-                  var result0 = result7;
+                if (result5 !== null) {
+                  var result0 = result5;
                 } else {
                   if (input.substr(pos, 1) === "+") {
-                    var result6 = "+";
+                    var result4 = "+";
                     pos += 1;
                   } else {
-                    var result6 = null;
+                    var result4 = null;
                     if (reportMatchFailures) {
                       matchFailed("\"+\"");
                     }
                   }
-                  if (result6 !== null) {
-                    var result0 = result6;
+                  if (result4 !== null) {
+                    var result0 = result4;
                   } else {
                     if (input.substr(pos, 1) === "-") {
-                      var result5 = "-";
+                      var result3 = "-";
                       pos += 1;
                     } else {
-                      var result5 = null;
+                      var result3 = null;
                       if (reportMatchFailures) {
                         matchFailed("\"-\"");
                       }
                     }
-                    if (result5 !== null) {
-                      var result0 = result5;
+                    if (result3 !== null) {
+                      var result0 = result3;
                     } else {
                       if (input.substr(pos, 1) === "~") {
-                        var result4 = "~";
+                        var result2 = "~";
                         pos += 1;
                       } else {
-                        var result4 = null;
+                        var result2 = null;
                         if (reportMatchFailures) {
                           matchFailed("\"~\"");
                         }
                       }
-                      if (result4 !== null) {
-                        var result0 = result4;
+                      if (result2 !== null) {
+                        var result0 = result2;
                       } else {
-                        var savedPos0 = pos;
                         if (input.substr(pos, 1) === "!") {
-                          var result2 = "!";
+                          var result1 = "!";
                           pos += 1;
                         } else {
-                          var result2 = null;
+                          var result1 = null;
                           if (reportMatchFailures) {
                             matchFailed("\"!\"");
                           }
-                        }
-                        var result3 = result2 !== null
-                          ? (function() { parseHandler('UnaryOperator'); })()
-                          : null;
-                        if (result3 !== null) {
-                          var result1 = result3;
-                        } else {
-                          var result1 = null;
-                          pos = savedPos0;
                         }
                         if (result1 !== null) {
                           var result0 = result1;
@@ -9319,7 +8983,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('MultiplicativeExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -9419,7 +9094,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(operator) { parseHandler('MultiplicativeOperator'); })(result1[0])
+          ? (function(operator) { return operator; })(result1[0])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -9517,7 +9192,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('AdditiveExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -9545,59 +9231,69 @@ timotuominen.createParser = function (parseHandler) {
         
         
         var savedPos3 = pos;
+        var savedPos4 = pos;
         if (input.substr(pos, 1) === "+") {
-          var result10 = "+";
+          var result12 = "+";
           pos += 1;
         } else {
-          var result10 = null;
+          var result12 = null;
           if (reportMatchFailures) {
             matchFailed("\"+\"");
           }
         }
-        if (result10 !== null) {
-          var savedPos4 = pos;
+        if (result12 !== null) {
+          var savedPos5 = pos;
           var savedReportMatchFailuresVar1 = reportMatchFailures;
           reportMatchFailures = false;
           if (input.substr(pos, 1) === "+") {
-            var result14 = "+";
+            var result16 = "+";
             pos += 1;
           } else {
-            var result14 = null;
+            var result16 = null;
             if (reportMatchFailures) {
               matchFailed("\"+\"");
             }
           }
-          if (result14 !== null) {
-            var result12 = result14;
+          if (result16 !== null) {
+            var result14 = result16;
           } else {
             if (input.substr(pos, 1) === "=") {
-              var result13 = "=";
+              var result15 = "=";
               pos += 1;
             } else {
-              var result13 = null;
+              var result15 = null;
               if (reportMatchFailures) {
                 matchFailed("\"=\"");
               }
             }
-            if (result13 !== null) {
-              var result12 = result13;
+            if (result15 !== null) {
+              var result14 = result15;
             } else {
-              var result12 = null;;
+              var result14 = null;;
             };
           }
           reportMatchFailures = savedReportMatchFailuresVar1;
-          if (result12 === null) {
-            var result11 = '';
+          if (result14 === null) {
+            var result13 = '';
           } else {
-            var result11 = null;
+            var result13 = null;
+            pos = savedPos5;
+          }
+          if (result13 !== null) {
+            var result10 = [result12, result13];
+          } else {
+            var result10 = null;
             pos = savedPos4;
           }
-          if (result11 !== null) {
-            var result9 = [result10, result11];
-          } else {
-            var result9 = null;
-            pos = savedPos3;
-          }
+        } else {
+          var result10 = null;
+          pos = savedPos4;
+        }
+        var result11 = result10 !== null
+          ? (function() { return "+"; })()
+          : null;
+        if (result11 !== null) {
+          var result9 = result11;
         } else {
           var result9 = null;
           pos = savedPos3;
@@ -9665,7 +9361,7 @@ timotuominen.createParser = function (parseHandler) {
             pos = savedPos1;
           }
           var result3 = result2 !== null
-            ? (function() { parseHandler('AdditiveOperator'); })()
+            ? (function() { return "-"; })()
             : null;
           if (result3 !== null) {
             var result1 = result3;
@@ -9769,7 +9465,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('ShiftExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -9797,47 +9504,37 @@ timotuominen.createParser = function (parseHandler) {
         
         
         if (input.substr(pos, 2) === "<<") {
-          var result5 = "<<";
+          var result3 = "<<";
           pos += 2;
         } else {
-          var result5 = null;
+          var result3 = null;
           if (reportMatchFailures) {
             matchFailed("\"<<\"");
           }
         }
-        if (result5 !== null) {
-          var result0 = result5;
+        if (result3 !== null) {
+          var result0 = result3;
         } else {
           if (input.substr(pos, 3) === ">>>") {
-            var result4 = ">>>";
+            var result2 = ">>>";
             pos += 3;
           } else {
-            var result4 = null;
+            var result2 = null;
             if (reportMatchFailures) {
               matchFailed("\">>>\"");
             }
           }
-          if (result4 !== null) {
-            var result0 = result4;
+          if (result2 !== null) {
+            var result0 = result2;
           } else {
-            var savedPos0 = pos;
             if (input.substr(pos, 2) === ">>") {
-              var result2 = ">>";
+              var result1 = ">>";
               pos += 2;
             } else {
-              var result2 = null;
+              var result1 = null;
               if (reportMatchFailures) {
                 matchFailed("\">>\"");
               }
-            }
-            var result3 = result2 !== null
-              ? (function() { parseHandler('ShiftOperator'); })()
-              : null;
-            if (result3 !== null) {
-              var result1 = result3;
-            } else {
-              var result1 = null;
-              pos = savedPos0;
             }
             if (result1 !== null) {
               var result0 = result1;
@@ -9936,7 +9633,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('RelationalExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -9964,68 +9672,58 @@ timotuominen.createParser = function (parseHandler) {
         
         
         if (input.substr(pos, 2) === "<=") {
-          var result8 = "<=";
+          var result6 = "<=";
           pos += 2;
         } else {
-          var result8 = null;
+          var result6 = null;
           if (reportMatchFailures) {
             matchFailed("\"<=\"");
           }
         }
-        if (result8 !== null) {
-          var result0 = result8;
+        if (result6 !== null) {
+          var result0 = result6;
         } else {
           if (input.substr(pos, 2) === ">=") {
-            var result7 = ">=";
+            var result5 = ">=";
             pos += 2;
           } else {
-            var result7 = null;
+            var result5 = null;
             if (reportMatchFailures) {
               matchFailed("\">=\"");
             }
           }
-          if (result7 !== null) {
-            var result0 = result7;
+          if (result5 !== null) {
+            var result0 = result5;
           } else {
             if (input.substr(pos, 1) === "<") {
-              var result6 = "<";
+              var result4 = "<";
               pos += 1;
             } else {
-              var result6 = null;
+              var result4 = null;
               if (reportMatchFailures) {
                 matchFailed("\"<\"");
               }
             }
-            if (result6 !== null) {
-              var result0 = result6;
+            if (result4 !== null) {
+              var result0 = result4;
             } else {
               if (input.substr(pos, 1) === ">") {
-                var result5 = ">";
+                var result3 = ">";
                 pos += 1;
               } else {
-                var result5 = null;
+                var result3 = null;
                 if (reportMatchFailures) {
                   matchFailed("\">\"");
                 }
               }
-              if (result5 !== null) {
-                var result0 = result5;
+              if (result3 !== null) {
+                var result0 = result3;
               } else {
-                var result4 = parse_InstanceofToken();
-                if (result4 !== null) {
-                  var result0 = result4;
+                var result2 = parse_InstanceofToken();
+                if (result2 !== null) {
+                  var result0 = result2;
                 } else {
-                  var savedPos0 = pos;
-                  var result2 = parse_InToken();
-                  var result3 = result2 !== null
-                    ? (function() { parseHandler('RelationalOperator'); })()
-                    : null;
-                  if (result3 !== null) {
-                    var result1 = result3;
-                  } else {
-                    var result1 = null;
-                    pos = savedPos0;
-                  }
+                  var result1 = parse_InToken();
                   if (result1 !== null) {
                     var result0 = result1;
                   } else {
@@ -10126,7 +9824,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('RelationalExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10154,64 +9863,54 @@ timotuominen.createParser = function (parseHandler) {
         
         
         if (input.substr(pos, 2) === "<=") {
-          var result7 = "<=";
+          var result5 = "<=";
           pos += 2;
         } else {
-          var result7 = null;
+          var result5 = null;
           if (reportMatchFailures) {
             matchFailed("\"<=\"");
           }
         }
-        if (result7 !== null) {
-          var result0 = result7;
+        if (result5 !== null) {
+          var result0 = result5;
         } else {
           if (input.substr(pos, 2) === ">=") {
-            var result6 = ">=";
+            var result4 = ">=";
             pos += 2;
           } else {
-            var result6 = null;
+            var result4 = null;
             if (reportMatchFailures) {
               matchFailed("\">=\"");
             }
           }
-          if (result6 !== null) {
-            var result0 = result6;
+          if (result4 !== null) {
+            var result0 = result4;
           } else {
             if (input.substr(pos, 1) === "<") {
-              var result5 = "<";
+              var result3 = "<";
               pos += 1;
             } else {
-              var result5 = null;
+              var result3 = null;
               if (reportMatchFailures) {
                 matchFailed("\"<\"");
               }
             }
-            if (result5 !== null) {
-              var result0 = result5;
+            if (result3 !== null) {
+              var result0 = result3;
             } else {
               if (input.substr(pos, 1) === ">") {
-                var result4 = ">";
+                var result2 = ">";
                 pos += 1;
               } else {
-                var result4 = null;
+                var result2 = null;
                 if (reportMatchFailures) {
                   matchFailed("\">\"");
                 }
               }
-              if (result4 !== null) {
-                var result0 = result4;
+              if (result2 !== null) {
+                var result0 = result2;
               } else {
-                var savedPos0 = pos;
-                var result2 = parse_InstanceofToken();
-                var result3 = result2 !== null
-                  ? (function() { parseHandler('RelationalOperatorNoIn'); })()
-                  : null;
-                if (result3 !== null) {
-                  var result1 = result3;
-                } else {
-                  var result1 = null;
-                  pos = savedPos0;
-                }
+                var result1 = parse_InstanceofToken();
                 if (result1 !== null) {
                   var result0 = result1;
                 } else {
@@ -10311,7 +10010,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('EqualityExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10409,7 +10119,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('EqualityExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10437,59 +10158,49 @@ timotuominen.createParser = function (parseHandler) {
         
         
         if (input.substr(pos, 3) === "===") {
-          var result6 = "===";
+          var result4 = "===";
           pos += 3;
         } else {
-          var result6 = null;
+          var result4 = null;
           if (reportMatchFailures) {
             matchFailed("\"===\"");
           }
         }
-        if (result6 !== null) {
-          var result0 = result6;
+        if (result4 !== null) {
+          var result0 = result4;
         } else {
           if (input.substr(pos, 3) === "!==") {
-            var result5 = "!==";
+            var result3 = "!==";
             pos += 3;
           } else {
-            var result5 = null;
+            var result3 = null;
             if (reportMatchFailures) {
               matchFailed("\"!==\"");
             }
           }
-          if (result5 !== null) {
-            var result0 = result5;
+          if (result3 !== null) {
+            var result0 = result3;
           } else {
             if (input.substr(pos, 2) === "==") {
-              var result4 = "==";
+              var result2 = "==";
               pos += 2;
             } else {
-              var result4 = null;
+              var result2 = null;
               if (reportMatchFailures) {
                 matchFailed("\"==\"");
               }
             }
-            if (result4 !== null) {
-              var result0 = result4;
+            if (result2 !== null) {
+              var result0 = result2;
             } else {
-              var savedPos0 = pos;
               if (input.substr(pos, 2) === "!=") {
-                var result2 = "!=";
+                var result1 = "!=";
                 pos += 2;
               } else {
-                var result2 = null;
+                var result1 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"!=\"");
                 }
-              }
-              var result3 = result2 !== null
-                ? (function() { parseHandler('EqualityOperator'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
-              } else {
-                var result1 = null;
-                pos = savedPos0;
               }
               if (result1 !== null) {
                 var result0 = result1;
@@ -10589,7 +10300,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseANDExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10687,7 +10409,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseANDExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10774,7 +10507,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('BitwiseANDOperator'); })()
+          ? (function() { return "&"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10872,7 +10605,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseXORExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -10970,7 +10714,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseXORExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11057,7 +10812,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('BitwiseXOROperator'); })()
+          ? (function() { return "^"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11155,7 +10910,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseORExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11253,7 +11019,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('BitwiseORExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11340,7 +11117,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('BitwiseOROperator'); })()
+          ? (function() { return "|"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11438,7 +11215,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('LogicalANDExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11536,7 +11324,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('LogicalANDExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11605,7 +11404,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('LogicalANDOperator'); })()
+          ? (function() { return "&&"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11703,7 +11502,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('LogicalORExpression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11801,7 +11611,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('LogicalORExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11870,7 +11691,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('LogicalOROperator'); })()
+          ? (function() { return "||"; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -11897,6 +11718,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var result5 = parse_LogicalORExpression();
         if (result5 !== null) {
@@ -11932,57 +11754,63 @@ timotuominen.createParser = function (parseHandler) {
                       if (result12 !== null) {
                         var result13 = parse_AssignmentExpression();
                         if (result13 !== null) {
-                          var result4 = [result5, result6, result7, result8, result9, result10, result11, result12, result13];
+                          var result3 = [result5, result6, result7, result8, result9, result10, result11, result12, result13];
                         } else {
-                          var result4 = null;
+                          var result3 = null;
                           pos = savedPos1;
                         }
                       } else {
-                        var result4 = null;
+                        var result3 = null;
                         pos = savedPos1;
                       }
                     } else {
-                      var result4 = null;
+                      var result3 = null;
                       pos = savedPos1;
                     }
                   } else {
-                    var result4 = null;
+                    var result3 = null;
                     pos = savedPos1;
                   }
                 } else {
-                  var result4 = null;
+                  var result3 = null;
                   pos = savedPos1;
                 }
               } else {
-                var result4 = null;
+                var result3 = null;
                 pos = savedPos1;
               }
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(condition, trueExpression, falseExpression) {
+                return {
+                  type: "ConditionalExpression",
+                  condition: condition,
+                  trueExpression: trueExpression,
+                  falseExpression: falseExpression
+                };
+              })(result3[0], result3[4], result3[8])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_LogicalORExpression();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('ConditionalExpression'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_LogicalORExpression();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -12008,6 +11836,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var result5 = parse_LogicalORExpressionNoIn();
         if (result5 !== null) {
@@ -12043,57 +11872,63 @@ timotuominen.createParser = function (parseHandler) {
                       if (result12 !== null) {
                         var result13 = parse_AssignmentExpressionNoIn();
                         if (result13 !== null) {
-                          var result4 = [result5, result6, result7, result8, result9, result10, result11, result12, result13];
+                          var result3 = [result5, result6, result7, result8, result9, result10, result11, result12, result13];
                         } else {
-                          var result4 = null;
+                          var result3 = null;
                           pos = savedPos1;
                         }
                       } else {
-                        var result4 = null;
+                        var result3 = null;
                         pos = savedPos1;
                       }
                     } else {
-                      var result4 = null;
+                      var result3 = null;
                       pos = savedPos1;
                     }
                   } else {
-                    var result4 = null;
+                    var result3 = null;
                     pos = savedPos1;
                   }
                 } else {
-                  var result4 = null;
+                  var result3 = null;
                   pos = savedPos1;
                 }
               } else {
-                var result4 = null;
+                var result3 = null;
                 pos = savedPos1;
               }
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(condition, trueExpression, falseExpression) {
+                return {
+                  type: "ConditionalExpression",
+                  condition: condition,
+                  trueExpression: trueExpression,
+                  falseExpression: falseExpression
+                };
+              })(result3[0], result3[4], result3[8])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_LogicalORExpressionNoIn();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('ConditionalExpressionNoIn'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_LogicalORExpressionNoIn();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -12119,6 +11954,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var result5 = parse_LeftHandSideExpression();
         if (result5 !== null) {
@@ -12130,41 +11966,47 @@ timotuominen.createParser = function (parseHandler) {
               if (result8 !== null) {
                 var result9 = parse_AssignmentExpression();
                 if (result9 !== null) {
-                  var result4 = [result5, result6, result7, result8, result9];
+                  var result3 = [result5, result6, result7, result8, result9];
                 } else {
-                  var result4 = null;
+                  var result3 = null;
                   pos = savedPos1;
                 }
               } else {
-                var result4 = null;
+                var result3 = null;
                 pos = savedPos1;
               }
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(left, operator, right) {
+                return {
+                  type: "AssignmentExpression",
+                  operator: operator,
+                  left: left,
+                  right: right
+                };
+              })(result3[0], result3[2], result3[4])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_ConditionalExpression();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('AssignmentExpression'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_ConditionalExpression();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -12190,6 +12032,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         var result5 = parse_LeftHandSideExpression();
         if (result5 !== null) {
@@ -12201,41 +12044,47 @@ timotuominen.createParser = function (parseHandler) {
               if (result8 !== null) {
                 var result9 = parse_AssignmentExpressionNoIn();
                 if (result9 !== null) {
-                  var result4 = [result5, result6, result7, result8, result9];
+                  var result3 = [result5, result6, result7, result8, result9];
                 } else {
-                  var result4 = null;
+                  var result3 = null;
                   pos = savedPos1;
                 }
               } else {
-                var result4 = null;
+                var result3 = null;
                 pos = savedPos1;
               }
             } else {
-              var result4 = null;
+              var result3 = null;
               pos = savedPos1;
             }
           } else {
-            var result4 = null;
+            var result3 = null;
             pos = savedPos1;
           }
         } else {
-          var result4 = null;
+          var result3 = null;
           pos = savedPos1;
         }
+        var result4 = result3 !== null
+          ? (function(left, operator, right) {
+                return {
+                  type: "AssignmentExpression",
+                  operator: operator,
+                  left: left,
+                  right: right
+                };
+              })(result3[0], result3[2], result3[4])
+          : null;
         if (result4 !== null) {
-          var result0 = result4;
+          var result2 = result4;
         } else {
-          var savedPos0 = pos;
-          var result2 = parse_ConditionalExpressionNoIn();
-          var result3 = result2 !== null
-            ? (function() { parseHandler('AssignmentExpressionNoIn'); })()
-            : null;
-          if (result3 !== null) {
-            var result1 = result3;
-          } else {
-            var result1 = null;
-            pos = savedPos0;
-          }
+          var result2 = null;
+          pos = savedPos0;
+        }
+        if (result2 !== null) {
+          var result0 = result2;
+        } else {
+          var result1 = parse_ConditionalExpressionNoIn();
           if (result1 !== null) {
             var result0 = result1;
           } else {
@@ -12261,6 +12110,7 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
+        var savedPos0 = pos;
         var savedPos1 = pos;
         if (input.substr(pos, 1) === "=") {
           var result15 = "=";
@@ -12292,156 +12142,155 @@ timotuominen.createParser = function (parseHandler) {
             pos = savedPos2;
           }
           if (result16 !== null) {
-            var result14 = [result15, result16];
+            var result13 = [result15, result16];
           } else {
-            var result14 = null;
+            var result13 = null;
             pos = savedPos1;
           }
         } else {
-          var result14 = null;
+          var result13 = null;
           pos = savedPos1;
         }
+        var result14 = result13 !== null
+          ? (function() { return "="; })()
+          : null;
         if (result14 !== null) {
-          var result0 = result14;
+          var result12 = result14;
+        } else {
+          var result12 = null;
+          pos = savedPos0;
+        }
+        if (result12 !== null) {
+          var result0 = result12;
         } else {
           if (input.substr(pos, 2) === "*=") {
-            var result13 = "*=";
+            var result11 = "*=";
             pos += 2;
           } else {
-            var result13 = null;
+            var result11 = null;
             if (reportMatchFailures) {
               matchFailed("\"*=\"");
             }
           }
-          if (result13 !== null) {
-            var result0 = result13;
+          if (result11 !== null) {
+            var result0 = result11;
           } else {
             if (input.substr(pos, 2) === "/=") {
-              var result12 = "/=";
+              var result10 = "/=";
               pos += 2;
             } else {
-              var result12 = null;
+              var result10 = null;
               if (reportMatchFailures) {
                 matchFailed("\"/=\"");
               }
             }
-            if (result12 !== null) {
-              var result0 = result12;
+            if (result10 !== null) {
+              var result0 = result10;
             } else {
               if (input.substr(pos, 2) === "%=") {
-                var result11 = "%=";
+                var result9 = "%=";
                 pos += 2;
               } else {
-                var result11 = null;
+                var result9 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"%=\"");
                 }
               }
-              if (result11 !== null) {
-                var result0 = result11;
+              if (result9 !== null) {
+                var result0 = result9;
               } else {
                 if (input.substr(pos, 2) === "+=") {
-                  var result10 = "+=";
+                  var result8 = "+=";
                   pos += 2;
                 } else {
-                  var result10 = null;
+                  var result8 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"+=\"");
                   }
                 }
-                if (result10 !== null) {
-                  var result0 = result10;
+                if (result8 !== null) {
+                  var result0 = result8;
                 } else {
                   if (input.substr(pos, 2) === "-=") {
-                    var result9 = "-=";
+                    var result7 = "-=";
                     pos += 2;
                   } else {
-                    var result9 = null;
+                    var result7 = null;
                     if (reportMatchFailures) {
                       matchFailed("\"-=\"");
                     }
                   }
-                  if (result9 !== null) {
-                    var result0 = result9;
+                  if (result7 !== null) {
+                    var result0 = result7;
                   } else {
                     if (input.substr(pos, 3) === "<<=") {
-                      var result8 = "<<=";
+                      var result6 = "<<=";
                       pos += 3;
                     } else {
-                      var result8 = null;
+                      var result6 = null;
                       if (reportMatchFailures) {
                         matchFailed("\"<<=\"");
                       }
                     }
-                    if (result8 !== null) {
-                      var result0 = result8;
+                    if (result6 !== null) {
+                      var result0 = result6;
                     } else {
                       if (input.substr(pos, 3) === ">>=") {
-                        var result7 = ">>=";
+                        var result5 = ">>=";
                         pos += 3;
                       } else {
-                        var result7 = null;
+                        var result5 = null;
                         if (reportMatchFailures) {
                           matchFailed("\">>=\"");
                         }
                       }
-                      if (result7 !== null) {
-                        var result0 = result7;
+                      if (result5 !== null) {
+                        var result0 = result5;
                       } else {
                         if (input.substr(pos, 4) === ">>>=") {
-                          var result6 = ">>>=";
+                          var result4 = ">>>=";
                           pos += 4;
                         } else {
-                          var result6 = null;
+                          var result4 = null;
                           if (reportMatchFailures) {
                             matchFailed("\">>>=\"");
                           }
                         }
-                        if (result6 !== null) {
-                          var result0 = result6;
+                        if (result4 !== null) {
+                          var result0 = result4;
                         } else {
                           if (input.substr(pos, 2) === "&=") {
-                            var result5 = "&=";
+                            var result3 = "&=";
                             pos += 2;
                           } else {
-                            var result5 = null;
+                            var result3 = null;
                             if (reportMatchFailures) {
                               matchFailed("\"&=\"");
                             }
                           }
-                          if (result5 !== null) {
-                            var result0 = result5;
+                          if (result3 !== null) {
+                            var result0 = result3;
                           } else {
                             if (input.substr(pos, 2) === "^=") {
-                              var result4 = "^=";
+                              var result2 = "^=";
                               pos += 2;
                             } else {
-                              var result4 = null;
+                              var result2 = null;
                               if (reportMatchFailures) {
                                 matchFailed("\"^=\"");
                               }
                             }
-                            if (result4 !== null) {
-                              var result0 = result4;
+                            if (result2 !== null) {
+                              var result0 = result2;
                             } else {
-                              var savedPos0 = pos;
                               if (input.substr(pos, 2) === "|=") {
-                                var result2 = "|=";
+                                var result1 = "|=";
                                 pos += 2;
                               } else {
-                                var result2 = null;
+                                var result1 = null;
                                 if (reportMatchFailures) {
                                   matchFailed("\"|=\"");
                                 }
-                              }
-                              var result3 = result2 !== null
-                                ? (function() { parseHandler('AssignmentOperator'); })()
-                                : null;
-                              if (result3 !== null) {
-                                var result1 = result3;
-                              } else {
-                                var result1 = null;
-                                pos = savedPos0;
                               }
                               if (result1 !== null) {
                                 var result0 = result1;
@@ -12565,7 +12414,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('Expression'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -12679,7 +12539,18 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('ExpressionNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = head;
+                for (var i = 0; i < tail.length; i++) {
+                  result = {
+                    type: "BinaryExpression",
+                    operator: tail[i][1],
+                    left: result,
+                    right: tail[i][3]
+                  };
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -12706,81 +12577,71 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result19 = parse_Block();
-        if (result19 !== null) {
-          var result0 = result19;
+        var result17 = parse_Block();
+        if (result17 !== null) {
+          var result0 = result17;
         } else {
-          var result18 = parse_VariableStatement();
-          if (result18 !== null) {
-            var result0 = result18;
+          var result16 = parse_VariableStatement();
+          if (result16 !== null) {
+            var result0 = result16;
           } else {
-            var result17 = parse_EmptyStatement();
-            if (result17 !== null) {
-              var result0 = result17;
+            var result15 = parse_EmptyStatement();
+            if (result15 !== null) {
+              var result0 = result15;
             } else {
-              var result16 = parse_ExpressionStatement();
-              if (result16 !== null) {
-                var result0 = result16;
+              var result14 = parse_ExpressionStatement();
+              if (result14 !== null) {
+                var result0 = result14;
               } else {
-                var result15 = parse_IfStatement();
-                if (result15 !== null) {
-                  var result0 = result15;
+                var result13 = parse_IfStatement();
+                if (result13 !== null) {
+                  var result0 = result13;
                 } else {
-                  var result14 = parse_IterationStatement();
-                  if (result14 !== null) {
-                    var result0 = result14;
+                  var result12 = parse_IterationStatement();
+                  if (result12 !== null) {
+                    var result0 = result12;
                   } else {
-                    var result13 = parse_ContinueStatement();
-                    if (result13 !== null) {
-                      var result0 = result13;
+                    var result11 = parse_ContinueStatement();
+                    if (result11 !== null) {
+                      var result0 = result11;
                     } else {
-                      var result12 = parse_BreakStatement();
-                      if (result12 !== null) {
-                        var result0 = result12;
+                      var result10 = parse_BreakStatement();
+                      if (result10 !== null) {
+                        var result0 = result10;
                       } else {
-                        var result11 = parse_ReturnStatement();
-                        if (result11 !== null) {
-                          var result0 = result11;
+                        var result9 = parse_ReturnStatement();
+                        if (result9 !== null) {
+                          var result0 = result9;
                         } else {
-                          var result10 = parse_WithStatement();
-                          if (result10 !== null) {
-                            var result0 = result10;
+                          var result8 = parse_WithStatement();
+                          if (result8 !== null) {
+                            var result0 = result8;
                           } else {
-                            var result9 = parse_LabelledStatement();
-                            if (result9 !== null) {
-                              var result0 = result9;
+                            var result7 = parse_LabelledStatement();
+                            if (result7 !== null) {
+                              var result0 = result7;
                             } else {
-                              var result8 = parse_SwitchStatement();
-                              if (result8 !== null) {
-                                var result0 = result8;
+                              var result6 = parse_SwitchStatement();
+                              if (result6 !== null) {
+                                var result0 = result6;
                               } else {
-                                var result7 = parse_ThrowStatement();
-                                if (result7 !== null) {
-                                  var result0 = result7;
+                                var result5 = parse_ThrowStatement();
+                                if (result5 !== null) {
+                                  var result0 = result5;
                                 } else {
-                                  var result6 = parse_TryStatement();
-                                  if (result6 !== null) {
-                                    var result0 = result6;
+                                  var result4 = parse_TryStatement();
+                                  if (result4 !== null) {
+                                    var result0 = result4;
                                   } else {
-                                    var result5 = parse_DebuggerStatement();
-                                    if (result5 !== null) {
-                                      var result0 = result5;
+                                    var result3 = parse_DebuggerStatement();
+                                    if (result3 !== null) {
+                                      var result0 = result3;
                                     } else {
-                                      var result4 = parse_FunctionDeclaration();
-                                      if (result4 !== null) {
-                                        var result0 = result4;
+                                      var result2 = parse_FunctionDeclaration();
+                                      if (result2 !== null) {
+                                        var result0 = result2;
                                       } else {
-                                        var savedPos0 = pos;
-                                        var result2 = parse_FunctionExpression();
-                                        var result3 = result2 !== null
-                                          ? (function() { parseHandler('Statement'); })()
-                                          : null;
-                                        if (result3 !== null) {
-                                          var result1 = result3;
-                                        } else {
-                                          var result1 = null;
-                                          pos = savedPos0;
-                                        }
+                                        var result1 = parse_FunctionExpression();
                                         if (result1 !== null) {
                                           var result0 = result1;
                                         } else {
@@ -12879,7 +12740,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(statements) { parseHandler('Block'); })(result1[2])
+          ? (function(statements) {
+                return {
+                  type: "Block",
+                  statements: statements !== "" ? statements[0] : []
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -12953,7 +12819,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('StatementList'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][1]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13008,7 +12880,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(declarations) { parseHandler('VariableStatement'); })(result1[2])
+          ? (function(declarations) {
+                return {
+                  type: "VariableStatement",
+                  declarations: declarations
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13122,7 +12999,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('VariableDeclarationList'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][3]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13236,7 +13119,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('VariableDeclarationListNoIn'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][3]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13286,7 +13175,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(name, value) { parseHandler('VariableDeclaration'); })(result1[0], result1[2])
+          ? (function(name, value) {
+                return {
+                  type: "VariableDeclaration",
+                  name: name,
+                  value: value !== "" ? value : null
+                };
+              })(result1[0], result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13336,7 +13231,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(name, value) { parseHandler('VariableDeclarationNoIn'); })(result1[0], result1[2])
+          ? (function(name, value) {
+                return {
+                  type: "VariableDeclaration",
+                  name: name,
+                  value: value !== "" ? value : null
+                };
+              })(result1[0], result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13417,7 +13318,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(expression) { parseHandler('Initialiser'); })(result1[3])
+          ? (function(expression) { return expression; })(result1[3])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13498,7 +13399,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(expression) { parseHandler('InitialiserNoIn'); })(result1[3])
+          ? (function(expression) { return expression; })(result1[3])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13536,7 +13437,7 @@ timotuominen.createParser = function (parseHandler) {
           }
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('EmptyStatement'); })()
+          ? (function() { return { type: "EmptyStatement" }; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13613,7 +13514,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(expression) { parseHandler('ExpressionStatement'); })(result1[1])
+          ? (function(expression) { return expression; })(result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13746,7 +13647,14 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(condition, ifStatement, elseStatement) { parseHandler('IfStatement'); })(result1[4], result1[8], result1[9])
+          ? (function(condition, ifStatement, elseStatement) {
+                return {
+                  type: "IfStatement",
+                  condition: condition,
+                  ifStatement: ifStatement,
+                  elseStatement: elseStatement !== "" ? elseStatement[3] : null
+                };
+              })(result1[4], result1[8], result1[9])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -13773,29 +13681,19 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var result6 = parse_DoWhileStatement();
-        if (result6 !== null) {
-          var result0 = result6;
+        var result4 = parse_DoWhileStatement();
+        if (result4 !== null) {
+          var result0 = result4;
         } else {
-          var result5 = parse_WhileStatement();
-          if (result5 !== null) {
-            var result0 = result5;
+          var result3 = parse_WhileStatement();
+          if (result3 !== null) {
+            var result0 = result3;
           } else {
-            var result4 = parse_ForStatement();
-            if (result4 !== null) {
-              var result0 = result4;
+            var result2 = parse_ForStatement();
+            if (result2 !== null) {
+              var result0 = result2;
             } else {
-              var savedPos0 = pos;
-              var result2 = parse_ForInStatement();
-              var result3 = result2 !== null
-                ? (function() { parseHandler('IterationStatement'); })()
-                : null;
-              if (result3 !== null) {
-                var result1 = result3;
-              } else {
-                var result1 = null;
-                pos = savedPos0;
-              }
+              var result1 = parse_ForInStatement();
               if (result1 !== null) {
                 var result0 = result1;
               } else {
@@ -13915,7 +13813,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(statement, condition) { parseHandler('DoWhileStatement'); })(result1[2], result1[8])
+          ? (function(statement, condition) {
+                return {
+                  type: "DoWhileStatement",
+                  condition: condition,
+                  statement: statement
+                };
+              })(result1[2], result1[8])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14016,7 +13920,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(condition, statement) { parseHandler('WhileStatement'); })(result1[4], result1[8])
+          ? (function(condition, statement) {
+                return {
+                  type: "WhileStatement",
+                  condition: condition,
+                  statement: statement
+                };
+              })(result1[4], result1[8])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14062,21 +13972,36 @@ timotuominen.createParser = function (parseHandler) {
               var result6 = parse___();
               if (result6 !== null) {
                 var savedPos2 = pos;
-                var result25 = parse_VarToken();
-                if (result25 !== null) {
-                  var result26 = parse___();
-                  if (result26 !== null) {
-                    var result27 = parse_VariableDeclarationListNoIn();
-                    if (result27 !== null) {
-                      var result24 = [result25, result26, result27];
+                var savedPos3 = pos;
+                var result27 = parse_VarToken();
+                if (result27 !== null) {
+                  var result28 = parse___();
+                  if (result28 !== null) {
+                    var result29 = parse_VariableDeclarationListNoIn();
+                    if (result29 !== null) {
+                      var result25 = [result27, result28, result29];
                     } else {
-                      var result24 = null;
-                      pos = savedPos2;
+                      var result25 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result24 = null;
-                    pos = savedPos2;
+                    var result25 = null;
+                    pos = savedPos3;
                   }
+                } else {
+                  var result25 = null;
+                  pos = savedPos3;
+                }
+                var result26 = result25 !== null
+                  ? (function(declarations) {
+                            return {
+                              type: "VariableStatement",
+                              declarations: declarations
+                            };
+                          })(result25[2])
+                  : null;
+                if (result26 !== null) {
+                  var result24 = result26;
                 } else {
                   var result24 = null;
                   pos = savedPos2;
@@ -14213,7 +14138,15 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(initializer, test, counter, statement) { parseHandler('ForStatement'); })(result1[4], result1[8], result1[12], result1[16])
+          ? (function(initializer, test, counter, statement) {
+                return {
+                  type: "ForStatement",
+                  initializer: initializer !== "" ? initializer : null,
+                  test: test !== "" ? test : null,
+                  counter: counter !== "" ? counter : null,
+                  statement: statement
+                };
+              })(result1[4], result1[8], result1[12], result1[16])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14259,21 +14192,31 @@ timotuominen.createParser = function (parseHandler) {
               var result6 = parse___();
               if (result6 !== null) {
                 var savedPos2 = pos;
-                var result18 = parse_VarToken();
-                if (result18 !== null) {
-                  var result19 = parse___();
-                  if (result19 !== null) {
-                    var result20 = parse_VariableDeclarationNoIn();
-                    if (result20 !== null) {
-                      var result17 = [result18, result19, result20];
+                var savedPos3 = pos;
+                var result20 = parse_VarToken();
+                if (result20 !== null) {
+                  var result21 = parse___();
+                  if (result21 !== null) {
+                    var result22 = parse_VariableDeclarationNoIn();
+                    if (result22 !== null) {
+                      var result18 = [result20, result21, result22];
                     } else {
-                      var result17 = null;
-                      pos = savedPos2;
+                      var result18 = null;
+                      pos = savedPos3;
                     }
                   } else {
-                    var result17 = null;
-                    pos = savedPos2;
+                    var result18 = null;
+                    pos = savedPos3;
                   }
+                } else {
+                  var result18 = null;
+                  pos = savedPos3;
+                }
+                var result19 = result18 !== null
+                  ? (function(declaration) { return declaration; })(result18[2])
+                  : null;
+                if (result19 !== null) {
+                  var result17 = result19;
                 } else {
                   var result17 = null;
                   pos = savedPos2;
@@ -14367,7 +14310,14 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(iterator, collection, statement) { parseHandler('ForInStatement'); })(result1[4], result1[8], result1[12])
+          ? (function(iterator, collection, statement) {
+                return {
+                  type: "ForInStatement",
+                  iterator: iterator,
+                  collection: collection,
+                  statement: statement
+                };
+              })(result1[4], result1[8], result1[12])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14400,24 +14350,44 @@ timotuominen.createParser = function (parseHandler) {
         if (result3 !== null) {
           var result4 = parse__();
           if (result4 !== null) {
-            var savedPos2 = pos;
-            var result8 = parse_Identifier();
-            if (result8 !== null) {
-              var result9 = parse_EOS();
-              if (result9 !== null) {
-                var result7 = [result8, result9];
+            var savedPos3 = pos;
+            var savedPos4 = pos;
+            var result12 = parse_Identifier();
+            if (result12 !== null) {
+              var result13 = parse_EOS();
+              if (result13 !== null) {
+                var result10 = [result12, result13];
               } else {
-                var result7 = null;
-                pos = savedPos2;
+                var result10 = null;
+                pos = savedPos4;
               }
             } else {
-              var result7 = null;
-              pos = savedPos2;
+              var result10 = null;
+              pos = savedPos4;
             }
-            if (result7 !== null) {
-              var result5 = result7;
+            var result11 = result10 !== null
+              ? (function(identifier) { return identifier; })(result10[0])
+              : null;
+            if (result11 !== null) {
+              var result9 = result11;
             } else {
-              var result6 = parse_EOSNoLineTerminator();
+              var result9 = null;
+              pos = savedPos3;
+            }
+            if (result9 !== null) {
+              var result5 = result9;
+            } else {
+              var savedPos2 = pos;
+              var result7 = parse_EOSNoLineTerminator();
+              var result8 = result7 !== null
+                ? (function() { return ""; })()
+                : null;
+              if (result8 !== null) {
+                var result6 = result8;
+              } else {
+                var result6 = null;
+                pos = savedPos2;
+              }
               if (result6 !== null) {
                 var result5 = result6;
               } else {
@@ -14439,7 +14409,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(label) { parseHandler('ContinueStatement'); })(result1[2])
+          ? (function(label) {
+                return {
+                  type: "ContinueStatement",
+                  label: label !== "" ? label : null
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14472,24 +14447,44 @@ timotuominen.createParser = function (parseHandler) {
         if (result3 !== null) {
           var result4 = parse__();
           if (result4 !== null) {
-            var savedPos2 = pos;
-            var result8 = parse_Identifier();
-            if (result8 !== null) {
-              var result9 = parse_EOS();
-              if (result9 !== null) {
-                var result7 = [result8, result9];
+            var savedPos3 = pos;
+            var savedPos4 = pos;
+            var result12 = parse_Identifier();
+            if (result12 !== null) {
+              var result13 = parse_EOS();
+              if (result13 !== null) {
+                var result10 = [result12, result13];
               } else {
-                var result7 = null;
-                pos = savedPos2;
+                var result10 = null;
+                pos = savedPos4;
               }
             } else {
-              var result7 = null;
-              pos = savedPos2;
+              var result10 = null;
+              pos = savedPos4;
             }
-            if (result7 !== null) {
-              var result5 = result7;
+            var result11 = result10 !== null
+              ? (function(identifier) { return identifier; })(result10[0])
+              : null;
+            if (result11 !== null) {
+              var result9 = result11;
             } else {
-              var result6 = parse_EOSNoLineTerminator();
+              var result9 = null;
+              pos = savedPos3;
+            }
+            if (result9 !== null) {
+              var result5 = result9;
+            } else {
+              var savedPos2 = pos;
+              var result7 = parse_EOSNoLineTerminator();
+              var result8 = result7 !== null
+                ? (function() { return ""; })()
+                : null;
+              if (result8 !== null) {
+                var result6 = result8;
+              } else {
+                var result6 = null;
+                pos = savedPos2;
+              }
               if (result6 !== null) {
                 var result5 = result6;
               } else {
@@ -14511,7 +14506,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(label) { parseHandler('BreakStatement'); })(result1[2])
+          ? (function(label) {
+                return {
+                  type: "BreakStatement",
+                  label: label !== "" ? label : null
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14544,24 +14544,44 @@ timotuominen.createParser = function (parseHandler) {
         if (result3 !== null) {
           var result4 = parse__();
           if (result4 !== null) {
-            var savedPos2 = pos;
-            var result8 = parse_Expression();
-            if (result8 !== null) {
-              var result9 = parse_EOS();
-              if (result9 !== null) {
-                var result7 = [result8, result9];
+            var savedPos3 = pos;
+            var savedPos4 = pos;
+            var result12 = parse_Expression();
+            if (result12 !== null) {
+              var result13 = parse_EOS();
+              if (result13 !== null) {
+                var result10 = [result12, result13];
               } else {
-                var result7 = null;
-                pos = savedPos2;
+                var result10 = null;
+                pos = savedPos4;
               }
             } else {
-              var result7 = null;
-              pos = savedPos2;
+              var result10 = null;
+              pos = savedPos4;
             }
-            if (result7 !== null) {
-              var result5 = result7;
+            var result11 = result10 !== null
+              ? (function(expression) { return expression; })(result10[0])
+              : null;
+            if (result11 !== null) {
+              var result9 = result11;
             } else {
-              var result6 = parse_EOSNoLineTerminator();
+              var result9 = null;
+              pos = savedPos3;
+            }
+            if (result9 !== null) {
+              var result5 = result9;
+            } else {
+              var savedPos2 = pos;
+              var result7 = parse_EOSNoLineTerminator();
+              var result8 = result7 !== null
+                ? (function() { return ""; })()
+                : null;
+              if (result8 !== null) {
+                var result6 = result8;
+              } else {
+                var result6 = null;
+                pos = savedPos2;
+              }
               if (result6 !== null) {
                 var result5 = result6;
               } else {
@@ -14583,7 +14603,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(value) { parseHandler('ReturnStatement'); })(result1[2])
+          ? (function(value) {
+                return {
+                  type: "ReturnStatement",
+                  value: value !== "" ? value : null
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14684,7 +14709,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(environment, statement) { parseHandler('WithStatement'); })(result1[4], result1[8])
+          ? (function(environment, statement) {
+                return {
+                  type: "WithStatement",
+                  environment: environment,
+                  statement: statement
+                };
+              })(result1[4], result1[8])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14785,7 +14816,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(expression, clauses) { parseHandler('SwitchStatement'); })(result1[4], result1[8])
+          ? (function(expression, clauses) {
+                return {
+                  type: "SwitchStatement",
+                  expression: expression,
+                  clauses: clauses
+                };
+              })(result1[4], result1[8])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14896,7 +14933,20 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(before, defaultAndAfter) { parseHandler('CaseBlock'); })(result1[2], result1[3])
+          ? (function(before, defaultAndAfter) {
+                var before = before !== "" ? before : [];
+                if (defaultAndAfter !== "") {
+                  var defaultClause = defaultAndAfter[1];
+                  var clausesAfter = defaultAndAfter[3] !== ""
+                    ? defaultAndAfter[3]
+                    : [];
+                } else {
+                  var defaultClause = null;
+                  var clausesAfter = [];
+                }
+          
+                return (defaultClause ? before.concat(defaultClause) : before).concat(clausesAfter);
+              })(result1[2], result1[3])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -14970,7 +15020,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('CaseClauses'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][1]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15059,7 +15115,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(selector, statements) { parseHandler('CaseClause'); })(result1[2], result1[5])
+          ? (function(selector, statements) {
+                return {
+                  type: "CaseClause",
+                  selector: selector,
+                  statements: statements !== "" ? statements[1] : []
+                };
+              })(result1[2], result1[5])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15136,7 +15198,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(statements) { parseHandler('DefaultClause'); })(result1[3])
+          ? (function(statements) {
+                return {
+                  type: "DefaultClause",
+                  statements: statements !== "" ? statements[1] : []
+                };
+              })(result1[3])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15205,7 +15272,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(label, statement) { parseHandler('LabelledStatement'); })(result1[0], result1[4])
+          ? (function(label, statement) {
+                return {
+                  type: "LabelledStatement",
+                  label: label,
+                  statement: statement
+                };
+              })(result1[0], result1[4])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15260,7 +15333,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(exception) { parseHandler('ThrowStatement'); })(result1[2])
+          ? (function(exception) {
+                return {
+                  type: "ThrowStatement",
+                  exception: exception
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15287,81 +15365,115 @@ timotuominen.createParser = function (parseHandler) {
         }
         
         
-        var savedPos3 = pos;
-        var result16 = parse_TryToken();
-        if (result16 !== null) {
-          var result17 = parse___();
-          if (result17 !== null) {
-            var result18 = parse_Block();
-            if (result18 !== null) {
-              var result19 = parse___();
-              if (result19 !== null) {
-                var result20 = parse_Catch();
-                if (result20 !== null) {
-                  var result21 = parse___();
-                  if (result21 !== null) {
-                    var result22 = parse_Finally();
-                    if (result22 !== null) {
-                      var result15 = [result16, result17, result18, result19, result20, result21, result22];
+        var savedPos4 = pos;
+        var savedPos5 = pos;
+        var result20 = parse_TryToken();
+        if (result20 !== null) {
+          var result21 = parse___();
+          if (result21 !== null) {
+            var result22 = parse_Block();
+            if (result22 !== null) {
+              var result23 = parse___();
+              if (result23 !== null) {
+                var result24 = parse_Catch();
+                if (result24 !== null) {
+                  var result25 = parse___();
+                  if (result25 !== null) {
+                    var result26 = parse_Finally();
+                    if (result26 !== null) {
+                      var result18 = [result20, result21, result22, result23, result24, result25, result26];
                     } else {
-                      var result15 = null;
-                      pos = savedPos3;
+                      var result18 = null;
+                      pos = savedPos5;
                     }
                   } else {
-                    var result15 = null;
+                    var result18 = null;
+                    pos = savedPos5;
+                  }
+                } else {
+                  var result18 = null;
+                  pos = savedPos5;
+                }
+              } else {
+                var result18 = null;
+                pos = savedPos5;
+              }
+            } else {
+              var result18 = null;
+              pos = savedPos5;
+            }
+          } else {
+            var result18 = null;
+            pos = savedPos5;
+          }
+        } else {
+          var result18 = null;
+          pos = savedPos5;
+        }
+        var result19 = result18 !== null
+          ? (function(block, catch_, finally_) {
+                return {
+                  type: "TryStatement",
+                  block: block,
+                  "catch": catch_,
+                  "finally": finally_
+                };
+              })(result18[2], result18[4], result18[6])
+          : null;
+        if (result19 !== null) {
+          var result17 = result19;
+        } else {
+          var result17 = null;
+          pos = savedPos4;
+        }
+        if (result17 !== null) {
+          var result0 = result17;
+        } else {
+          var savedPos2 = pos;
+          var savedPos3 = pos;
+          var result12 = parse_TryToken();
+          if (result12 !== null) {
+            var result13 = parse___();
+            if (result13 !== null) {
+              var result14 = parse_Block();
+              if (result14 !== null) {
+                var result15 = parse___();
+                if (result15 !== null) {
+                  var result16 = parse_Catch();
+                  if (result16 !== null) {
+                    var result10 = [result12, result13, result14, result15, result16];
+                  } else {
+                    var result10 = null;
                     pos = savedPos3;
                   }
                 } else {
-                  var result15 = null;
+                  var result10 = null;
                   pos = savedPos3;
                 }
               } else {
-                var result15 = null;
+                var result10 = null;
                 pos = savedPos3;
               }
             } else {
-              var result15 = null;
+              var result10 = null;
               pos = savedPos3;
             }
           } else {
-            var result15 = null;
+            var result10 = null;
             pos = savedPos3;
           }
-        } else {
-          var result15 = null;
-          pos = savedPos3;
-        }
-        if (result15 !== null) {
-          var result0 = result15;
-        } else {
-          var savedPos2 = pos;
-          var result10 = parse_TryToken();
-          if (result10 !== null) {
-            var result11 = parse___();
-            if (result11 !== null) {
-              var result12 = parse_Block();
-              if (result12 !== null) {
-                var result13 = parse___();
-                if (result13 !== null) {
-                  var result14 = parse_Catch();
-                  if (result14 !== null) {
-                    var result9 = [result10, result11, result12, result13, result14];
-                  } else {
-                    var result9 = null;
-                    pos = savedPos2;
-                  }
-                } else {
-                  var result9 = null;
-                  pos = savedPos2;
-                }
-              } else {
-                var result9 = null;
-                pos = savedPos2;
-              }
-            } else {
-              var result9 = null;
-              pos = savedPos2;
-            }
+          var result11 = result10 !== null
+            ? (function(block, catch_) {
+                  return {
+                    type: "TryStatement",
+                    block: block,
+                    "catch": catch_,
+                    "finally": null
+                  };
+                })(result10[2], result10[4])
+            : null;
+          if (result11 !== null) {
+            var result9 = result11;
           } else {
             var result9 = null;
             pos = savedPos2;
@@ -15403,7 +15515,14 @@ timotuominen.createParser = function (parseHandler) {
               pos = savedPos1;
             }
             var result3 = result2 !== null
-              ? (function(block, finally_) { parseHandler('TryStatement'); })(result2[2], result2[4])
+              ? (function(block, finally_) {
+                    return {
+                      type: "TryStatement",
+                      block: block,
+                      "catch": null,
+                      "finally": finally_
+                    };
+                  })(result2[2], result2[4])
               : null;
             if (result3 !== null) {
               var result1 = result3;
@@ -15511,7 +15630,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(identifier, block) { parseHandler('Catch'); })(result1[4], result1[8])
+          ? (function(identifier, block) {
+                return {
+                  type: "Catch",
+                  identifier: identifier,
+                  block: block
+                };
+              })(result1[4], result1[8])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15560,7 +15685,12 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(block) { parseHandler('Finally'); })(result1[2])
+          ? (function(block) {
+                return {
+                  type: "Finally",
+                  block: block
+                };
+              })(result1[2])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15603,7 +15733,7 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function() { parseHandler('DebuggerStatement'); })()
+          ? (function() { return { type: "DebuggerStatement" }; })()
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15757,7 +15887,14 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(name, params, elements) { parseHandler('FunctionDeclaration'); })(result1[2], result1[6], result1[12])
+          ? (function(name, params, elements) {
+                return {
+                  type: "Function",
+                  name: name,
+                  params: params !== "" ? params : [],
+                  elements: elements
+                };
+              })(result1[2], result1[6], result1[12])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -15912,7 +16049,14 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(name, params, elements) { parseHandler('FunctionExpression'); })(result1[2], result1[6], result1[12])
+          ? (function(name, params, elements) {
+                return {
+                  type: "Function",
+                  name: name !== "" ? name : null,
+                  params: params !== "" ? params : [],
+                  elements: elements
+                };
+              })(result1[2], result1[6], result1[12])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -16026,7 +16170,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('FormalParameterList'); })(result1[0], result1[1])
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][3]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -16057,7 +16207,7 @@ timotuominen.createParser = function (parseHandler) {
         var result3 = parse_SourceElements();
         var result1 = result3 !== null ? result3 : '';
         var result2 = result1 !== null
-          ? (function(elements) { parseHandler('FunctionBody'); })(result1)
+          ? (function(elements) { return elements !== "" ? elements : []; })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -16088,7 +16238,12 @@ timotuominen.createParser = function (parseHandler) {
         var result3 = parse_SourceElements();
         var result1 = result3 !== null ? result3 : '';
         var result2 = result1 !== null
-          ? (function(elements) { parseHandler('Program'); })(result1)
+          ? (function(elements) {
+                return {
+                  type: "Program",
+                  elements: elements !== "" ? elements : []
+                };
+              })(result1)
           : null;
         if (result2 !== null) {
           var result0 = result2;
@@ -16117,13 +16272,13 @@ timotuominen.createParser = function (parseHandler) {
         
         var savedPos0 = pos;
         var savedPos1 = pos;
-        var result3 = parse_SourceElement();
+        var result3 = parse_Statement();
         if (result3 !== null) {
           var result4 = [];
           var savedPos2 = pos;
           var result6 = parse___();
           if (result6 !== null) {
-            var result7 = parse_SourceElement();
+            var result7 = parse_Statement();
             if (result7 !== null) {
               var result5 = [result6, result7];
             } else {
@@ -16139,7 +16294,7 @@ timotuominen.createParser = function (parseHandler) {
             var savedPos2 = pos;
             var result6 = parse___();
             if (result6 !== null) {
-              var result7 = parse_SourceElement();
+              var result7 = parse_Statement();
               if (result7 !== null) {
                 var result5 = [result6, result7];
               } else {
@@ -16162,37 +16317,13 @@ timotuominen.createParser = function (parseHandler) {
           pos = savedPos1;
         }
         var result2 = result1 !== null
-          ? (function(head, tail) { parseHandler('SourceElements'); })(result1[0], result1[1])
-          : null;
-        if (result2 !== null) {
-          var result0 = result2;
-        } else {
-          var result0 = null;
-          pos = savedPos0;
-        }
-        
-        
-        
-        cache[cacheKey] = {
-          nextPos: pos,
-          result:  result0
-        };
-        return result0;
-      }
-      
-      function parse_SourceElement() {
-        var cacheKey = 'SourceElement@' + pos;
-        var cachedResult = cache[cacheKey];
-        if (cachedResult) {
-          pos = cachedResult.nextPos;
-          return cachedResult.result;
-        }
-        
-        
-        var savedPos0 = pos;
-        var result1 = parse_Statement();
-        var result2 = result1 !== null
-          ? (function() { parseHandler('SourceElement'); })()
+          ? (function(head, tail) {
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                  result.push(tail[i][1]);
+                }
+                return result;
+              })(result1[0], result1[1])
           : null;
         if (result2 !== null) {
           var result0 = result2;

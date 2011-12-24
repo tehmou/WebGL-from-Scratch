@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+Intro comment.
+-->
+
+<!-- START OF demo.html -->
+<html>
+<head>
+    <title>WebGL from Scratch</title>
+
+    <!--
+    Vertex shader
+    -->
+    <script id="vs-shader" type="x-shader/x-vertex">
+******        attribute vec4 position;    // Position on the surface of the model.
+
+        // Entry point for shader is always the method main. It does not return anything, nor does it take arguments.
+        void main(void) {
+            gl_Position = transform*position;
+        }******
+    </script>
+
+    <!--
+    Fragment shader
+    -->
+    <script id="fs-shader" type="x-shader/x-fragment">
+******        // Some boilerplate code.
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        varying vec2 xyPos;         // Value the vertex shader passes to us.******
+    </script>
+
+
+    <!--
+    The JavaScript part
+    -->
+    <script type="text/javascript">
+******
+        window.timotuominen = { webgl: {} };
+
+        // Function to call when the page has loaded.
+        function initialize () {
+            var demo, image, canvas;
+            canvas.height = window.innerHeight;
+            demo.run(canvas);
+        }******
+
+    </script>
+
+</head>
+
+<body onload="initialize()">
+    <canvas id="canvas"></canvas>
+</body>
+
+</html>

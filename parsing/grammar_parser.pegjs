@@ -1,17 +1,18 @@
 {
-    function processSequence(elements) {
+    function processSequence(elements, action) {
       var elementsList = [], elementsObject = [];
 
       for (var i = 0; i < elements.length; i++) {
         var item = elements[i];
-        if (typeof(item) === "Array") {
+        if (Array.isArray(item)) {
            elementsList.push(item.join(":"));
            elementsObject.push(item[0] + ": " + item[0]);
         } else {
            elementsList.push(item);
         }
       }
-      return elementsList.join(" ") + " {\n      parseHandler('name', {\n" + "\n      });\n    }\n";
+      return elementsList.join(" ") + (action ? " " + action : "");
+      //return elementsList.join(" ");// + " {\n      parseHandler('name', {\n" + "\n      });\n    }\n";
     }
 }
 
@@ -26,29 +27,29 @@ initializer
     }
 
 rule
-  = name:identifier displayName:string? equals expression:expression semicolon:semicolon? {
+  = name:identifier displayName:string? equals expression:choice semicolon:semicolon? {
       return name + " " + displayName + "\n  = " + expression + semicolon;
     }
 
 expression
-  = choice
+  = choice:choice { return choice.head + " / " + choice.tail. }
 
 choice
   = head:sequence tail:(slashSequence)* {
-      return head + (tail ? "  " : "") + tail.join("  ");
+      return { head: head, tail: tail };
     }
 
 slashSequence
   = slash sequence:sequence {
-      return "\n  / " + sequence;
+      return sequence;
     }
 
 sequence
   = elements:labeled* code:action {
-      return processSequence(elements);
+      return { elements: elements, code: code };
     }
   / elements:labeled* {
-      return processSequence(elements);
+      return { elements: elements };
     }
 
 labeled
