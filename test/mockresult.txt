@@ -13,9 +13,11 @@ Intro comment.
     Vertex shader
     -->
     <script id="vs-shader" type="x-shader/x-vertex">******
-        attribute vec4 position;    // Position on the surface of the model.
+        // Position on the surface of the model.
+        attribute vec4 position;
 
-        // Entry point for shader is always the method main. It does not return anything, nor does it take arguments.
+        // Entry point for shader is always the method main. It
+        // does not return anything, nor does it take arguments.
         void main(void) {
             gl_Position = transform*position;
         }

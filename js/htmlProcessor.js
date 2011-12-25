@@ -34,37 +34,54 @@ var htmlProcessor = {
         return blocks;
     },
     processBlock: function (block) {
-        function processHTML (block, regexp) {
+        function process (text, regexp) {
             var result = [],
-                text = block.text,
-                re = new RegExp(regexp, "g"),
-                matches, match, pos, lastPos = 0,
-                comment = "", code;
+                matches = text.match(new RegExp(regexp, "g")),
+                lastPos = 0, comment = "";
 
-            if (matches = block.text.match(re)) {
-                for (var i = 0; i < matches.length; i++) {
-                    match = matches[i];
-                    pos = text.indexOf(match);
-                    code = text.substr(lastPos, pos-lastPos);
-                    result.push([ comment, code ]);
+            if (matches) {
+                matches.forEach(function (match) {
+                    var pos = text.indexOf(match),
+                        code = text.substr(lastPos, pos-lastPos);
+                    result.push({ comment: comment, code: code });
                     comment = new RegExp(regexp).exec(match)[1];
                     text = text.replace(match, "");
                     lastPos = pos;
-                }
-                result.push([ comment, text.substr(lastPos)]);
-            } else {
-                result.push([ "", text, "red" ]);
+                });
             }
+            result.push({ comment: comment, code: text.substr(lastPos) });
+            return result;
+        }
+
+        // FIXME: not working at all
+        function processOneLines (text, regexp) {
+            var result = [],
+                matches = text.match(new RegExp(regexp, "g")),
+                lastPos = 0, comment = "";
+
+            if (matches) {
+                matches.forEach(function (match) {
+                    var pos = text.indexOf(match),
+                        code = text.substr(lastPos, pos-lastPos),
+                        parts = new RegExp(regexp).exec(match);
+                    result.push({ comment: "", code: code });
+                    result.push({ comment: parts[2], code: parts[1] });
+                    text = text.replace(match, "");
+                    lastPos = pos;
+                });
+            }
+            result.push({ comment: "", code: text.substr(lastPos) });
             return result;
         }
 
         switch (block.language) {
             case "html":
-                return processHTML(block, '<\\!--((:?[\n\r]|.)*?)-->');
+                return process(block.text, '<\\!--((:?[\n\r]|.)*?)-->');
                 break;
 
             default:
-                return processScript(block, '(:?\n\\s*)?\/\/(.*)\n');
+                return process(block.text, '//(.*)');
+                //return processOneLines(block.text, '([.;]*)\\s*\/\/(.*)');
                 break;
         }
     }
