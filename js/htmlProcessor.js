@@ -53,27 +53,6 @@ var htmlProcessor = {
             return result;
         }
 
-        // FIXME: not working at all
-        function processOneLines (text, regexp) {
-            var result = [],
-                matches = text.match(new RegExp(regexp, "g")),
-                lastPos = 0, comment = "";
-
-            if (matches) {
-                matches.forEach(function (match) {
-                    var pos = text.indexOf(match),
-                        code = text.substr(lastPos, pos-lastPos),
-                        parts = new RegExp(regexp).exec(match);
-                    result.push({ comment: "", code: code });
-                    result.push({ comment: parts[2], code: parts[1] });
-                    text = text.replace(match, "");
-                    lastPos = pos;
-                });
-            }
-            result.push({ comment: "", code: text.substr(lastPos) });
-            return result;
-        }
-
         switch (block.language) {
             case "html":
                 return process(block.text, '<\\!--((:?[\n\r]|.)*?)-->');
@@ -84,5 +63,8 @@ var htmlProcessor = {
                 //return processOneLines(block.text, '([.;]*)\\s*\/\/(.*)');
                 break;
         }
+    },
+    processComments: function (comments) {
+        return [];
     }
 };
