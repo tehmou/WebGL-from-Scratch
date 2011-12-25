@@ -9,6 +9,7 @@
 // enojy your tests!
 
 
+            
 function loadFile (name, callback) {
     var xmlHttp = new XMLHttpRequest();
     if (xmlHttp) {
@@ -39,22 +40,21 @@ function runtest (mockFile, mockResultFile) {
         {
             name: "Test blocks",
             test: function () {
-                wru.assert("right number of blocks", blocks.length === 7);
-                wru.assert("right language", blocks[0].language === "html");
-                wru.assert("match #0", blocks[0].text === results[0]);
-                wru.assert("right language", blocks[1].language === "x-shader/x-vertex");
-                wru.assert("match #1", blocks[1].text === results[1]);
-
-                wru.assert("right language", blocks[2].language === "html");
-                wru.assert("match #2", blocks[2].text === results[2]);
-                wru.assert("right language", blocks[3].language === "x-shader/x-fragment");
-                wru.assert("match #3", blocks[3].text === results[3]);
-                wru.assert("right language", blocks[4].language === "html");
-                wru.assert("match #4", blocks[4].text === results[4]);
-                wru.assert("right language", blocks[5].language === "text/javascript");
-                wru.assert("match #5", blocks[5].text === results[5]);
-                wru.assert("right language", blocks[6].language === "html");
-                wru.assert("match #6", blocks[6].text === results[6]);
+                assert("right number of blocks", blocks.length === 7);
+                assert("right language", blocks[0].language === "html");
+                assert("match #0", blocks[0].text === results[0]);
+                assert("right language", blocks[1].language === "x-shader/x-vertex");
+                assert("match #1", blocks[1].text === results[1]);
+                assert("right language", blocks[2].language === "html");
+                assert("match #2", blocks[2].text === results[2]);
+                assert("right language", blocks[3].language === "x-shader/x-fragment");
+                assert("match #3", blocks[3].text === results[3]);
+                assert("right language", blocks[4].language === "html");
+                assert("match #4", blocks[4].text === results[4]);
+                assert("right language", blocks[5].language === "text/javascript");
+                assert("match #5", blocks[5].text === results[5]);
+                assert("right language", blocks[6].language === "html");
+                assert("match #6", blocks[6].text === results[6]);
             }
         }
     ]);
@@ -63,15 +63,16 @@ function runtest (mockFile, mockResultFile) {
             name: "Test HTML comments",
             test: function () {
                 var comments = htmlProcessor.processBlock(blocks[0]);
-                wru.assert("wrong number of comments found", comments.length === 4);
-                wru.assert("match #1 comment", comments[0][0] === "");
-                wru.assert("match #1 code", comments[0][1] === '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n');
+                assert("wrong number of comments found", comments.length === 4);
+                assert("match #1 comment", comments[0][0] === "");
+                assert("match #1 code", comments[0][1] === '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n');
 
-                wru.assert("match #2 comment", comments[1][0] === 'Intro comment.');
-                wru.assert("match #2 code", comments[1][1] === "\n");
+                assert("match #2 comment", comments[1][0] === '\nIntro comment.\n');
+                assert("match #2 code", comments[1][1] === "\n\n");
 
-                wru.assert("match #3 comment", comments[2][0] === 'START OF demo.html');
-                wru.assert("match #3 code", comments[2][1] === "<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ");
+                assert("match #3 comment", comments[2][0] === ' START OF demo.html ');
+                assert("match #3 code", comments[2][1] === "\n<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ");
+                logQuoted(comments[2][1]);
             }
         }
     ]);

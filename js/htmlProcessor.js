@@ -1,7 +1,7 @@
 var htmlProcessor = {
     sliceHTML: function (code) {
         var blocks = [],
-            scriptMatcher = '<script .*type="(.*)".*>\n?((:?[\n\r]|.)*?)\\s*<\/script>',
+            scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)<\/script>',
             scriptRegExp = new RegExp(scriptMatcher, "g"),
             position = 0,
             lastInsertedPosition = 0,
@@ -60,11 +60,11 @@ var htmlProcessor = {
 
         switch (block.language) {
             case "html":
-                return processHTML(block, '<\\!--\n?\\s*((:?[\n\r]|.)*?)\\s*\n?-->\n?');
+                return processHTML(block, '<\\!--((:?[\n\r]|.)*?)-->');
                 break;
 
             default:
-                return processScript(block, '(:?\n\\s*)?\/\/.*');
+                return processScript(block, '(:?\n\\s*)?\/\/(.*)\n');
                 break;
         }
     }
