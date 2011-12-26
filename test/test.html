@@ -8,18 +8,28 @@
 
 // enojy your tests!
 
-function assertEquals () {
-    var desc = arguments[0],
-        a = arguments[1],
-        b = arguments[2];
-
-    if (a === b) {
-        wru.assert(desc, true);
-        return true;
-    } else {
+function assertEquals (desc, a, b) {
+    var result = a === b;
+    if (!result) {
         console.error("Assertion error\nexpected '" + b + "'\nwas '" + a + "'");
-        wru.assert(desc, false);
-        return false;
+    }
+    wru.assert(desc, result);
+    return result;
+}
+
+function assertArraysEqual (a, b) {
+    if (assertEquals("arrays are the same length", a.length, b.length)) {
+        for (var i = 0; i < a.length; i++) {
+            if (typeof a[i] === "object") {
+                for (var key in a[i]) {
+                    if (a[i].hasOwnProperty(key)) {
+                        assertEquals("item." + key + " #" + i, a[i][key], b[i][key]);
+                    }
+                }
+            } else {
+                assertEquals("item #" + i, a[i], b[i]);
+            }
+        }
     }
 }
             
@@ -49,24 +59,41 @@ function runtest (mockResultFile) {
         {
             name: "Test language block recognition",
             test: function () {
-                var results = mockResultFile.split("******"),
-                    blocks = htmlProcessor.sliceHTML(mockResultFile.replace(/\*{6}/g, ""));
+                var data = mockResultFile.replace(/\*{6}/g, ""),
+                    result = htmlProcessor.sliceHTML(data),
+                    expectedData = mockResultFile.split("******"),
+                    expected = [
+                        {
+                            text: expectedData[0],
+                            language: "html"
+                        },
+                        {
+                            text: expectedData[1],
+                            language: "x-shader/x-vertex"
+                        },
+                        {
+                            text: expectedData[2],
+                            language: "html"
+                        },
+                        {
+                            text: expectedData[3],
+                            language: "x-shader/x-fragment"
+                        },
+                        {
+                            text: expectedData[4],
+                            language: "html"
+                        },
+                        {
+                            text: expectedData[5],
+                            language: "text/javascript"
+                        },
+                        {
+                            text: expectedData[6],
+                            language: "html"
+                        }
+                    ];
 
-                assertEquals("right number of blocks found", blocks.length, 7);
-                assertEquals("right language", blocks[0].language, "html");
-                assertEquals("match #0", blocks[0].text, results[0]);
-                assertEquals("right language", blocks[1].language, "x-shader/x-vertex");
-                assertEquals("match #1", blocks[1].text, results[1]);
-                assertEquals("right language", blocks[2].language, "html");
-                assertEquals("match #2", blocks[2].text, results[2]);
-                assertEquals("right language", blocks[3].language, "x-shader/x-fragment");
-                assertEquals("match #3", blocks[3].text, results[3]);
-                assertEquals("right language", blocks[4].language, "html");
-                assertEquals("match #4", blocks[4].text, results[4]);
-                assertEquals("right language", blocks[5].language, "text/javascript");
-                assertEquals("match #5", blocks[5].text, results[5]);
-                assertEquals("right language", blocks[6].language, "html");
-                assertEquals("match #6", blocks[6].text, results[6]);
+                    assertArraysEqual(expected, result);
             }
         },
         {
@@ -88,6 +115,7 @@ function runtest (mockResultFile) {
                         '    Vertex shader\n' +
                         '    -->\n' +
                         '    <script id="vs-shader" type="x-shader/x-vertex">',
+                    result = htmlProcessor.processBlock({ language: "html", text: data }),
                     expected = [
                         {
                             text: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n',
@@ -117,15 +145,9 @@ function runtest (mockResultFile) {
                             text: '\n    <script id="vs-shader" type="x-shader/x-vertex">',
                             type: 'code'
                         }
-                    ],
-                    result = htmlProcessor.processBlock({ language: "html", text: data });
+                    ];
 
-                if (assertEquals("right number of results found", expected.length, result.length)) {
-                    for (var i = 0; i < expected.length; i++) {
-                        assertEquals('text #' + i, expected[i].text, result[i].text);
-                        assertEquals('type #' + i, expected[i].type, result[i].type);
-                    }
-                }
+                assertArraysEqual(expected, result);
             }
         },
         {
@@ -174,12 +196,7 @@ function runtest (mockResultFile) {
                     ],
                     result = htmlProcessor.processBlock({ language: "text/javascript", text: data });
 
-                if (assertEquals("right number of results found", expected.length, result.length)) {
-                    for (var i = 0; i < expected.length; i++) {
-                        assertEquals('text #' + i, expected[i].text, result[i].text);
-                        assertEquals('type #' + i, expected[i].type, result[i].type);
-                    }
-                }
+                assertArraysEqual(expected, result);
             }
         },
         {
@@ -187,40 +204,59 @@ function runtest (mockResultFile) {
             test: function () {
                 var data = [
                         {
-                            comment: "",
-                            code: "\n\n   "
+                            text: "\n\n   ",
+                            type: "code"
                         },
                         {
-                            comment: " Test line 1 that is",
-                            code: "\n    "
+                            text: " Test line 1 that is",
+                            type: "comment"
                         },
                         {
-                            comment: " split into two.",
-                            code: "\n   codeToComment();\n"
+                            text: "\n    ",
+                            type: "code"
                         },
                         {
-                            comment: " Test line 2.",
-                            code: "\n\n     "
+                            text: " split into two.",
+                            type: "comment"
                         },
                         {
-                            comment: " Test line 2 is not combined",
-                            code: "\n  moreCodeToComment();\n  }\n   "
+                            text: "\n   codeToComment();\n",
+                            type: "code"
+                        },
+                        {
+                            text: " Test line 2.",
+                            type: "comment"
+                        },
+                        {
+                            text: "\n\n     ",
+                            type: "code"
+                        },
+                        {
+                            text: " Test line 2 is not combined",
+                            type: "comment"
+                        },
+                        {
+                            text: "\n  moreCodeToComment();\n  }\n   ",
+                            type: "code"
                         }
                     ],
-                    comments = htmlProcessor.processComments(data);
+                    result = htmlProcessor.processComments(data),
+                    expected = [
+                        {
+                            comment: "Test line 1 that is split into two.",
+                            text: "   codeToComment();"
+                        },
+                        {
+                            comment: "Test line 2.",
+                            text: ""
+                        },
+                        {
+                            comment: "Test line 2 is not combined",
+                            text: "  moreCodeToComment();\n  }"
+                        }
+                    ];
 
-                assertEquals("right number of processed comments", comments.length, 3);
-
-                console.log(comments);
-
-                // combine comments if in the code there is max one line break
-                /*assertEquals("match #1 comment", comments[0].comment, "Test line 1 that is split into two.")
-                assertEquals("match #1 code", comments[0].code, "   codeToComment();");
-                assertEquals("match #2 comment", comments[1].comment, "Test line 2.");
-                assertEquals("match #2 code", comments[1].code, "\n     ");
-                assertEquals("match #3 comment", comments[2].comment, "Test line 2 is not combined");
-                assertEquals("match #3 code", comments[2].code, "  moreCodeToComment();\n  }\n   ");
-                assertEquals()*/
+                assertArraysEqual(expected, result);
             }
         }
     ]);
