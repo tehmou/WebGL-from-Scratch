@@ -1,4 +1,12 @@
 var htmlProcessor = {
+    extractComments: function (code) {
+        var result = [],
+            blocks = htmlProcessor.sliceHTML(code);
+        blocks.forEach(function (block) {
+            result = result.concat(htmlProcessor.processComments(htmlProcessor.processBlock(block)));
+        });
+        return result;
+    },
     sliceHTML: function (code) {
         var blocks = [],
             scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)<\/script>',

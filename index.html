@@ -44,6 +44,7 @@
 
 <script type="text/javascript">
 
+    console.log("moi");
     (function () {
 
         function numLines (str) {
@@ -55,22 +56,19 @@
         }
 
         function displayCode (code) {
-            var blocks = htmlProcessor.sliceHTML(code);
+            var cssClass = "",
+                comments = htmlProcessor.extractComments(code);
+            console.log(comments);
+            comments.forEach(addComment);
 
-            for (var i = 0; i < blocks.length; i++) {
-                htmlProcessor.processBlock(blocks[i]).map(function (item) {
-                    addComment(item[0], item[1]);
-                });
-            }
-
-            function addComment (comment, code, cssClass) {
-                cssClass = cssClass || "";
+            function addComment (block) {
+                cssClass = cssClass === "" ? "red" : "";
                 var el = document.createElement("div"),
                     commentEl = document.createElement("span"),
                     codeEl = document.createElement("pre");
                 
-                commentEl.innerHTML = comment;
-                codeEl.innerHTML = escapeCode(code);
+                commentEl.innerHTML = block.comment;
+                codeEl.innerHTML = escapeCode(block.text);
                 el.appendChild(commentEl);
                 el.appendChild(codeEl);
                 document.getElementById("content").appendChild(el);
