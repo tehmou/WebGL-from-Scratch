@@ -21,7 +21,7 @@ Intro comment.
         void main(void) {
             gl_Position = transform*position;
         }
-    ******</script>
+******    </script>
 
     <!--
     Fragment shader
@@ -33,7 +33,7 @@ Intro comment.
         #endif
 
         varying vec2 xyPos;         // Value the vertex shader passes to us.
-    ******</script>
+******    </script>
 
 
     <!--
@@ -50,7 +50,7 @@ Intro comment.
             demo.run(canvas);
         }
 
-    ******</script>
+******    </script>
 
 </head>
 

@@ -9,7 +9,7 @@ var htmlProcessor = {
     },
     sliceHTML: function (code) {
         var blocks = [],
-            scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)<\/script>',
+            scriptMatcher = '<script .*type="(.*)".*>((:?[\n\r]|.)*?)[ \t]*<\/script>',
             scriptRegExp = new RegExp(scriptMatcher, "g"),
             position = 0,
             lastInsertedPosition = 0,
