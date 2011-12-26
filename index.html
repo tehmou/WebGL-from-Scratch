@@ -22,6 +22,10 @@
         color: red;
     }
 
+    #content {
+        margin: 20px;
+    }
+
     #content span, #content pre {
         display: inline-block;
         width: 50%;
@@ -44,7 +48,6 @@
 
 <script type="text/javascript">
 
-    console.log("moi");
     (function () {
 
         function numLines (str) {
@@ -56,10 +59,9 @@
         }
 
         function displayCode (code) {
-            var cssClass = "",
-                comments = htmlProcessor.extractComments(code);
-            console.log(comments);
-            comments.forEach(addComment);
+            var cssClass = "";
+
+            htmlProcessor.extractComments(code).splice(1).forEach(addComment);
 
             function addComment (block) {
                 cssClass = cssClass === "" ? "red" : "";
