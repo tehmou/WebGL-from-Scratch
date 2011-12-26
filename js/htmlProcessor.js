@@ -65,7 +65,34 @@ var htmlProcessor = {
                 break;
         }
     },
-    processComments: function (comments) {
-        return [];
+    processComments: function (pieces) {
+        var result = [],
+            code, comment = "",
+            codeCleaner = /^\s*?\n|[ \t]*$/g,
+            commentCleaner = /^\s*|\s*$/g,
+            wholeStringIsWhiteSpace = /^\s*$/;
+
+        pieces.forEach(function (piece) {
+            if (piece.type === "code") {
+                code = piece.text.replace(codeCleaner, "");
+                if (code !== "") {
+                    code = code.replace(wholeStringIsWhiteSpace, "");
+                    comment = comment.replace(wholeStringIsWhiteSpace, "");
+                    if (code !== "" || comment !== "") {
+                        result.push({ text: code, comment: comment });
+                    }
+                    code = comment = ""
+                }
+            } else if (piece.type === "comment") {
+                if (comment !== "") { comment += "\n"; }
+                comment += piece.text.replace(commentCleaner, "");
+            } else {
+                throw "Unknown type '" + piece.type + "'";
+            }
+        });
+        if (comment !== "") {
+            result.push({ text : "", comment: comment });
+        }
+        return result;
     }
 };

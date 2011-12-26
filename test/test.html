@@ -11,7 +11,7 @@
 function assertEquals (desc, a, b) {
     var result = a === b;
     if (!result) {
-        console.error("Assertion error\nexpected '" + b + "'\nwas '" + a + "'");
+        console.error("Assertion error\nexpected '" + a + "'\nwas '" + b + "'");
     }
     wru.assert(desc, result);
     return result;
@@ -66,28 +66,22 @@ function runtest (mockResultFile) {
                         {
                             text: expectedData[0],
                             language: "html"
-                        },
-                        {
+                        },{
                             text: expectedData[1],
                             language: "x-shader/x-vertex"
-                        },
-                        {
+                        },{
                             text: expectedData[2],
                             language: "html"
-                        },
-                        {
+                        },{
                             text: expectedData[3],
                             language: "x-shader/x-fragment"
-                        },
-                        {
+                        },{
                             text: expectedData[4],
                             language: "html"
-                        },
-                        {
+                        },{
                             text: expectedData[5],
                             language: "text/javascript"
-                        },
-                        {
+                        },{
                             text: expectedData[6],
                             language: "html"
                         }
@@ -120,28 +114,22 @@ function runtest (mockResultFile) {
                         {
                             text: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n',
                             type: 'code'
-                        },
-                        {
+                        },{
                             text: '\n  Intro comment.\n',
                             type: 'comment'
-                        },
-                        {
+                        },{
                             text: '\n\n',
                             type: 'code'
-                        },
-                        {
+                        },{
                             text: ' START OF demo.html ',
                             type: 'comment'
-                        },
-                        {
+                        },{
                             text: '\n<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ',
                             type: 'code'
-                        },
-                        {
+                        },{
                             text: '\n    Vertex shader\n    ',
                             type: 'comment'
-                        },
-                        {
+                        },{
                             text: '\n    <script id="vs-shader" type="x-shader/x-vertex">',
                             type: 'code'
                         }
@@ -168,28 +156,22 @@ function runtest (mockResultFile) {
                         {
                             text: "\n        ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " Position on the surface of the model.",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n        attribute vec4 position;\n\n        ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " Entry point for shader is always the method main. It",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n        ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " does not return anything, nor does it take arguments.",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n        void main(void) {\n            gl_Position = transform*position;\n        }\n    ",
                             type: "code"
                         }
@@ -206,36 +188,28 @@ function runtest (mockResultFile) {
                         {
                             text: "\n\n   ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " Test line 1 that is",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n    ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " split into two.",
                             type: "comment"
-                        },
-                        {
-                            text: "\n   codeToComment();\n",
+                        },{
+                            text: "\n   codeToComment();\n   ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " Test line 2.",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n\n     ",
                             type: "code"
-                        },
-                        {
+                        },{
                             text: " Test line 2 is not combined",
                             type: "comment"
-                        },
-                        {
+                        },{
                             text: "\n  moreCodeToComment();\n  }\n   ",
                             type: "code"
                         }
@@ -243,16 +217,14 @@ function runtest (mockResultFile) {
                     result = htmlProcessor.processComments(data),
                     expected = [
                         {
-                            comment: "Test line 1 that is split into two.",
-                            text: "   codeToComment();"
-                        },
-                        {
+                            comment: "Test line 1 that is\nsplit into two.",
+                            text: "   codeToComment();\n"
+                        },{
                             comment: "Test line 2.",
                             text: ""
-                        },
-                        {
+                        },{
                             comment: "Test line 2 is not combined",
-                            text: "  moreCodeToComment();\n  }"
+                            text: "  moreCodeToComment();\n  }\n"
                         }
                     ];
 
