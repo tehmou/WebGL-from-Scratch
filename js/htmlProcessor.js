@@ -42,14 +42,15 @@ var htmlProcessor = {
             if (matches) {
                 matches.forEach(function (match) {
                     var pos = text.indexOf(match),
-                        code = text.substr(lastPos, pos-lastPos);
-                    result.push({ comment: comment, code: code });
-                    comment = new RegExp(regexp).exec(match)[1];
+                        code = text.substr(lastPos, pos-lastPos),
+                        comment = new RegExp(regexp).exec(match)[1];
+                    result.push({ text: code, type: "code" });
+                    result.push({ text: comment, type: "comment" });
                     text = text.replace(match, "");
                     lastPos = pos;
                 });
             }
-            result.push({ comment: comment, code: text.substr(lastPos) });
+            result.push({ text: text.substr(lastPos), type: "code" });
             return result;
         }
 

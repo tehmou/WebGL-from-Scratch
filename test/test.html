@@ -15,11 +15,11 @@ function assertEquals () {
 
     if (a === b) {
         wru.assert(desc, true);
+        return true;
     } else {
-        console.error("Assertion error");
-        console.error("expected '" + b + "'");
-        console.error("was '" + a + "'");
+        console.error("Assertion error\nexpected '" + b + "'\nwas '" + a + "'");
         wru.assert(desc, false);
+        return false;
     }
 }
             
@@ -45,12 +45,13 @@ function logQuoted (msg) {
 }
 
 function runtest (mockResultFile) {
-    var results = mockResultFile.split("******"),
-        blocks = htmlProcessor.sliceHTML(mockResultFile.replace(/\*{6}/g, ""));
     wru.test([
         {
             name: "Test language block recognition",
             test: function () {
+                var results = mockResultFile.split("******"),
+                    blocks = htmlProcessor.sliceHTML(mockResultFile.replace(/\*{6}/g, ""));
+
                 assertEquals("right number of blocks found", blocks.length, 7);
                 assertEquals("right language", blocks[0].language, "html");
                 assertEquals("match #0", blocks[0].text, results[0]);
@@ -72,61 +73,113 @@ function runtest (mockResultFile) {
             name: "Test HTML comment parsing",
             test: function () {
                 var data = "" +
-                    '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n' +
-                    '        "http://www.w3.org/TR/html4/loose.dtd">\n' +
-                    '<!--\n' +
-                    'Intro comment.\n' +
-                    '-->\n' +
-                    '\n' +
-                    '<!-- START OF demo.html -->\n' +
-                    '<html>\n' +
-                    '<head>\n' +
-                    '    <title>WebGL from Scratch</title>\n' +
-                    '\n' +
-                    '    <!--\n' +
-                    '    Vertex shader\n' +
-                    '    -->\n' +
-                    '    <script id="vs-shader" type="x-shader/x-vertex">',
-                    comments = htmlProcessor.processBlock({ language: "html", text: data });
+                        '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n' +
+                        '        "http://www.w3.org/TR/html4/loose.dtd">\n' +
+                        '<!--\n' +
+                        '  Intro comment.\n' +
+                        '-->\n' +
+                        '\n' +
+                        '<!-- START OF demo.html -->\n' +
+                        '<html>\n' +
+                        '<head>\n' +
+                        '    <title>WebGL from Scratch</title>\n' +
+                        '\n' +
+                        '    <!--\n' +
+                        '    Vertex shader\n' +
+                        '    -->\n' +
+                        '    <script id="vs-shader" type="x-shader/x-vertex">',
+                    expected = [
+                        {
+                            text: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n',
+                            type: 'code'
+                        },
+                        {
+                            text: '\n  Intro comment.\n',
+                            type: 'comment'
+                        },
+                        {
+                            text: '\n\n',
+                            type: 'code'
+                        },
+                        {
+                            text: ' START OF demo.html ',
+                            type: 'comment'
+                        },
+                        {
+                            text: '\n<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ',
+                            type: 'code'
+                        },
+                        {
+                            text: '\n    Vertex shader\n    ',
+                            type: 'comment'
+                        },
+                        {
+                            text: '\n    <script id="vs-shader" type="x-shader/x-vertex">',
+                            type: 'code'
+                        }
+                    ],
+                    result = htmlProcessor.processBlock({ language: "html", text: data });
 
-                assertEquals("right number of comments found", comments.length, 4);
-
-                assertEquals("match #1 comment", comments[0].comment, "");
-                assertEquals("match #1 code", comments[0].code, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n');
-                assertEquals("match #2 comment", comments[1].comment, '\nIntro comment.\n');
-                assertEquals("match #2 code", comments[1].code, "\n\n");
-                assertEquals("match #3 comment", comments[2].comment, ' START OF demo.html ');
-                assertEquals("match #3 code", comments[2].code, "\n<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ");
-                assertEquals("match #4 comment", comments[3].comment, '\n    Vertex shader\n    ');
-                assertEquals("match #4 code", comments[3].code, '\n    <script id="vs-shader" type="x-shader/x-vertex">');
+                if (assertEquals("right number of results found", expected.length, result.length)) {
+                    for (var i = 0; i < expected.length; i++) {
+                        assertEquals('text #' + i, expected[i].text, result[i].text);
+                        assertEquals('type #' + i, expected[i].type, result[i].type);
+                    }
+                }
             }
         },
         {
             name: "Test script comment parsing",
             test: function () {
                 var data =
-                    "\n" +
-                    "        // Position on the surface of the model.\n" +
-                    "        attribute vec4 position;\n" +
-                    "\n" +
-                    "        // Entry point for shader is always the method main. It\n" +
-                    "        // does not return anything, nor does it take arguments.\n" +
-                    "        void main(void) {\n" +
-                    "            gl_Position = transform*position;\n" +
-                    "        }\n" +
-                    "    ",
-                    comments = htmlProcessor.processBlock({ language: "text/javascript", text: data });
-                console.log(comments);
-                assertEquals("right number of comments found", comments.length, 4);
+                        "\n" +
+                        "        // Position on the surface of the model.\n" +
+                        "        attribute vec4 position;\n" +
+                        "\n" +
+                        "        // Entry point for shader is always the method main. It\n" +
+                        "        // does not return anything, nor does it take arguments.\n" +
+                        "        void main(void) {\n" +
+                        "            gl_Position = transform*position;\n" +
+                        "        }\n" +
+                        "    ",
+                    expected = [
+                        {
+                            text: "\n        ",
+                            type: "code"
+                        },
+                        {
+                            text: " Position on the surface of the model.",
+                            type: "comment"
+                        },
+                        {
+                            text: "\n        attribute vec4 position;\n\n        ",
+                            type: "code"
+                        },
+                        {
+                            text: " Entry point for shader is always the method main. It",
+                            type: "comment"
+                        },
+                        {
+                            text: "\n        ",
+                            type: "code"
+                        },
+                        {
+                            text: " does not return anything, nor does it take arguments.",
+                            type: "comment"
+                        },
+                        {
+                            text: "\n        void main(void) {\n            gl_Position = transform*position;\n        }\n    ",
+                            type: "code"
+                        }
+                    ],
+                    result = htmlProcessor.processBlock({ language: "text/javascript", text: data });
 
-                assertEquals("match #1 comment", comments[0].comment, "");
-                assertEquals("match #1 code", comments[0].code, "\n        ");
-                assertEquals("match #2 comment", comments[1].comment, " Position on the surface of the model.");
-                assertEquals("match #2 code", comments[1].code, "\n        attribute vec4 position;\n\n        ");
-                assertEquals("match #4 comment", comments[2].comment, " Entry point for shader is always the method main. It");
-                assertEquals("match #4 code", comments[2].code, "\n        ");
-                assertEquals("match #5 comment", comments[3].comment, " does not return anything, nor does it take arguments.");
-                assertEquals("match #5 code", comments[3].code, "\n        void main(void) {\n            gl_Position = transform*position;\n        }\n    ");
+                if (assertEquals("right number of results found", expected.length, result.length)) {
+                    for (var i = 0; i < expected.length; i++) {
+                        assertEquals('text #' + i, expected[i].text, result[i].text);
+                        assertEquals('type #' + i, expected[i].type, result[i].type);
+                    }
+                }
             }
         },
         {
@@ -143,7 +196,7 @@ function runtest (mockResultFile) {
                         },
                         {
                             comment: " split into two.",
-                            code: "\n   codeToComment();"
+                            code: "\n   codeToComment();\n"
                         },
                         {
                             comment: " Test line 2.",
@@ -157,6 +210,17 @@ function runtest (mockResultFile) {
                     comments = htmlProcessor.processComments(data);
 
                 assertEquals("right number of processed comments", comments.length, 3);
+
+                console.log(comments);
+
+                // combine comments if in the code there is max one line break
+                /*assertEquals("match #1 comment", comments[0].comment, "Test line 1 that is split into two.")
+                assertEquals("match #1 code", comments[0].code, "   codeToComment();");
+                assertEquals("match #2 comment", comments[1].comment, "Test line 2.");
+                assertEquals("match #2 code", comments[1].code, "\n     ");
+                assertEquals("match #3 comment", comments[2].comment, "Test line 2 is not combined");
+                assertEquals("match #3 code", comments[2].code, "  moreCodeToComment();\n  }\n   ");
+                assertEquals()*/
             }
         }
     ]);
