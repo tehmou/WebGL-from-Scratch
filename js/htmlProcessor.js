@@ -61,7 +61,6 @@ var htmlProcessor = {
 
             default:
                 return process(block.text, '//(.*)');
-                //return processOneLines(block.text, '([.;]*)\\s*\/\/(.*)');
                 break;
         }
     },
