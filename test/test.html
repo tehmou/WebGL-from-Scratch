@@ -9,12 +9,11 @@
 // enojy your tests!
 
 function assertEquals (desc, a, b) {
-    var result = a === b;
-    if (!result) {
-        console.error("Assertion error\nexpected '" + a + "'\nwas '" + b + "'");
+    if (a === b) {
+        return wru.assert(desc, true);
+    } else {
+        return wru.assert(desc + "<br />expected '" + a + "'\nwas '" + b + "'", false);
     }
-    wru.assert(desc, result);
-    return result;
 }
 
 function assertArraysEqual (a, b) {

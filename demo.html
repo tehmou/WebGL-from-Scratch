@@ -30,15 +30,13 @@ example the shader are embedded to the HTML page as script blocks of a specific 
 from a text file with ajax, or to write them inline as a JavaScript string. WebGL will never know where the code came
 from.</p>
 
-<p>Enough introduction, let's get started with the code!</p>
+<p>Enough introduction, let's get started with the code!</p><br/><br/>
 -->
 
-
-<!-- START OF demo.html -->
+<!-- This will be a simple HTML page. Nothing special to see here... -->
 <html>
 <head>
     <title>WebGL from Scratch</title>
-
 
     <style type="text/css">
         body {
@@ -49,14 +47,19 @@ from.</p>
 
     <!--
     <h2>Vertex shader</h2>
-    <p>Let's start with the vertex shader, as it is processed first in the WebGL rendering chain. Noticed that the type
-    here only means that we don't want to execute the code as JavaScript. It will be referenced later only by its id,
-    and its contents will retrieved as plain text.</p>
+    <p>Of our two shaders, let's start with the vertex shader, as it is processed first in the WebGL rendering chain.
     -->
+
+    <!-- Type here is arbitrary, it is treated as pure text. -->
     <script id="vs-shader" type="x-shader/x-vertex">
-        attribute vec4 position;    // Position on the surface of the model.
-        varying vec2 xyPos;         // Used to pass the xy-coordinate for the texture pixel.
-        uniform mat4 transform;     // Matrix used for transformation (not required, just useful).
+        // Position on the surface of the model.
+        attribute vec4 position;
+
+        // Used to pass the xy-coordinate for the texture pixel.
+        varying vec2 xyPos;
+
+        // Matrix used for transformation (not required, just useful).
+        uniform mat4 transform;
 
         // Entry point for shader is always the method main. It does not return anything, nor does it take arguments.
         void main(void) {
@@ -76,15 +79,20 @@ from.</p>
     <li>uniform: assignable from <b>outside</b> of WebGL. In our case can be set from JS.</li>
     </ul>
     -->
+    
+    <!-- Type here is arbitrary, it is treated as pure text. -->
     <script id="fs-shader" type="x-shader/x-fragment">
 
-        // Some boilerplate code. 3
+        // Some boilerplate code.
         #ifdef GL_ES
         precision highp float;
         #endif
 
-        varying vec2 xyPos;         // Value the vertex shader passes to us.
-        uniform sampler2D tex;      // Texture we want to use.
+        // Value the vertex shader passes to us.
+        varying vec2 xyPos;
+        
+        // Texture we want to use.
+        uniform sampler2D tex;
 
         void main(void) {
             // gl_FragColor is the return value. Simply read the pixel value of
@@ -93,14 +101,12 @@ from.</p>
         }
     </script>
 
+    <!-- <h2>The JavaScript part</h2> -->
 
-    <!--
-    <h2>The JavaScript part</h2>
-    -->
+    <!-- -->
     <script type="text/javascript">
-
+        // Namespace for the things we are creating.
         window.timotuominen = { webgl: {} };
-
 
         // Utilities for WebGL shaders.
         timotuominen.webgl.shaderUtils = {
@@ -143,13 +149,18 @@ from.</p>
             }
         };
 
-
         // We start by creating a utility class that takes care of the WebGL initialization and viewport.
-       timotuominen.webgl.Runner = function () {
+        timotuominen.webgl.Runner = function () {
             return {
-                el: null, // Hold the canvas element.
-                gl: null, // Reference to the WebGL object.
-                isRunning: true, // Whether we should continue the render loop.
+                // Hold the canvas element.
+                el: null,
+
+                // Reference to the WebGL object.
+                gl: null,
+
+                // Whether we should continue the render loop.
+                isRunning: true,
+
                 initialize: function () {
                     // First we create the WebGL object by requesting "experimental-webgl" context.
                     // If WebGL is not supported, this will either throw an error or result null.
@@ -178,7 +189,6 @@ from.</p>
                 }
             };
         };
-
 
         // The actual demo we will show.
         timotuominen.webgl.FromScratchDemo = function () {
@@ -239,7 +249,6 @@ from.</p>
             }
         };
 
-
         // Function to call when the page has loaded.
         function initialize () {
             var demo, image, canvas;
@@ -259,13 +268,11 @@ from.</p>
             demo.run(canvas);
         }
 
-
     </script>
-
 </head>
-
+<!-- Call initialize when we are finished loading the page. -->
 <body onload="initialize()">
+<!-- One canvas is used for all drawing. -->
     <canvas id="canvas"></canvas>
 </body>
-
 </html>
