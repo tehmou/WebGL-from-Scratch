@@ -18,9 +18,6 @@
         line-height: 1.3rem;
     }
 
-    .red {
-    }
-
     #content {
         margin: 20px;
     }
@@ -43,6 +40,16 @@
         line-height: 20px;
         width: 63%;
         min-width: 500px;
+    }
+
+    #content .html-comment {
+        margin-bottom: 4px;
+    }
+
+    #content .script-comment span {
+        color: blue;
+        text-align: right;
+        margin-bottom: 10px;
     }
 
 </style>
@@ -71,7 +78,7 @@
             htmlProcessor.extractComments(code).splice(1).forEach(addComment);
 
             function addComment (block) {
-                cssClass = cssClass === "" ? "red" : "";
+                cssClass = block.language === "html" ? "html-comment" : "script-comment";
                 var el = document.createElement("div"),
                     commentEl = document.createElement("span"),
                     codeEl = document.createElement("pre");

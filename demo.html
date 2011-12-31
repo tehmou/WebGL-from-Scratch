@@ -47,10 +47,14 @@ from.</p>
 
     <!--
     <h2>Vertex shader</h2>
-    <p>Of our two shaders, let's start with the vertex shader, as it is processed first in the WebGL rendering chain.
+    <p>Of our two shaders, let's start with the vertex shader, as it is processed first in the WebGL rendering chain.</p>
+
+    <p>Notice that the type of the script block is arbitrary; it is treated as pure text.</p>
     -->
 
-    <!-- Type here is arbitrary, it is treated as pure text. -->
+    <!--
+
+    -->
     <script id="vs-shader" type="x-shader/x-vertex">
         // Position on the surface of the model.
         attribute vec4 position;
@@ -80,7 +84,9 @@ from.</p>
     </ul>
     -->
     
-    <!-- Type here is arbitrary, it is treated as pure text. -->
+    <!--
+
+    -->
     <script id="fs-shader" type="x-shader/x-fragment">
 
         // Some boilerplate code.
@@ -105,7 +111,9 @@ from.</p>
     <h2>The JavaScript part</h2>
     -->
 
-    <!-- Script block. -->
+    <!--
+
+    -->
     <script type="text/javascript">
         // Namespace for the things we are creating.
         window.timotuominen = { webgl: {} };
@@ -170,7 +178,7 @@ from.</p>
                     this.gl = this.el.getContext("experimental-webgl");
 
                     // Store the size of the canvas. DOM operation are in general expensive,
-                    // and we certainly don't want to do this on every frame. 2
+                    // and we certainly don't want to do this on every frame.
                     this.viewportWidth = this.el.width;
                     this.viewportHeight = this.el.height;
 
@@ -184,7 +192,7 @@ from.</p>
                     this.renderLoop = this.renderLoop.bind(this);
                 },
                 // The rendering loop that repeatedly call itself 60 times a second, as long
-                // as isRunning is truthy. 4
+                // as isRunning is truthy.
                 renderLoop: function() {
                     this.isRunning && setTimeout(this.renderLoop, 1000/60);
                     this.render && this.render();
