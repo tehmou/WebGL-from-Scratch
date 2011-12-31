@@ -102,6 +102,7 @@ from.</p>
         // Texture we want to use.
         uniform sampler2D tex;
 
+        // Entry point of all shaders.
         void main(void) {
             // gl_FragColor is the return value. Simply read the pixel value of
             // our texture at coordinate xyPos.
@@ -110,7 +111,7 @@ from.</p>
     </script>
 
     <!--
-    <h2>The JavaScript part</h2>
+    <h2>Shader utilities</h2>
     -->
 
     <!--
@@ -119,7 +120,6 @@ from.</p>
     <script type="text/javascript">
         // Namespace for the things we are creating.
         window.timotuominen = { webgl: {} };
-
         // Utilities for WebGL shaders.
         timotuominen.webgl.shaderUtils = {
             createProgram: function (gl, vsCode, fsCode) {
@@ -160,6 +160,16 @@ from.</p>
                 return texture;
             }
         };
+    </script>
+
+    <!--
+    <h2>Runner class for the render loop</h2>
+    -->
+
+    <!--
+
+    -->
+    <script type="text/javascript">
 
         // We start by creating a utility class that takes care of the WebGL initialization and viewport.
         timotuominen.webgl.Runner = function () {
@@ -173,6 +183,7 @@ from.</p>
                 // Whether we should continue the render loop.
                 isRunning: true,
 
+                // Initialize should be called to start the loop.
                 initialize: function () {
                     // First we create the WebGL object by requesting "experimental-webgl" context.
                     // If WebGL is not supported, this will either throw an error or result null.
@@ -201,7 +212,16 @@ from.</p>
                 }
             };
         };
+    </script>
 
+    <!--
+    <h2>The actual code for the demo</h2>
+    -->
+
+    <!--
+
+    -->
+    <script type="text/javascript">
         // The actual demo we will show.
         timotuominen.webgl.FromScratchDemo = function () {
             return {
@@ -260,7 +280,16 @@ from.</p>
                 }
             }
         };
+    </script>
 
+    <!--
+    <h2>Initialize hook</h2>
+    -->
+
+    <!--
+
+    -->
+    <script type="text/javascript">
         // Function to call when the page has loaded.
         function initialize () {
             var demo, image, canvas;
