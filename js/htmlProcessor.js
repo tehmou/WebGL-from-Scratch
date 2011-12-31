@@ -52,13 +52,13 @@ var htmlProcessor = {
                     var pos = text.indexOf(match),
                         code = text.substr(lastPos, pos-lastPos),
                         comment = new RegExp(regexp).exec(match)[1];
-                    result.push({ text: code, type: "code" });
-                    result.push({ text: comment, type: "comment" });
+                    result.push({ text: code, type: "code", language: block.language });
+                    result.push({ text: comment, type: "comment", language: block.language });
                     text = text.replace(match, "");
                     lastPos = pos;
                 });
             }
-            result.push({ text: text.substr(lastPos), type: "code" });
+            result.push({ text: text.substr(lastPos), type: "code", language: block.language });
             return result;
         }
 
@@ -86,7 +86,7 @@ var htmlProcessor = {
                     code = code.replace(wholeStringIsWhiteSpace, "");
                     comment = comment.replace(wholeStringIsWhiteSpace, "");
                     if (code !== "" || comment !== "") {
-                        result.push({ text: code, comment: comment });
+                        result.push({ text: code, comment: comment, language: piece.language });
                     }
                     code = comment = ""
                 }

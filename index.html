@@ -19,23 +19,30 @@
     }
 
     .red {
-        color: red;
     }
 
     #content {
         margin: 20px;
     }
 
+    #content > div {
+    }
+
     #content span, #content pre {
         display: inline-block;
-        width: 50%;
         vertical-align: top;
     }
+    #content span {
+        text-align: left;
+        width: 35%;
+    }
     #content pre {
-        margin: 0;
+        margin: 0 0 0 2%;
         padding: 0;
         font-size: 13px;
         line-height: 20px;
+        width: 63%;
+        min-width: 500px;
     }
 
 </style>
