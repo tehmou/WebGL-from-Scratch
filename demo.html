@@ -30,7 +30,7 @@ example the shader are embedded to the HTML page as script blocks of a specific 
 from a text file with ajax, or to write them inline as a JavaScript string. WebGL will never know where the code came
 from.</p>
 
-<p>This example will is single HTML page, with no external dependencies.<p>
+<p>This example will be a single HTML page, with no external dependencies.<p>
 -->
 <html>
 <head>
@@ -177,7 +177,9 @@ covered topic in mathematics.</p>
 
 <p>Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
 small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
-using, but I find it helpful to see what is actually going on.
+using, but I find it helpful to see what is actually going on.</p>
+
+<p>Or, the very least, how much is going on.</p>
 -->
 <script type="text/javascript">
 
@@ -205,11 +207,11 @@ using, but I find it helpful to see what is actually going on.
 
         // Compiles a single shader into bytecode.
         compileShader: function (gl, code, type) {
-            var s = gl.createShader(type);
+            var shader = gl.createShader(type);
             gl.shaderSource(s, code);
-            gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                throw "SHADER ERROR: " + gl.getShaderInfoLog(s);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                throw "SHADER ERROR: " + gl.getShaderInfoLog(shader);
             }
             return s;
         },
@@ -337,6 +339,10 @@ in case the browser cannot handle it.
     }
 
 </script>
+
+<!--
+<h3 style="text-align: center"><a href="demo.html">live version</a></h3>
+-->
 </head>
 <body onload="initialize()">
     <canvas id="canvas"></canvas>
