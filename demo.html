@@ -208,12 +208,12 @@ using, but I find it helpful to see what is actually going on.</p>
         // Compiles a single shader into bytecode.
         compileShader: function (gl, code, type) {
             var shader = gl.createShader(type);
-            gl.shaderSource(s, code);
+            gl.shaderSource(shader, code);
             gl.compileShader(shader);
             if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
                 throw "SHADER ERROR: " + gl.getShaderInfoLog(shader);
             }
-            return s;
+            return shader;
         },
 
         // Create a texture from a loaded Image. The image is simply a
