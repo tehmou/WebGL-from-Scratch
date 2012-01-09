@@ -68,7 +68,8 @@ covered topic in mathematics.</p>
     // Matrix used for transformation (not required, just useful).
     uniform mat4 transform;
 
-    // Entry point for shader is always the method main. It does not return anything, nor does it take arguments.
+    // Entry point for shader is always the method main.
+    // It does not return anything, nor does it take arguments.
     void main(void) {
         // Calculate the texture xy-coordinate, considering our surface is of size (1.0,1.0) with origin at (0.5,0.5).
         xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
@@ -112,6 +113,66 @@ covered topic in mathematics.</p>
 </script>
 
 <!--
+<h2>The actual code for the demo</h2>
+-->
+<script type="text/javascript">
+
+    // Namespace for the things we are creating.
+    window.timotuominen = { webgl: {} };
+
+    // The actual demo we will show.
+    timotuominen.webgl.FromScratchDemo = function (options) {
+        options = options || {};
+        return {
+            __proto__: new timotuominen.webgl.Runner(options),
+            shader: null,
+            vertexBuffer: null,
+            texture: null,
+            matrix: new Float32Array([
+                1.,0.,0.,0.,
+                0.,1.,0.,0.,
+                0.,0.,1.,0.,
+                0.,0.,0.,1.
+            ]),
+            vertices: new Float32Array([
+                -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
+                1.0,-1.0, 1.0,1.0, -1.0,1.0
+            ]),
+            initialize: function () {
+                var shaderUtils = timotuominen.webgl.shaderUtils,
+                    vsCode = options.vsCode,
+                    fsCode = options.fsCode;
+                this.__proto__.initialize.apply(this);
+                this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
+                this.texture = shaderUtils.createTexture(this.gl, options.image1);
+                this.vertexBuffer = this.gl.createBuffer();
+            },
+            render: function () {
+                var gl = this.gl;
+                gl.useProgram(this.shader);
+                gl.uniformMatrix4fv(
+                        gl.getUniformLocation(this.shader, "transform"),
+                        false, this.matrix);
+                gl.enableVertexAttribArray(
+                        gl.getAttribLocation(this.shader, "position"));
+                gl.vertexAttribPointer(
+                        gl.getAttribLocation(this.shader, "position"),
+                        2, gl.FLOAT, false, 0, 0);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, this.texture);
+                gl.uniform1i(gl.getUniformLocation(this.shader, "tex"), 0);
+                gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+                gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
+            }
+        };
+    };
+
+</script>
+
+<!--
 <h2>Shader utilities</h2>
 
 <p>Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
@@ -119,9 +180,6 @@ small utilities that help us to initialize the shaders. Usually this would be bu
 using, but I find it helpful to see what is actually going on.
 -->
 <script type="text/javascript">
-
-    // Namespace for the things we are creating.
-    window.timotuominen = { webgl: {} };
 
     // Utilities for WebGL shaders.
     timotuominen.webgl.shaderUtils = {
@@ -156,18 +214,32 @@ using, but I find it helpful to see what is actually going on.
             return s;
         },
 
-        // Create texture from a loaded Image. This is simply a
+        // Create a texture from a loaded Image. The image is simply a
         // reference to a DOM element, which has finished loading.
         createTexture: function (gl, image) {
             var texture = gl.createTexture();
-            gl.enable(gl.TEXTURE_2D);
+
+            // Tell WebGL we want to load activate our texture.
             gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            // Set the texture to match our image. Understanding the magic is not
+            // important, unless you know what you are doing with the image bytes.
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+            // Set the filters to use if the texture needs to be scaled up or down.
+            // These are the simplest ones you would want to use, and work predictably.
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+            // What should happen if we run out of texture? CLAMP_TO_EDGE makes
+            // WebGL repeat the edge pixels for the empty area.
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+            // We are ready, release the texture.
             gl.bindTexture(gl.TEXTURE_2D, null);
+
+            // Return our processed texture.
             return texture;
         }
     };
@@ -187,7 +259,8 @@ in case the browser cannot handle it.
 
     timotuominen.webgl.Runner = function (options) {
         options = options || {};
-        return {
+        var self = {
+
             // Hold the canvas element.
             el: options.el,
 
@@ -210,87 +283,23 @@ in case the browser cannot handle it.
 
                 // Bind the renderLoop to this object. Since we will be using a timeout to
                 // call renderLoop continually, it would otherwise be the window object.
-                this.renderLoop = this.renderLoop.bind(this);
+                var realRenderLoop = this.renderLoop;
+                var self = this;
+                this.renderLoop = function () {
+                    realRenderLoop.apply(self);
+                };
             },
+
             // The rendering loop that repeatedly call itself 60 times a second.
             renderLoop: function() {
                 setTimeout(this.renderLoop, 1000/60);
                 this.render && this.render();
             }
+
         };
+        return self;
     };
 
-</script>
-
-<!--
-<h2>The actual code for the demo</h2>
--->
-<script type="text/javascript">
-
-    // The actual demo we will show.
-    timotuominen.webgl.FromScratchDemo = function (options) {
-        var gl, shader,
-            uniformLocations, attributeLocations,
-            vertexBuffer, texture,
-            matrix = new Float32Array([
-                1.,0.,0.,0.,
-                0.,1.,0.,0.,
-                0.,0.,1.,0.,
-                0.,0.,0.,1.
-            ]),
-            vertices = new Float32Array([
-                -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
-                1.0,-1.0, 1.0,1.0, -1.0,1.0
-            ]),
-            utils = timotuominen.webgl.shaderUtils;
-
-        return {
-            __proto__: new timotuominen.webgl.Runner(),
-            el: options.el,
-            image1: options.image1,
-            vsCode: options.vsCode,
-            fsCode: options.fsCode,
-            render: function () {
-                gl = gl || this.gl;
-                if (!shader) {
-                    shader = utils.createProgram(gl, this.vsCode, this.fsCode);
-                    uniformLocations = {
-                        transform: gl.getUniformLocation(shader, "transform"),
-                        tex: gl.getUniformLocation(shader, "tex")
-                    };
-                    attributeLocations = {
-                        position: gl.getAttribLocation(shader, "position")
-                    };
-                }
-                if (!texture && this.image1) {
-                    texture = utils.createTexture(gl, this.image1);
-                }
-                if (!vertexBuffer) {
-                    vertexBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-                }
-                if (shader) {
-                    gl.useProgram(shader);
-                    gl.uniformMatrix4fv(uniformLocations.transform, false, matrix);
-                    gl.enableVertexAttribArray(attributeLocations.position);
-                    gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-                    if (texture) {
-                        gl.activeTexture(gl.TEXTURE0);
-                        gl.bindTexture(gl.TEXTURE_2D, texture);
-                        gl.uniform1i(uniformLocations.tex, 0);
-                    }
-                }
-                gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                if (vertices && vertexBuffer) {
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-                    gl.drawArrays(gl.TRIANGLES, 0, vertices.length/2);
-                }
-            }
-        };
-    };
-    
 </script>
 
 <!--
@@ -302,13 +311,14 @@ in case the browser cannot handle it.
         var demo, image, canvas;
 
         canvas = document.getElementById('canvas');
+
+        // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
+        // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
+        // to manually set the properties width and height of the canvas element accordingly.
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        image = new Image();
-        image.onload = start;
-        image.src = "IMG_2235.JPG";
-
+        // Point at which everything should be loaded and we can start the application.
         function start () {
             demo = new timotuominen.webgl.FromScratchDemo({
                 image1: image,
@@ -319,6 +329,11 @@ in case the browser cannot handle it.
             demo.initialize();
             demo.renderLoop();
         }
+
+        // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
+        image = new Image();
+        image.onload = start;
+        image.src = "IMG_2235.JPG";
     }
 
 </script>
