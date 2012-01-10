@@ -25,7 +25,7 @@
     #content > div {
     }
 
-    #content span, #content pre {
+    #content span, #content .code {
         display: inline-block;
         vertical-align: top;
     }
@@ -33,7 +33,7 @@
         text-align: left;
         width: 35%;
     }
-    #content pre {
+    #content .code {
         margin: 0 0 0 2%;
         padding: 0;
         font-size: 13px;
@@ -50,7 +50,7 @@
         padding-bottom: 40px;
     }
 
-    #content .html-comment span, #content .html-comment pre {
+    #content .html-comment span, #content .html-comment .code {
         vertical-align: bottom;
     }
 
@@ -79,6 +79,12 @@
 
 </style>
 
+<link href="style/shCoreDefault.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="lib/shCore.js"></script>
+<script type="text/javascript" src="lib/shBrushCpp.js"></script>
+<script type="text/javascript" src="lib/shBrushJScript.js"></script>
+<script type="text/javascript" src="lib/shBrushXml.js"></script>
+
 <script type="text/javascript">
     var timotuominen = timotuominen || {};
 </script>
@@ -98,20 +104,32 @@
         }
 
         function displayCode (code) {
-            var cssClass = "";
-
             htmlProcessor.extractComments(code).splice(1).forEach(addComment);
+            SyntaxHighlighter.highlight({
+                gutter: false,
+                toolbar: false
+            });
 
             function addComment (block) {
-                cssClass = block.language === "html" ? "html-comment" : "script-comment";
+                var cssClass = block.language === "html" ? "html-comment" : "script-comment";
                 var el = document.createElement("div"),
                     commentEl = document.createElement("span"),
+                    outerCodeEl = document.createElement("div"),
                     codeEl = document.createElement("pre");
                 
                 commentEl.innerHTML = block.comment;
+                outerCodeEl.className = "code";
+                if (block.language === "html") {
+                    codeEl.className = "brush: html;";
+                } else if (block.language === "text/javascript") {
+                    codeEl.className = "brush: js;";
+                } else {
+                    codeEl.className = "brush: cpp;";
+                }
                 codeEl.innerHTML = escapeCode(block.text);
                 el.appendChild(commentEl);
-                el.appendChild(codeEl);
+                outerCodeEl.appendChild(codeEl);
+                el.appendChild(outerCodeEl);
                 document.getElementById("content").appendChild(el);
                 el.className = cssClass;
             }
@@ -132,13 +150,10 @@
 
     })();
 
-
 </script>
 
 </head>
 <body>
-
 <div id="content"></div>
-
 </body>
 </html>
