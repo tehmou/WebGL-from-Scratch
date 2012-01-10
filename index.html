@@ -13,9 +13,9 @@
         height: 100%;
         text-shadow: rgba(0, 0, 0, .1) 2px 1px 2px;
         overflow-x: hidden;
-        font-family: "Droid Sans", "Arial", sans-serif;
-        font-size: 10pt;
-        line-height: 1.3rem;
+        font-family: "Helvetica", "Droid Sans", "Arial", sans-serif;
+        font-size: 11pt;
+        line-height: 1.4rem;
     }
 
     #content {
@@ -80,6 +80,7 @@
 </style>
 
 <link href="style/shCoreDefault.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="lib/showdown.js"></script>
 <script type="text/javascript" src="lib/shCore.js"></script>
 <script type="text/javascript" src="lib/shBrushCpp.js"></script>
 <script type="text/javascript" src="lib/shBrushJScript.js"></script>
@@ -117,7 +118,7 @@
                     outerCodeEl = document.createElement("div"),
                     codeEl = document.createElement("pre");
                 
-                commentEl.innerHTML = block.comment;
+                commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
                 outerCodeEl.className = "code";
                 if (block.language === "html") {
                     codeEl.className = "brush: html;";

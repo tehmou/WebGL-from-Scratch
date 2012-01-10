@@ -1,36 +1,41 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
-<h1>WebGL standalone<br/>example</h1>
 
-<p><i>The WebGL tutorial written from scratch&mdash;without any external libraries.
-See the this demo <a href="demo.html">live</a></i></p>
+WebGL standalone example
+========================
 
-<p>To directly tap into hardware acceleration, we need to setup a 3D rendering pipeline. Of course, we can still do 2D as
-well by using planes, but the technology under the hood is for 3D.</p>
+The WebGL tutorial written from scratch&mdash;without any external libraries.
+See the the [live demo].
 
-<p>To do this, we feed the graphics card specifically crafted pieces of code it can digest. These pieces are called
+To directly tap into hardware acceleration, we need to setup a 3D rendering pipeline. Of course, we can still do 2D as
+well by using planes, but the technology under the hood is for 3D.
 
-<b>shaders</b>. Shaders are always written in a special <a href="http://en.wikipedia.org/wiki/GLSL">shader language</a>.
-It looks a bit like C, but with powerful syntax for processing structures with multiple components&mdash;such as colors.</p>
+To do this, we feed the graphics card specifically crafted pieces of code it can digest. These pieces are called
+**shaders**. Shaders are always written in a special [shader language].
+It looks a bit like C, but with powerful syntax for processing structures with multiple components&mdash;such as colors.
 
-<p>So, what exactly happens when we render?</p>
+So, what exactly happens when we render?
 
-<p>First, we are given a chance to manipulate our 3D model with a <b>vertex shader</b>. The name comes from the corners
+First, we are given a chance to manipulate our 3D model with a **vertex shader**. The name comes from the corners
 of a model being called vertices (singular "vertex"). Most commonly you would apply a matrix transformation, or two, to
-render your model in the correct place. You can read more about matrices in 3D programming from plenty of sources.</p>
+render your model in the correct place. You can read more about matrices in 3D programming from plenty of sources.
 
-<p>The second step we can do, is assigning a <b>fragment shader</b> (also sometimes referred to as a pixel shader).
+The second step we can do, is assigning a **fragment shader** (also sometimes referred to as a pixel shader).
 A fragment shaders allows us to run the same code for every single pixel visible. The vertex shader can pass values to
 the pixel shader, such as the current xy-position on the surface of the model being rendered. This way we can know which
-pixel of the texture image to use when rendering.</p>
+pixel of the texture image to use when rendering.
 
-<p>You have to have both of these shaders, but fortunately the simplest form for each is only a few lines. In this
+You have to have both of these shaders, but fortunately the simplest form for each is only a few lines. In this
 example the shader are embedded to the HTML page as script blocks of a specific type, but you could as well load them
 from a text file with ajax, or to write them inline as a JavaScript string. WebGL will never know where the code came
-from.</p>
+from.
 
-<p>This example will be a single HTML page, with no external dependencies.<p>
+This example will be a single HTML page, with no external dependencies.
+
+  [live demo]: demo.html
+  [shader language]: http://en.wikipedia.org/wiki/GLSL
+
 -->
 <html>
 <head>
@@ -44,18 +49,22 @@ from.</p>
 </style>
 
 <!--
-<h2>Vertex shader<br/>(operates on 3D models)</h2>
-<p>Of our two shaders, let's start with the vertex shader, as it is processed first in the WebGL rendering chain.
+
+Vertex shader (operates on 3D models)
+-------------------------------------
+
+Of our two shaders, let's start with the vertex shader, as it is processed first in the WebGL rendering chain.
 Vertex shader is a function, which is executed on every vertex (corner point) of the 3D model being rendered. A vertex
 goes in, and a modifies vertex comes out. This does not affect the original model, but is performed anew each time we
-render.</p>
+render.
 
-<p>Here you would do all kinds of transformations on the 3D model. Usually this would involve rotating and scaling the
+Here you would do all kinds of transformations on the 3D model. Usually this would involve rotating and scaling the
 model around its own origin, and then moving it to the correct position in the final 3D world. The matrix "transform"
 contains all necessary information to do this. You can google more about matrix transformations, they are a heavily
-covered topic in mathematics.</p>
+covered topic in mathematics.
 
-<p>Notice that the type of the script block is arbitrary; it is treated as pure text.</p>
+Notice that the type of the script block is arbitrary; it is treated as pure text.
+
 -->
 <script id="vs-shader" type="x-shader/x-vertex">
 
@@ -80,15 +89,16 @@ covered topic in mathematics.</p>
 </script>
 
 <!--
-<h2>Fragment shader<br/>(operates on pixels)</h2>
 
-<p>If you are wondering about all the keywords, here is a quick list of what the ones before variables mean.</p>
+Fragment shader (operates on pixels)
+------------------------------------
 
-<ul>
-<li>attribute: a value WebGL gives to us.</li>
-<li>varying: shader across shaders and can be modified.</li>
-<li>uniform: assignable from <b>outside</b> of WebGL. In our case can be set from JS.</li>
-</ul>
+If you are wondering about all the keywords, here is a quick list of what the ones before variables mean.
+
+  - attribute: a value WebGL gives to us.
+  - varying: shader across shaders and can be modified.
+  - uniform: assignable from **outside** of WebGL. In our case can be set from JS.
+
 -->
 <script id="fs-shader" type="x-shader/x-fragment">
 
@@ -113,7 +123,10 @@ covered topic in mathematics.</p>
 </script>
 
 <!--
-<h2>The actual code for the demo</h2>
+
+The actual code for the demo
+----------------------------
+
 -->
 <script type="text/javascript">
 
@@ -173,13 +186,16 @@ covered topic in mathematics.</p>
 </script>
 
 <!--
-<h2>Shader utilities</h2>
 
-<p>Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
+Shader utilities
+----------------
+
+Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
 small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
-using, but I find it helpful to see what is actually going on.</p>
+using, but I find it helpful to see what is actually going on.
 
-<p>Or, the very least, how much is going on.</p>
+Or, the very least, how much is going on.
+
 -->
 <script type="text/javascript">
 
@@ -249,13 +265,16 @@ using, but I find it helpful to see what is actually going on.</p>
 </script>
 
 <!--
-<h2>Basic renderer</h2>
 
-<p>Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
+Basic renderer
+--------------
+
+Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
 and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
-some browsers have,
-<a href="https://developer.mozilla.org/en/DOM/window.requestAnimationFrame">requestAnimationFrame</a>, or reduce fps
-in case the browser cannot handle it.
+some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
+
+  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
+
 -->
 <script type="text/javascript">
 
@@ -305,7 +324,10 @@ in case the browser cannot handle it.
 </script>
 
 <!--
-<h2>Initialize hook</h2>
+
+Initialize hook
+---------------
+
 -->
 <script type="text/javascript">
 
@@ -341,7 +363,12 @@ in case the browser cannot handle it.
 </script>
 
 <!--
-<h3 style="text-align: center"><a href="demo.html">live version</a></h3>
+
+[live version]
+--------------
+
+  [live version]: demo.html
+
 -->
 </head>
 <body onload="initialize()">
