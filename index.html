@@ -25,11 +25,11 @@
     #content > div {
     }
 
-    #content span, #content .code {
+    #content .comment, #content .code {
         display: inline-block;
         vertical-align: top;
     }
-    #content span {
+    #content .comment {
         text-align: left;
         width: 35%;
     }
@@ -46,11 +46,11 @@
         margin-bottom: 4px;
     }
 
-    #content .html-comment span {
+    #content .html-comment>span {
         padding-bottom: 40px;
     }
 
-    #content .html-comment span, #content .html-comment .code {
+    #content .html-comment>span, #content .html-comment .code {
         vertical-align: bottom;
     }
 
@@ -70,7 +70,7 @@
         border: 1px dashed #aaa;
     }
 
-    #content .script-comment span {
+    #content .script-comment>span {
         text-align: right;
         margin-bottom: 10px;
         font-style: italic;
@@ -79,12 +79,10 @@
 
 </style>
 
-<link href="style/shCoreDefault.css" rel="stylesheet" type="text/css">
+<link href="style/default.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="lib/showdown.js"></script>
-<script type="text/javascript" src="lib/shCore.js"></script>
-<script type="text/javascript" src="lib/shBrushCpp.js"></script>
-<script type="text/javascript" src="lib/shBrushJScript.js"></script>
-<script type="text/javascript" src="lib/shBrushXml.js"></script>
+<script type="text/javascript" src="lib/highlight.js"></script>
+<script type="text/javascript" src="lib/highlight.pack.js"></script>
 
 <script type="text/javascript">
     var timotuominen = timotuominen || {};
@@ -106,30 +104,38 @@
 
         function displayCode (code) {
             htmlProcessor.extractComments(code).splice(1).forEach(addComment);
-            SyntaxHighlighter.highlight({
+            /*SyntaxHighlighter.highlight({
                 gutter: false,
                 toolbar: false
-            });
+            });*/
 
             function addComment (block) {
                 var cssClass = block.language === "html" ? "html-comment" : "script-comment";
                 var el = document.createElement("div"),
                     commentEl = document.createElement("span"),
-                    outerCodeEl = document.createElement("div"),
-                    codeEl = document.createElement("pre");
-                
+                    outerCodeEl = document.createElement("pre"),
+                    codeEl = document.createElement("code");
+
+                commentEl.className = "comment";
                 commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
+
                 outerCodeEl.className = "code";
+                outerCodeEl.appendChild(codeEl);
+
                 if (block.language === "html") {
-                    codeEl.className = "brush: html;";
+                    codeEl.className = "html;";
                 } else if (block.language === "text/javascript") {
-                    codeEl.className = "brush: js;";
+                    codeEl.className = "javascript;";
                 } else {
-                    codeEl.className = "brush: cpp;";
+                    codeEl.className = "cpp;";
                 }
                 codeEl.innerHTML = escapeCode(block.text);
+
+                if (codeEl) {
+                    hljs.highlightBlock(codeEl);
+                }
+
                 el.appendChild(commentEl);
-                outerCodeEl.appendChild(codeEl);
                 el.appendChild(outerCodeEl);
                 document.getElementById("content").appendChild(el);
                 el.className = cssClass;
