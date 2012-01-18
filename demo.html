@@ -77,6 +77,9 @@ Notice that the type of the script block is arbitrary; it is treated as pure tex
     // Matrix used for transformation (not required, just useful).
     uniform mat4 transform;
 
+    // System absolute milliseconds passed from JavaScript.
+    uniform float time;
+
     // Entry point for shader is always the method main.
     // It does not return anything, nor does it take arguments.
     void main(void) {
@@ -113,6 +116,9 @@ If you are wondering about all the keywords, here is a quick list of what the on
     // Texture we want to use.
     uniform sampler2D tex;
 
+    // System absolute milliseconds passed from JavaScript.
+    uniform float time;
+
     // Entry point of all shaders.
     void main(void) {
         // gl_FragColor is the return value. Simply read the pixel value of
@@ -141,43 +147,84 @@ The actual code for the demo
             shader: null,
             vertexBuffer: null,
             texture: null,
-            matrix: new Float32Array([
-                1.,0.,0.,0.,
-                0.,1.,0.,0.,
-                0.,0.,1.,0.,
-                0.,0.,0.,1.
-            ]),
-            vertices: new Float32Array([
-                -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
-                1.0,-1.0, 1.0,1.0, -1.0,1.0
-            ]),
+            matrix: null,
+            vertices: null,
             initialize: function () {
+                this.__proto__.initialize.apply(this);
+
                 var shaderUtils = timotuominen.webgl.shaderUtils,
                     vsCode = options.vsCode,
                     fsCode = options.fsCode;
-                this.__proto__.initialize.apply(this);
+
+                // This is the identity matrix, the number "1" of matrices.
+                this.matrix = new Float32Array([
+                    1.,0.,0.,0.,
+                    0.,1.,0.,0.,
+                    0.,0.,1.,0.,
+                    0.,0.,0.,1.
+                ]);
+
+                // Create a flat plane spanning from (-1.0,-1.0) to (1.0,1.0).
+                // This consist of two triangles, so six (x,y) points in total.
+                this.vertices = new Float32Array([
+                    -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
+                    1.0,-1.0, 1.0,1.0, -1.0,1.0
+                ]);
+
+                // Create a shader program that has both our shaders.
                 this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
+
+                // Enable position attribute on our newly-created shader.
+                this.gl.enableVertexAttribArray(
+                        this.gl.getAttribLocation(this.shader, "position"));
+
+                // Create texture from the image we have loaded.
                 this.texture = shaderUtils.createTexture(this.gl, options.image1);
+
+                // Create vertex buffer for storing the 3D model.
                 this.vertexBuffer = this.gl.createBuffer();
             },
             render: function () {
+
+                // Save WebGL into a variable for convenience.
                 var gl = this.gl;
+
+                // Tell it we want to use our shader program.
                 gl.useProgram(this.shader);
-                gl.uniformMatrix4fv(
-                        gl.getUniformLocation(this.shader, "transform"),
-                        false, this.matrix);
-                gl.enableVertexAttribArray(
-                        gl.getAttribLocation(this.shader, "position"));
+
+                // Bind the vertex position to the attribute "position" of our shader.
                 gl.vertexAttribPointer(
                         gl.getAttribLocation(this.shader, "position"),
                         2, gl.FLOAT, false, 0, 0);
+
+                // Load our texture into the texture slot of index 0.
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+                // Tell our shader to use the texture from the slot 0.
                 gl.uniform1i(gl.getUniformLocation(this.shader, "tex"), 0);
+
+                // Give the shader the transform matrix as a uniform.
+                gl.uniformMatrix4fv(
+                        gl.getUniformLocation(this.shader, "transform"),
+                        false, this.matrix);
+
+                // Set the time uniform to absolute system time in milliseconds.
+                gl.uniform1f(gl.getUniformLocation(this.shader, "time"), new Date().getTime());
+
+                // Set the size of the viewport we want to render.
                 gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
+
+                // Clear everything previously drawn on the screen.
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                // Activate this.vertexBuffer as array buffer for vertices.
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+
+                // Set vertex data to this.vertices.
                 gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+
+                // Finally, draw the vertices as triangles.
                 gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
             }
         };
@@ -280,7 +327,7 @@ some browsers have, [requestAnimationFrame], or reduce fps in case the browser c
 
     timotuominen.webgl.Runner = function (options) {
         options = options || {};
-        var self = {
+        return {
 
             // Hold the canvas element.
             el: options.el,
@@ -318,7 +365,6 @@ some browsers have, [requestAnimationFrame], or reduce fps in case the browser c
             }
 
         };
-        return self;
     };
 
 </script>

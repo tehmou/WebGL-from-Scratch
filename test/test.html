@@ -117,6 +117,7 @@ function runtest (mockResultFile) {
                         },{
                             text: '\n  Intro comment.\n',
                             type: 'comment',
+                            matchPos: 0,
                             language: "html"
                         },{
                             text: '\n\n',
@@ -125,6 +126,7 @@ function runtest (mockResultFile) {
                         },{
                             text: ' START OF demo.html ',
                             type: 'comment',
+                            matchPos: 0,
                             language: "html"
                         },{
                             text: '\n<html>\n<head>\n    <title>WebGL from Scratch</title>\n\n    ',
@@ -133,6 +135,7 @@ function runtest (mockResultFile) {
                         },{
                             text: '\n    Vertex shader\n    ',
                             type: 'comment',
+                            matchPos: 0,
                             language: "html"
                         },{
                             text: '\n    <script id="vs-shader" type="x-shader/x-vertex">',
@@ -152,8 +155,10 @@ function runtest (mockResultFile) {
                         "        // Position on the surface of the model.\n" +
                         "        attribute vec4 position;\n" +
                         "\n" +
-                        "        // Entry point for shader is always the method main. It\n" +
-                        "        // does not return anything, nor does it take arguments.\n" +
+                        "        /**\n" +
+                        "         * Entry point for shader is always the method main. It\n" +
+                        "         * does not return anything, nor does it take arguments.\n" +
+                        "         */\n" +
                         "        void main(void) {\n" +
                         "            gl_Position = transform*position;\n" +
                         "        }\n" +
@@ -166,22 +171,16 @@ function runtest (mockResultFile) {
                         },{
                             text: " Position on the surface of the model.",
                             type: "comment",
+                            matchPos: 0,
                             language: "text/javascript"
                         },{
                             text: "\n        attribute vec4 position;\n\n        ",
                             type: "code",
                             language: "text/javascript"
                         },{
-                            text: " Entry point for shader is always the method main. It",
+                            text: "*\n         * Entry point for shader is always the method main. It\n         * does not return anything, nor does it take arguments.\n         ",
                             type: "comment",
-                            language: "text/javascript"
-                        },{
-                            text: "\n        ",
-                            type: "code",
-                            language: "text/javascript"
-                        },{
-                            text: " does not return anything, nor does it take arguments.",
-                            type: "comment",
+                            matchPos: 1,
                             language: "text/javascript"
                         },{
                             text: "\n        void main(void) {\n            gl_Position = transform*position;\n        }\n    ",
@@ -205,6 +204,7 @@ function runtest (mockResultFile) {
                         },{
                             text: " Test line 1 that is",
                             type: "comment",
+                            matchPos: 0,
                             language: "random"
                         },{
                             text: "\n    ",
@@ -213,6 +213,7 @@ function runtest (mockResultFile) {
                         },{
                             text: " split into two.",
                             type: "comment",
+                            matchPos: 0,
                             language: "random"
                         },{
                             text: "\n   codeToComment();\n   ",
@@ -221,6 +222,7 @@ function runtest (mockResultFile) {
                         },{
                             text: " Test line 2.",
                             type: "comment",
+                            matchPos: 0,
                             language: "random"
                         },{
                             text: "\n\n     ",
@@ -229,9 +231,19 @@ function runtest (mockResultFile) {
                         },{
                             text: " Test line 2 is not combined",
                             type: "comment",
-                            language: "random"
+                            matchPos: 0,
+                             language: "random"
                         },{
                             text: "\n  moreCodeToComment();\n  }\n   ",
+                            type: "code",
+                            language: "random"
+                        },{
+                            text: "*\n         * Entry point for shader is always the method main. It\n         * does not return anything, nor does it take arguments.\n         ",
+                            type: "comment",
+                            matchPos: 1,
+                            language: "random"
+                        },{
+                            text: "someMoreCode();",
                             type: "code",
                             language: "random"
                         }
@@ -241,18 +253,27 @@ function runtest (mockResultFile) {
                         {
                             comment: "Test line 1 that is\nsplit into two.",
                             text: "   codeToComment();\n",
+                            matchPos: 0,
                             language: "random"
                         },{
                             comment: "Test line 2.",
                             text: "",
+                            matchPos: 0,
                             language: "random"
                         },{
                             comment: "Test line 2 is not combined",
                             text: "  moreCodeToComment();\n  }\n",
+                            matchPos: 0,
+                            language: "random"
+                        },{
+                            comment: "Entry point for shader is always the method main. It\ndoes not return anything, nor does it take arguments.",
+                            text: "someMoreCode();",
+                            matchPos: 1,
                             language: "random"
                         }
                     ];
 
+                console.log(result);
                 assertArraysEqual(expected, result);
             }
         }

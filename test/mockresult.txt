@@ -41,9 +41,12 @@ Intro comment.
     -->
     <script type="text/javascript">******
 
+        // Create our namespace.
         window.timotuominen = { webgl: {} };
 
-        // Function to call when the page has loaded.
+        /**
+         * Function to call when the page has loaded.
+         */
         function initialize () {
             var demo, image, canvas;
             canvas.height = window.innerHeight;

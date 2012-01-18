@@ -51,9 +51,17 @@ var htmlProcessor = {
                 matches.forEach(function (match) {
                     var pos = text.indexOf(match),
                         code = text.substr(lastPos, pos-lastPos),
-                        comment = new RegExp(regexp).exec(match)[1];
+                        matchResult = new RegExp(regexp).exec(match),
+                        comment;
+
+                    for (var i = 1; i < matchResult.length; i++) {
+                        if (matchResult[i]) {
+                            comment = matchResult[i];
+                            break;
+                        }
+                    }
                     result.push({ text: code, type: "code", language: block.language });
-                    result.push({ text: comment, type: "comment", language: block.language });
+                    result.push({ text: comment, type: "comment", language: block.language, matchPos: i-1 });
                     text = text.replace(match, "");
                     lastPos = pos;
                 });
@@ -68,15 +76,17 @@ var htmlProcessor = {
                 break;
 
             default:
-                return process(block.text, '//(.*)');
+                return process(block.text, '//(.*)|/\\*((?:[\n\r]|.)*?)\\*/');
                 break;
         }
     },
     processComments: function (pieces) {
         var result = [],
             code, comment = "",
+            matchPos,
             codeCleaner = /^\s*?\n|[ \t]*$/g,
             commentCleaner = /^\s*|\s*$/g,
+            lineCommentCleaner = /^[ \*]*/gm,
             wholeStringIsWhiteSpace = /^\s*$/;
 
         pieces.forEach(function (piece) {
@@ -86,13 +96,15 @@ var htmlProcessor = {
                     code = code.replace(wholeStringIsWhiteSpace, "");
                     comment = comment.replace(wholeStringIsWhiteSpace, "");
                     if (code !== "" || comment !== "") {
-                        result.push({ text: code, comment: comment, language: piece.language });
+                        result.push({ text: code, comment: comment, language: piece.language, matchPos: matchPos });
                     }
-                    code = comment = ""
+                    code = comment = "";
+                    matchPos = null;
                 }
             } else if (piece.type === "comment") {
+                matchPos = piece.matchPos;
                 if (comment !== "") { comment += "\n"; }
-                comment += piece.text.replace(commentCleaner, "");
+                comment += piece.text.replace(lineCommentCleaner, "").replace(commentCleaner, "");
             } else {
                 throw "Unknown type '" + piece.type + "'";
             }
