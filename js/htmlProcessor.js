@@ -84,7 +84,7 @@ var htmlProcessor = {
         var result = [],
             code, comment = "",
             matchPos,
-            codeCleaner = /^\s*?\n|[ \t]*$/g,
+            codeCleaner = /^\s*?\n|(:?\n)?[ \t]*$/g,
             commentCleaner = /^\s*|\s*$/g,
             lineCommentCleaner = /^[ \*]*/gm,
             wholeStringIsWhiteSpace = /^\s*$/;

@@ -45,6 +45,7 @@ This example will be a single HTML page, with no external dependencies.
     body {
         margin: 0;
         padding: 0;
+        cursor: ;
     }
 </style>
 
@@ -68,26 +69,21 @@ Notice that the type of the script block is arbitrary; it is treated as pure tex
 -->
 <script id="vs-shader" type="x-shader/x-vertex">
 
-    // Position on the surface of the model.
-    attribute vec4 position;
+// Position on the surface of the model.
+attribute vec4 position;
 
-    // Used to pass the xy-coordinate for the texture pixel.
-    varying vec2 xyPos;
+// Matrix used for transformation (not required, just useful).
+uniform mat4 transform;
 
-    // Matrix used for transformation (not required, just useful).
-    uniform mat4 transform;
+// System absolute milliseconds passed from JavaScript.
+uniform float time;
 
-    // System absolute milliseconds passed from JavaScript.
-    uniform float time;
-
-    // Entry point for shader is always the method main.
-    // It does not return anything, nor does it take arguments.
-    void main(void) {
-        // Calculate the texture xy-coordinate, considering our surface is of size (1.0,1.0) with origin at (0.5,0.5).
-        xyPos = vec2(position.x*.5+.5,.5-position.y*.5);
-        // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
-        gl_Position = transform*position;
-    }
+// Entry point for shader is always the method main.
+// It does not return anything, nor does it take arguments.
+void main(void) {
+    // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
+    gl_Position = transform*position;
+}
 
 </script>
 
@@ -105,26 +101,56 @@ If you are wondering about all the keywords, here is a quick list of what the on
 -->
 <script id="fs-shader" type="x-shader/x-fragment">
 
-    // Some boilerplate code; just include it.
-    #ifdef GL_ES
-    precision highp float;
-    #endif
+// Some boilerplate code; just include it.
+#ifdef GL_ES
+precision highp float;
+#endif
 
-    // Value the vertex shader passes to us.
-    varying vec2 xyPos;
+// Texture we want to use.
+uniform sampler2D tex0;
 
-    // Texture we want to use.
-    uniform sampler2D tex;
+// System absolute milliseconds passed from JavaScript.
+uniform float time;
 
-    // System absolute milliseconds passed from JavaScript.
-    uniform float time;
+// Screen size in pixels.
+uniform vec2 resolution;
 
-    // Entry point of all shaders.
-    void main(void) {
-        // gl_FragColor is the return value. Simply read the pixel value of
-        // our texture at coordinate xyPos.
-        gl_FragColor = texture2D(tex, xyPos);
-    }
+// Absolute mouse position.
+uniform vec2 mouse;
+
+
+void main(void)
+{
+    // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
+    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+
+    // Vector from mouse position to this pixel.
+    vec2 delta = vec2(coord.x-mouse.x,coord.y-mouse.y);
+
+    // Save distance from mouse position.
+    float distance = length(delta);
+
+    // Normalized delta.
+    vec2 deltaNormal = delta/distance;
+
+    // WebGL considers the texture to be from (0,0) to (1,1), so we need to calculate
+    // this coordinate from the pixel coordinates we have.
+    vec2 uv = coord.xy/resolution.xy;
+
+    // Distort the texture coordinate to create a ripple effect.
+    uv += deltaNormal*sin(distance*.025-time*4.0)*.025;
+
+    // Retrieve the texture pixel at the right location.
+    vec3 col = texture2D(tex0,uv).xyz;
+
+    // Apply some lighting effects depending on the distance from mouse; this
+    // simply multiplies all components of the colors, making ones closer brighter,
+    // and the ones further away darker. The circle that stays unmodified is of radius 50px.
+    col *= 100.0/distance;
+
+    // Return the color in the result variable gl_FragColor.
+    gl_FragColor = vec4(col,1.0);
+}
 
 </script>
 
@@ -149,12 +175,15 @@ The actual code for the demo
             texture: null,
             matrix: null,
             vertices: null,
+            startTime: null,
+            mousePos: {},
             initialize: function () {
                 this.__proto__.initialize.apply(this);
 
                 var shaderUtils = timotuominen.webgl.shaderUtils,
                     vsCode = options.vsCode,
-                    fsCode = options.fsCode;
+                    fsCode = options.fsCode,
+                    mousePos = this.mousePos;
 
                 // This is the identity matrix, the number "1" of matrices.
                 this.matrix = new Float32Array([
@@ -183,6 +212,15 @@ The actual code for the demo
 
                 // Create vertex buffer for storing the 3D model.
                 this.vertexBuffer = this.gl.createBuffer();
+
+                this.startTime = new Date().getTime();
+
+                mousePos.x = this.viewportWidth/2;
+                mousePos.y = this.viewportHeight/2;
+                this.el.onmousemove = function (e) {
+                    mousePos.x = e.clientX;
+                    mousePos.y = e.clientY;
+                };
             },
             render: function () {
 
@@ -202,7 +240,7 @@ The actual code for the demo
                 gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
                 // Tell our shader to use the texture from the slot 0.
-                gl.uniform1i(gl.getUniformLocation(this.shader, "tex"), 0);
+                gl.uniform1i(gl.getUniformLocation(this.shader, "tex0"), 0);
 
                 // Give the shader the transform matrix as a uniform.
                 gl.uniformMatrix4fv(
@@ -210,7 +248,11 @@ The actual code for the demo
                         false, this.matrix);
 
                 // Set the time uniform to absolute system time in milliseconds.
-                gl.uniform1f(gl.getUniformLocation(this.shader, "time"), new Date().getTime());
+                var time = (new Date().getTime() - this.startTime)/1000;
+                gl.uniform1f(gl.getUniformLocation(this.shader, "time"), time);
+
+                gl.uniform2f(gl.getUniformLocation(this.shader, "resolution"), this.viewportWidth, this.viewportHeight);
+                gl.uniform2f(gl.getUniformLocation(this.shader, "mouse"), this.mousePos.x, this.mousePos.y);
 
                 // Set the size of the viewport we want to render.
                 gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
@@ -230,23 +272,17 @@ The actual code for the demo
         };
     };
 
-</script>
-
-<!--
-
-Shader utilities
-----------------
-
-Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
-small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
-using, but I find it helpful to see what is actually going on.
-
-Or, the very least, how much is going on.
-
--->
-<script type="text/javascript">
-
-    // Utilities for WebGL shaders.
+    /**
+     * Shader utilities
+     * ----------------
+     *
+     * Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
+     * small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
+     * using, but I find it helpful to see what is actually going on.
+     *
+     * Or, the very least, how much is going on.
+     *
+     */
     timotuominen.webgl.shaderUtils = {
 
         // A shader program is basically vertex shader + fragment shader
@@ -309,22 +345,17 @@ Or, the very least, how much is going on.
         }
     };
 
-</script>
-
-<!--
-
-Basic renderer
---------------
-
-Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
-and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
-some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
-
-  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
-
--->
-<script type="text/javascript">
-
+    /**
+     * Basic renderer
+     * --------------
+     *
+     * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
+     * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
+     * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
+     *
+     *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
+     *
+     */
     timotuominen.webgl.Runner = function (options) {
         options = options || {};
         return {
@@ -367,16 +398,11 @@ some browsers have, [requestAnimationFrame], or reduce fps in case the browser c
         };
     };
 
-</script>
-
-<!--
-
-Initialize hook
----------------
-
--->
-<script type="text/javascript">
-
+    /**
+     * Initialize hook
+     * ---------------
+     *
+     */
     function initialize () {
         var demo, image, canvas;
 

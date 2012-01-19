@@ -225,7 +225,7 @@ function runtest (mockResultFile) {
                             matchPos: 0,
                             language: "random"
                         },{
-                            text: "\n\n     ",
+                            text: "\n\n\n     ",
                             type: "code",
                             language: "random"
                         },{
@@ -252,7 +252,7 @@ function runtest (mockResultFile) {
                     expected = [
                         {
                             comment: "Test line 1 that is\nsplit into two.",
-                            text: "   codeToComment();\n",
+                            text: "   codeToComment();",
                             matchPos: 0,
                             language: "random"
                         },{
@@ -262,7 +262,7 @@ function runtest (mockResultFile) {
                             language: "random"
                         },{
                             comment: "Test line 2 is not combined",
-                            text: "  moreCodeToComment();\n  }\n",
+                            text: "  moreCodeToComment();\n  }",
                             matchPos: 0,
                             language: "random"
                         },{
@@ -273,7 +273,6 @@ function runtest (mockResultFile) {
                         }
                     ];
 
-                console.log(result);
                 assertArraysEqual(expected, result);
             }
         }

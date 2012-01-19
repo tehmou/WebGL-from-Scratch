@@ -63,7 +63,7 @@
     }
 
     #content .script-comment {
-        padding-top: 6px;
+        padding: 3px 0;
     }
 
     #content .script-comment>span {
@@ -106,7 +106,8 @@
             });*/
 
             function addComment (block) {
-                var cssClass = block.language === "html" ? "html-comment" : "script-comment";
+                var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);
+                var cssClass = isMajorComment ? "html-comment" : "script-comment";
                 var el = document.createElement("div"),
                     commentEl = document.createElement("span"),
                     outerCodeEl = document.createElement("pre"),
