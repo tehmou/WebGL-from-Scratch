@@ -5,8 +5,12 @@
 WebGL standalone example
 ========================
 
-The WebGL tutorial written from scratch&mdash;without any external libraries.
-See the the [live demo].
+_The WebGL tutorial written from scratch&mdash;without any external libraries.
+See the the [live demo]._
+
+
+Introduction
+------------
 
 To directly tap into hardware acceleration, we need to setup a 3D rendering pipeline. Of course, we can still do 2D as
 well by using planes, but the technology under the hood is for 3D.
@@ -72,17 +76,11 @@ Notice that the type of the script block is arbitrary; it is treated as pure tex
 // Position on the surface of the model.
 attribute vec4 position;
 
-// Matrix used for transformation (not required, just useful).
-uniform mat4 transform;
-
-// System absolute milliseconds passed from JavaScript.
-uniform float time;
-
 // Entry point for shader is always the method main.
 // It does not return anything, nor does it take arguments.
 void main(void) {
     // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
-    gl_Position = transform*position;
+    gl_Position = position;
 }
 
 </script>
@@ -154,18 +152,20 @@ void main(void)
 
 </script>
 
-<!--
-
-The actual code for the demo
-----------------------------
-
--->
 <script type="text/javascript">
 
-    // Namespace for the things we are creating.
+    /**
+     * The code that runs around the shaders
+     * -------------------------------------
+     *
+     * The shaders need to provided with the necessary information from JavaScript.
+     * They cannot directly access any code outside of their own block.
+     *
+     */
+
     window.timotuominen = { webgl: {} };
 
-    // The actual demo we will show.
+    // This is the class we will instantiate for the demo.
     timotuominen.webgl.FromScratchDemo = function (options) {
         options = options || {};
         return {
@@ -173,7 +173,6 @@ The actual code for the demo
             shader: null,
             vertexBuffer: null,
             texture: null,
-            matrix: null,
             vertices: null,
             startTime: null,
             mousePos: {},
@@ -184,14 +183,6 @@ The actual code for the demo
                     vsCode = options.vsCode,
                     fsCode = options.fsCode,
                     mousePos = this.mousePos;
-
-                // This is the identity matrix, the number "1" of matrices.
-                this.matrix = new Float32Array([
-                    1.,0.,0.,0.,
-                    0.,1.,0.,0.,
-                    0.,0.,1.,0.,
-                    0.,0.,0.,1.
-                ]);
 
                 // Create a flat plane spanning from (-1.0,-1.0) to (1.0,1.0).
                 // This consist of two triangles, so six (x,y) points in total.
@@ -241,11 +232,6 @@ The actual code for the demo
 
                 // Tell our shader to use the texture from the slot 0.
                 gl.uniform1i(gl.getUniformLocation(this.shader, "tex0"), 0);
-
-                // Give the shader the transform matrix as a uniform.
-                gl.uniformMatrix4fv(
-                        gl.getUniformLocation(this.shader, "transform"),
-                        false, this.matrix);
 
                 // Set the time uniform to absolute system time in milliseconds.
                 var time = (new Date().getTime() - this.startTime)/1000;
@@ -406,6 +392,7 @@ The actual code for the demo
     function initialize () {
         var demo, image, canvas;
 
+        // Retrieve our canvas element that was already created by the browser.
         canvas = document.getElementById('canvas');
 
         // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
