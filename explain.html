@@ -93,72 +93,83 @@
 
 <script type="text/javascript">
 
-    (function () {
+function initialize () {
+    var demoUrl, demoName, demoLink;
 
-        function numLines (str) {
-            return (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
-        }
+    if (window.location.hash.length > 1) {
+        demoName = window.location.hash.substr(1);
+        demoUrl = demoName ? "samples/" + demoName + ".html" : "";
+        demoLink = document.createElement("a");
+        demoLink.href = demoUrl;
+        demoLink.innerHTML = "Show demo";
+        demoLink.style.cssText = "position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;";
+        document.body.appendChild(demoLink);
+    } else {
+        demoUrl = "";
+    }
 
-        function escapeCode (code) {
-            return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function displayCode (code) {
-            htmlProcessor.extractComments(code).splice(1).forEach(addComment);
-
-            function addComment (block) {
-                var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);
-                var cssClass = isMajorComment ? "html-comment" : "script-comment";
-                var el = document.createElement("div"),
-                    commentEl = document.createElement("span"),
-                    outerCodeEl = document.createElement("pre"),
-                    codeEl = document.createElement("code");
-
-                commentEl.className = "comment";
-                commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
-
-                outerCodeEl.className = "code";
-                outerCodeEl.appendChild(codeEl);
-
-                if (block.language === "html") {
-                    codeEl.className = "html;";
-                } else if (block.language === "text/javascript") {
-                    codeEl.className = "javascript;";
-                } else {
-                    codeEl.className = "cpp;";
-                }
-                codeEl.innerHTML = escapeCode(block.text);
-
-                if (codeEl) {
-                    hljs.highlightBlock(codeEl);
-                }
-
-                el.appendChild(commentEl);
-                el.appendChild(outerCodeEl);
-                document.getElementById("content").appendChild(el);
-                el.className = cssClass;
+    var xmlHttp = new XMLHttpRequest();
+    if (xmlHttp) {
+        xmlHttp.open("GET", demoUrl, true);
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState === 4) {
+                displayCode(xmlHttp.responseText);
             }
-        }
+        };
+        xmlHttp.send(null);
+    }
 
-        (function () {
-            var xmlHttp = new XMLHttpRequest();
-            if (xmlHttp) {
-                xmlHttp.open("GET", "index.html", true);
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState === 4) {
-                        displayCode(xmlHttp.responseText);
-                    }
-                };
-                xmlHttp.send(null);
+
+    function numLines (str) {
+        return (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
+    }
+
+    function escapeCode (code) {
+        return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function displayCode (code) {
+        htmlProcessor.extractComments(code).splice(1).forEach(addComment);
+
+        function addComment (block) {
+            var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);
+            var cssClass = isMajorComment ? "html-comment" : "script-comment";
+            var el = document.createElement("div"),
+                commentEl = document.createElement("span"),
+                outerCodeEl = document.createElement("pre"),
+                codeEl = document.createElement("code");
+
+            commentEl.className = "comment";
+            commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
+
+            outerCodeEl.className = "code";
+            outerCodeEl.appendChild(codeEl);
+
+            if (block.language === "html") {
+                codeEl.className = "html;";
+            } else if (block.language === "text/javascript") {
+                codeEl.className = "javascript;";
+            } else {
+                codeEl.className = "cpp;";
             }
-        })();
+            codeEl.innerHTML = escapeCode(block.text);
 
-    })();
+            if (codeEl) {
+                hljs.highlightBlock(codeEl);
+            }
+
+            el.appendChild(commentEl);
+            el.appendChild(outerCodeEl);
+            document.getElementById("content").appendChild(el);
+            el.className = cssClass;
+        }
+    }
+}
 
 </script>
 
 </head>
-<body>
+<body onload="initialize()">
 <div id="content"></div>
 </body>
 </html>
