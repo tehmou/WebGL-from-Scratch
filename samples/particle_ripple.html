@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>WebGL from Scratch</title>
+
+<style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+
+<script id="vs-shader" type="x-shader/x-vertex">
+
+attribute vec4 position;
+
+void main(void) {
+    gl_Position = position;
+}
+
+</script>
+
+<script id="fs-shader" type="x-shader/x-fragment">
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform sampler2D tex0;
+uniform float time;
+uniform vec2 resolution;
+uniform vec2 mouse;
+
+void main(void)
+{
+    // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
+    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+
+    // Vector from mouse position to this pixel.
+    vec2 delta = vec2(coord.x-mouse.x,coord.y-mouse.y);
+
+    // Save distance from mouse position.
+    float distance = length(delta);
+
+    // Normalized delta.
+    vec2 deltaNormal = delta/distance;
+
+    // WebGL considers the texture to be from (0,0) to (1,1), so we need to calculate
+    // this coordinate from the pixel coordinates we have.
+    vec2 uv = coord.xy/resolution.xy;
+
+    // Distort the texture coordinate to create a ripple effect.
+    uv += deltaNormal*sin(distance*.025-time*4.0)*.025;
+
+    // Retrieve the texture pixel at the right location.
+    vec3 col = texture2D(tex0,uv).xyz;
+
+    // Apply some lighting effects depending on the distance from mouse; this
+    // simply multiplies all components of the colors, making ones closer brighter,
+    // and the ones further away darker. The circle that stays unmodified is of radius 50px.
+    col *= 100.0/distance;
+
+    // Return the color in the result variable gl_FragColor.
+    gl_FragColor = vec4(col,1.0);
+}
+
+</script>
+
+<script type="text/javascript">
+
+    window.timotuominen = { webgl: {} };
+
+    timotuominen.webgl.FromScratchDemo = function (options) {
+        options = options || {};
+        return {
+            __proto__: new timotuominen.webgl.Runner(options),
+
+            shader: null,
+            vertexBuffer: null,
+            texture: null,
+            vertices: null,
+            startTime: null,
+            mousePos: {},
+
+            initialize: function () {
+                this.__proto__.initialize.apply(this);
+
+                var shaderUtils = timotuominen.webgl.shaderUtils,
+                    vsCode = options.vsCode,
+                    fsCode = options.fsCode,
+                    mousePos = this.mousePos;
+
+                this.vertices = new Float32Array([
+                    -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
+                    1.0,-1.0, 1.0,1.0, -1.0,1.0
+                ]);
+
+                this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
+
+                this.gl.enableVertexAttribArray(
+                        this.gl.getAttribLocation(this.shader, "position"));
+
+                this.texture = shaderUtils.createTexture(this.gl, options.image1);
+
+                this.vertexBuffer = this.gl.createBuffer();
+
+                this.startTime = new Date().getTime();
+
+                mousePos.x = this.viewportWidth/2;
+                mousePos.y = this.viewportHeight/2;
+
+                this.el.onmousemove = function (e) {
+                    mousePos.x = e.clientX;
+                    mousePos.y = e.clientY;
+                };
+            },
+
+            render: function () {
+                var gl = this.gl;
+                gl.useProgram(this.shader);
+
+                gl.vertexAttribPointer(
+                        gl.getAttribLocation(this.shader, "position"),
+                        2, gl.FLOAT, false, 0, 0);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+                gl.uniform1i(gl.getUniformLocation(this.shader, "tex0"), 0);
+
+                var time = (new Date().getTime() - this.startTime)/1000;
+                gl.uniform1f(gl.getUniformLocation(this.shader, "time"), time);
+                gl.uniform2f(gl.getUniformLocation(this.shader, "resolution"), this.viewportWidth, this.viewportHeight);
+                gl.uniform2f(gl.getUniformLocation(this.shader, "mouse"), this.mousePos.x, this.mousePos.y);
+
+                gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
+
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+                gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
+            }
+        };
+    };
+
+    function initialize () {
+        var demo, image, canvas;
+
+        canvas = document.getElementById('canvas');
+
+        function start () {
+            demo = new timotuominen.webgl.FromScratchDemo({
+                image1: image,
+                vsCode: document.getElementById("vs-shader").innerHTML,
+                fsCode: document.getElementById("fs-shader").innerHTML,
+                el: canvas
+            });
+            demo.initialize();
+            demo.renderLoop();
+
+            window.onresize = updateCanvasSize;
+            updateCanvasSize();
+        }
+
+        function updateCanvasSize () {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            demo.updateSize();
+        }
+
+        image = new Image();
+        image.onload = start;
+        image.src = "IMG_2235.JPG";
+    }
+
+</script>
+
+<script src="../js/webglUtils.js"></script>
+
+</head>
+<body onload="initialize()">
+    <canvas id="canvas"></canvas>
+    <a href="../explain.html#particle_ripple" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show formatted source</a>
+</body>
+</html>
