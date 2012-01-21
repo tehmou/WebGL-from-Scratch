@@ -392,10 +392,8 @@ actual docs for uniforms in WebGL specifically :)
                 // For this example we will not handle these scenarios.
                 this.gl = this.el.getContext("experimental-webgl");
 
-                // Store the size of the canvas. DOM operation are in general expensive,
-                // and we certainly don't want to do this on every frame.
-                this.viewportWidth = this.el.width;
-                this.viewportHeight = this.el.height;
+                this.updateSize = this.updateSize.bind(this);
+                this.updateSize();
 
                 // Color that is used to clear the whole canvas before starting to
                 // draw the frame. We use rgba here, in which all four components
@@ -409,6 +407,13 @@ actual docs for uniforms in WebGL specifically :)
                 this.renderLoop = function () {
                     realRenderLoop.apply(self);
                 };
+            },
+
+            updateSize: function () {
+                // Store the size of the canvas. DOM operation are in general expensive,
+                // and we certainly don't want to do this on every frame.
+                this.viewportWidth = this.el.width;
+                this.viewportHeight = this.el.height;
             },
 
             // The rendering loop that repeatedly call itself 60 times a second.
@@ -435,12 +440,6 @@ actual docs for uniforms in WebGL specifically :)
         // Retrieve our canvas element that was already created by the browser.
         canvas = document.getElementById('canvas');
 
-        // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
-        // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
-        // to manually set the properties width and height of the canvas element accordingly.
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         // Point at which everything should be loaded and we can start the application.
         function start () {
             demo = new timotuominen.webgl.FromScratchDemo({
@@ -451,6 +450,21 @@ actual docs for uniforms in WebGL specifically :)
             });
             demo.initialize();
             demo.renderLoop();
+
+            window.onresize = updateCanvasSize;
+            updateCanvasSize();
+        }
+
+        // Call this whenever there are changes in canvas size.
+        function updateCanvasSize () {
+            // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
+            // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
+            // to manually set the properties width and height of the canvas element accordingly.
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Tell the demo that its canvas has changed its size.
+            demo.updateSize();
         }
 
         // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
