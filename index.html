@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-<a href="index.html" style="position:absolute;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;">Show demo</a>
+<a href="index.html" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show demo</a>
 
 WebGL standalone example
 ========================
@@ -13,7 +13,6 @@ a WebGL compatible browser or it is turned off; try [Google Chrome]._
 
 You can report any errors or improvement ideas at [github].
 
-_See the [full demo]._
 
 Introduction
 ------------
@@ -43,7 +42,7 @@ from.
 
 This example will be a single HTML page, with no external dependencies.
 
-  [full demo]: index.html
+  [live demo]: index.html
   [shader language]: http://en.wikipedia.org/wiki/GLSL
   [Google Chrome]: http://www.google.com/chrome/
   [github]: http://github.com/tehmou/WebGL-from-Scratch/
@@ -159,30 +158,35 @@ void main(void)
 
 </script>
 
-<script type="text/javascript">
+<!--
 
-    /**
-     * The code that runs around the shaders
-     * -------------------------------------
-     *
-     * The shaders need to provided with the necessary information from JavaScript.
-     * They cannot directly access any code outside of their own block.
-     *
-     */
+The code that runs around the shaders
+-------------------------------------
+
+The shaders need to provided with the necessary information from JavaScript.
+They cannot directly access any code outside of their own block.
+
+-->
+<script type="text/javascript">
 
     window.timotuominen = { webgl: {} };
 
-    // This is the class we will instantiate for the demo.
     timotuominen.webgl.FromScratchDemo = function (options) {
         options = options || {};
         return {
             __proto__: new timotuominen.webgl.Runner(options),
+
+            // Declare some variables for clarity.
             shader: null,
             vertexBuffer: null,
             texture: null,
             vertices: null,
             startTime: null,
             mousePos: {},
+
+            // I don't like doing oo much in the constructor, hence
+            // a separate initialize function. This should only be called
+            // once DOM has finished loading.
             initialize: function () {
                 this.__proto__.initialize.apply(this);
 
@@ -213,13 +217,22 @@ void main(void)
 
                 this.startTime = new Date().getTime();
 
+                // Initial mouse position, so we won't look silly right after loading.
                 mousePos.x = this.viewportWidth/2;
                 mousePos.y = this.viewportHeight/2;
+
+                // Keep track of mouse coordinates.
                 this.el.onmousemove = function (e) {
                     mousePos.x = e.clientX;
                     mousePos.y = e.clientY;
                 };
             },
+
+            // Render will be called continuously up to 60 times per second.
+            // However, this number is usually called Frames Per Second, or FPS.
+            // If you, for whatever reason, go below 24 FPS, your users will
+            // perceive it is as laggy. This is due to how fast our eyes can
+            // register new "frames".
             render: function () {
 
                 // Save WebGL into a variable for convenience.
@@ -395,6 +408,10 @@ void main(void)
      * Initialize hook
      * ---------------
      *
+     * This is simply the initialization code we will run after document as finished
+     * loading. Mainly we just set up the demo instance and give it the necessary
+     * argument, in order for it to do its job.
+     * 
      */
     function initialize () {
         var demo, image, canvas;
@@ -439,6 +456,6 @@ void main(void)
 </head>
 <body onload="initialize()">
     <canvas id="canvas"></canvas>
-    <a href="explain.html" style="position:absolute;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;">Show formatted source</a>
+    <a href="explain.html" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show formatted source</a>
 </body>
 </html>
