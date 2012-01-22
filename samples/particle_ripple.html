@@ -3,13 +3,7 @@
 <html>
 <head>
 <title>WebGL from Scratch</title>
-
-<style type="text/css">
-    body {
-        margin: 0;
-        padding: 0;
-    }
-</style>
+<link href="common/style.css" rel="stylesheet" type="text/css">
 
 <script id="vs-shader" type="x-shader/x-vertex">
 
@@ -144,40 +138,10 @@ void main(void)
         };
     };
 
-    function initialize () {
-        var demo, image, canvas;
-
-        canvas = document.getElementById('canvas');
-
-        function start () {
-            demo = new timotuominen.webgl.FromScratchDemo({
-                image1: image,
-                vsCode: document.getElementById("vs-shader").innerHTML,
-                fsCode: document.getElementById("fs-shader").innerHTML,
-                el: canvas
-            });
-            demo.initialize();
-            demo.renderLoop();
-
-            window.onresize = updateCanvasSize;
-            updateCanvasSize();
-        }
-
-        function updateCanvasSize () {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            demo.updateSize();
-        }
-
-        image = new Image();
-        image.onload = start;
-        image.src = "IMG_2235.JPG";
-    }
-
 </script>
 
-<script src="../js/canvasInitialize.js"></script>
-<script src="../js/webglUtils.js"></script>
+<script src="common/canvasInitialize.js"></script>
+<script src="common/webglUtils.js"></script>
 
 </head>
 <body>
