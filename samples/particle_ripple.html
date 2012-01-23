@@ -3,7 +3,7 @@
 <html>
 <head>
 <title>WebGL from Scratch</title>
-<link href="common/style.css" rel="stylesheet" type="text/css">
+<link href="style.css" rel="stylesheet" type="text/css">
 
 <script id="vs-shader" type="x-shader/x-vertex">
 
@@ -25,7 +25,7 @@ uniform sampler2D tex0;
 uniform float time;
 uniform vec2 resolution;
 uniform vec2 mouse;
-uniform vec3 particles[128];
+uniform vec3 particles[2];
 
 vec3 calculateDistortion(vec2 coord, vec3 particle)
 {
@@ -127,7 +127,7 @@ void main(void)
                 gl.uniform2f(uni("mouse"), this.mousePos.x, this.mousePos.y);
 
                 // FIXME: The second particle is never assigned.
-                gl.uniform3f(uni("particles"), this.viewportWidth/2, this.viewportHeight/2, 1.);
+                gl.uniform3fv(uni("particles"), new Float32Array(this.viewportWidth/2, this.viewportHeight/2, 1., this.mousePos.x, this.mousePos.y, 1.));
 
                 gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
 
@@ -145,8 +145,8 @@ void main(void)
 
 </script>
 
-<script src="common/canvasInitialize.js"></script>
-<script src="common/webglUtils.js"></script>
+<script src="canvasInitialize.js"></script>
+<script src="webglUtils.js"></script>
 
 </head>
 <body>

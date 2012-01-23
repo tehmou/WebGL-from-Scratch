@@ -24,7 +24,7 @@ task ("default", function () {
         logIntend++;
         if (filetype === "html") {
             processSample(filename);
-        } else if (filetype) {
+        } else if (filetype && filetype !== "js") {
             copyFile(filename);
         }
         logIntend--;
