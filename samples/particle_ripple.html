@@ -25,38 +25,34 @@ uniform sampler2D tex0;
 uniform float time;
 uniform vec2 resolution;
 uniform vec2 mouse;
+uniform vec3 particles[128];
+
+vec3 calculateDistortion(vec2 coord, vec3 particle)
+{
+    vec2 delta = vec2(coord.x-particle.x,coord.y-particle.y);
+    float distance = length(delta);
+    vec2 deltaNormal = delta/distance;
+    vec2 distortion = deltaNormal*sin(distance*.05-time*2.0);
+    return vec3(distortion, 0);
+}
 
 void main(void)
 {
-    // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
     vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+    vec3 uv = vec3(coord.xy/resolution.xy,1);
+    vec4 addColor = vec4(0);
 
-    // Vector from mouse position to this pixel.
-    vec2 delta = vec2(coord.x-mouse.x,coord.y-mouse.y);
-
-    // Save distance from mouse position.
-    float distance = length(delta);
-
-    // Normalized delta.
-    vec2 deltaNormal = delta/distance;
-
-    // WebGL considers the texture to be from (0,0) to (1,1), so we need to calculate
-    // this coordinate from the pixel coordinates we have.
-    vec2 uv = coord.xy/resolution.xy;
-
-    // Distort the texture coordinate to create a ripple effect.
-    uv += deltaNormal*sin(distance*.025-time*4.0)*.025;
-
-    // Retrieve the texture pixel at the right location.
-    vec3 col = texture2D(tex0,uv).xyz;
-
-    // Apply some lighting effects depending on the distance from mouse; this
-    // simply multiplies all components of the colors, making ones closer brighter,
-    // and the ones further away darker. The circle that stays unmodified is of radius 50px.
-    col *= 100.0/distance;
-
-    // Return the color in the result variable gl_FragColor.
-    gl_FragColor = vec4(col,1.0);
+    uv = vec3(.5);
+    for (int i = 0; i < 1; i++) {
+        vec3 distortion = .5*calculateDistortion(coord, particles[i]);
+        //uv += distortion*.05;
+        uv += distortion;
+        addColor += 2.*vec4(distortion.x*distortion.y);
+    }
+    
+    vec3 col = uv.z * texture2D(tex0,uv.xy).xyz;
+    gl_FragColor = vec4(uv, 1.0) + addColor;
+    //gl_FragColor = vec4(col,1.0) + addColor;
 }
 
 </script>
@@ -111,22 +107,27 @@ void main(void)
             },
 
             render: function () {
-                var gl = this.gl;
-                gl.useProgram(this.shader);
+                var gl = this.gl,
+                    shader = this.shader;
+
+                gl.useProgram(shader);
 
                 gl.vertexAttribPointer(
-                        gl.getAttribLocation(this.shader, "position"),
+                        gl.getAttribLocation(shader, "position"),
                         2, gl.FLOAT, false, 0, 0);
 
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
-                gl.uniform1i(gl.getUniformLocation(this.shader, "tex0"), 0);
+                gl.uniform1i(uni(shader, "tex0"), 0);
 
                 var time = (new Date().getTime() - this.startTime)/1000;
-                gl.uniform1f(gl.getUniformLocation(this.shader, "time"), time);
-                gl.uniform2f(gl.getUniformLocation(this.shader, "resolution"), this.viewportWidth, this.viewportHeight);
-                gl.uniform2f(gl.getUniformLocation(this.shader, "mouse"), this.mousePos.x, this.mousePos.y);
+                gl.uniform1f(uni("time"), time);
+                gl.uniform2f(uni("resolution"), this.viewportWidth, this.viewportHeight);
+                gl.uniform2f(uni("mouse"), this.mousePos.x, this.mousePos.y);
+
+                // FIXME: The second particle is never assigned.
+                gl.uniform3f(uni("particles"), this.viewportWidth/2, this.viewportHeight/2, 1.);
 
                 gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
 
@@ -134,6 +135,10 @@ void main(void)
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
                 gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
                 gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
+
+                function uni (uniformName) {
+                    return gl.getUniformLocation(shader, uniformName);
+                }
             }
         };
     };
