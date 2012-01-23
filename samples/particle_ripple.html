@@ -25,15 +25,21 @@ uniform sampler2D tex0;
 uniform float time;
 uniform vec2 resolution;
 uniform vec2 mouse;
-uniform vec3 particles[2];
+uniform vec3 particles[32];
+uniform vec2 lightDirection;
 
 vec3 calculateDistortion(vec2 coord, vec3 particle)
 {
     vec2 delta = vec2(coord.x-particle.x,coord.y-particle.y);
     float distance = length(delta);
     vec2 deltaNormal = delta/distance;
-    vec2 distortion = deltaNormal*sin(distance*.05-time*2.0);
+    vec2 distortion = deltaNormal*sin(distance*.08-time*2.0)*particle.z;
     return vec3(distortion, 0);
+}
+
+vec4 dodge(vec4 bottom, vec4 top)
+{
+    return vec4(bottom.xyz/(vec3(1.)-top.xyz),1.);
 }
 
 void main(void)
@@ -41,18 +47,19 @@ void main(void)
     vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
     vec3 uv = vec3(coord.xy/resolution.xy,1);
     vec4 addColor = vec4(0);
+    vec3 debug_uv = vec3(.5);
 
-    uv = vec3(.5);
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 32; i++) {
         vec3 distortion = .5*calculateDistortion(coord, particles[i]);
-        //uv += distortion*.05;
-        uv += distortion;
-        addColor += 2.*vec4(distortion.x*distortion.y);
+        uv += distortion*.05;
+        debug_uv += distortion;
+        addColor += .5*vec4(lightDirection.x*distortion.x+lightDirection.y*distortion.y);
     }
+    addColor = clamp(addColor,0.,1.);
     
     vec3 col = uv.z * texture2D(tex0,uv.xy).xyz;
-    gl_FragColor = vec4(uv, 1.0) + addColor;
-    //gl_FragColor = vec4(col,1.0) + addColor;
+    //gl_FragColor = vec4(debug_uv, 1.0);
+    gl_FragColor = dodge(vec4(col,1.0),addColor);
 }
 
 </script>
@@ -125,9 +132,10 @@ void main(void)
                 gl.uniform1f(uni("time"), time);
                 gl.uniform2f(uni("resolution"), this.viewportWidth, this.viewportHeight);
                 gl.uniform2f(uni("mouse"), this.mousePos.x, this.mousePos.y);
+                gl.uniform2f(uni("lightDirection"), Math.sqrt(2), Math.sqrt(2));
 
-                // FIXME: The second particle is never assigned.
-                gl.uniform3fv(uni("particles"), new Float32Array(this.viewportWidth/2, this.viewportHeight/2, 1., this.mousePos.x, this.mousePos.y, 1.));
+                var arr = [this.mousePos.x, this.mousePos.y, 1., this.viewportWidth/2, this.viewportHeight/2, 1.];
+                gl.uniform3fv(uni("particles"), arr);
 
                 gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
 
