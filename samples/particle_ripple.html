@@ -33,7 +33,7 @@ vec3 calculateDistortion(vec2 coord, vec3 particle)
     vec2 delta = vec2(coord.x-particle.x,coord.y-particle.y);
     float distance = length(delta);
     vec2 deltaNormal = delta/distance;
-    vec2 distortion = deltaNormal*sin(distance*.08-time*2.0)*particle.z;
+    vec2 distortion = deltaNormal*sin(distance*.08-time*2.0)*clamp(particle.z,0.,1.);
     return vec3(distortion, 0);
 }
 
@@ -70,6 +70,12 @@ void main(void)
 
     timotuominen.webgl.FromScratchDemo = function (options) {
         options = options || {};
+        var NUM_PARTICLE_COMPONENTS = 3;
+        var PARTICLE_X = 0;
+        var PARTICLE_Y = 1;
+        var PARTICLE_LIFE = 2;
+        var NUM_MAX_PARTICLES = 4;
+
         return {
             __proto__: new timotuominen.webgl.Runner(options),
 
@@ -78,35 +84,35 @@ void main(void)
             texture: null,
             vertices: null,
             startTime: null,
-            mousePos: {},
+            mousePos: null,
+            particles: new Array(NUM_MAX_PARTICLES*NUM_PARTICLE_COMPONENTS),
 
             initialize: function () {
                 this.__proto__.initialize.apply(this);
 
                 var shaderUtils = timotuominen.webgl.shaderUtils,
                     vsCode = options.vsCode,
-                    fsCode = options.fsCode,
-                    mousePos = this.mousePos;
+                    fsCode = options.fsCode;
 
                 this.vertices = new Float32Array([
                     -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
                     1.0,-1.0, 1.0,1.0, -1.0,1.0
                 ]);
-
                 this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
-
                 this.gl.enableVertexAttribArray(
                         this.gl.getAttribLocation(this.shader, "position"));
-
                 this.texture = shaderUtils.createTexture(this.gl, options.image1);
-
                 this.vertexBuffer = this.gl.createBuffer();
-
                 this.startTime = new Date().getTime();
+                this.trackMouse();
+                this.gl.useProgram(this.shader);
+            },
 
-                mousePos.x = this.viewportWidth/2;
-                mousePos.y = this.viewportHeight/2;
-
+            trackMouse: function () {
+                var mousePos = this.mousePos = {
+                    x: this.viewportWidth/2,
+                    y: this.viewportHeight/2
+                };
                 this.el.onmousemove = function (e) {
                     mousePos.x = e.clientX;
                     mousePos.y = e.clientY;
@@ -114,10 +120,34 @@ void main(void)
             },
 
             render: function () {
+                this.updateParticles();
+                this.prepareShader();
+                this.draw();
+            },
+
+            updateParticles: function () {
+                var particles = this.particles,
+                    numParticles = ~~(this.particles.length/NUM_PARTICLE_COMPONENTS);
+
+                for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                    var life = particles[i*3+PARTICLE_LIFE] || 0;
+                    if (life < 0) {
+                        life++;
+                    } else {
+                        life *= 1-.01*(i+1);
+                        if (life < .01) {
+                            life = -Math.random()*20;
+                            particles[i*3+PARTICLE_X] = Math.random()*this.viewportWidth;
+                            particles[i*3+PARTICLE_Y] = Math.random()*this.viewportHeight;
+                        }
+                    }
+                    particles[i*3+PARTICLE_LIFE] = life;
+                }
+            },
+
+            prepareShader: function () {
                 var gl = this.gl,
                     shader = this.shader;
-
-                gl.useProgram(shader);
 
                 gl.vertexAttribPointer(
                         gl.getAttribLocation(shader, "position"),
@@ -125,28 +155,26 @@ void main(void)
 
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(gl.TEXTURE_2D, this.texture);
+                gl.uniform1i(uni("tex0"), 0);
 
-                gl.uniform1i(uni(shader, "tex0"), 0);
-
-                var time = (new Date().getTime() - this.startTime)/1000;
-                gl.uniform1f(uni("time"), time);
+                gl.uniform1f(uni("time"), (new Date().getTime()-this.startTime)/1000);
                 gl.uniform2f(uni("resolution"), this.viewportWidth, this.viewportHeight);
                 gl.uniform2f(uni("mouse"), this.mousePos.x, this.mousePos.y);
                 gl.uniform2f(uni("lightDirection"), Math.sqrt(2), Math.sqrt(2));
-
-                var arr = [this.mousePos.x, this.mousePos.y, 1., this.viewportWidth/2, this.viewportHeight/2, 1.];
-                gl.uniform3fv(uni("particles"), arr);
-
-                gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
-
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
-                gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
+                gl.uniform3fv(uni("particles"), this.particles);
 
                 function uni (uniformName) {
                     return gl.getUniformLocation(shader, uniformName);
                 }
+            },
+
+            draw: function () {
+                var gl = this.gl;
+                gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+                gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
             }
         };
     };
