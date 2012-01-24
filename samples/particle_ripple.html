@@ -33,7 +33,9 @@ vec3 calculateDistortion(vec2 coord, vec3 particle)
     vec2 delta = vec2(coord.x-particle.x,coord.y-particle.y);
     float distance = length(delta);
     vec2 deltaNormal = delta/distance;
-    vec2 distortion = deltaNormal*sin(distance*.08-time*2.0)*clamp(particle.z,0.,1.);
+    float magnitude = clamp(particle.z,0.,1.);
+    float fade = clamp(60./magnitude-distance,0.,1.);
+    vec2 distortion = deltaNormal*sin(distance*.1-time*2.0)*magnitude*fade;
     return vec3(distortion, 0);
 }
 
@@ -74,7 +76,7 @@ void main(void)
         var PARTICLE_X = 0;
         var PARTICLE_Y = 1;
         var PARTICLE_LIFE = 2;
-        var NUM_MAX_PARTICLES = 4;
+        var NUM_MAX_PARTICLES = 32;
 
         return {
             __proto__: new timotuominen.webgl.Runner(options),
@@ -134,7 +136,7 @@ void main(void)
                     if (life < 0) {
                         life++;
                     } else {
-                        life *= 1-.01*(i+1);
+                        life -= .001*(i+1);
                         if (life < .01) {
                             life = -Math.random()*20;
                             particles[i*3+PARTICLE_X] = Math.random()*this.viewportWidth;
