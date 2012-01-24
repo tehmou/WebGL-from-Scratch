@@ -23,7 +23,6 @@ window.onload = function initialize () {
             el: canvas
         });
         demo.initialize();
-        demo.renderLoop();
 
         window.onresize = updateCanvasSize;
         updateCanvasSize();

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>WebGL from Scratch</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+
+<script id="vs-shader" type="x-shader/x-vertex">
+
+attribute vec4 position;
+
+void main(void) {
+    gl_Position = position;
+}
+
+</script>
+
+<script id="fs-shader" type="x-shader/x-fragment">
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+struct Particle
+{
+    vec2 pos;
+    float life;
+    float size;
+};
+
+uniform sampler2D tex0;
+uniform float time;
+uniform vec2 resolution;
+uniform Particle particles[128];
+uniform vec2 lightDirection;
+
+float calculateInfluence(Particle p, vec2 coord) {
+    float r = 5.*(1.-p.life)*p.size;
+    float distanceFromSize = r-length(p.pos-coord);
+    float weight = 10.+(1.-p.life)*50.;
+    return clamp(p.life*(weight-abs(distanceFromSize))/weight,0.,1.);
+}
+
+void main(void)
+{
+    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+
+    vec3 color = vec3(0.);
+    for (int i = 0; i < 32; i++) {
+        Particle particle = particles[i];
+        if (particle.life > 0.) {
+            color.x += calculateInfluence(particle, coord);
+        }
+    }
+
+    gl_FragColor = vec4(color, 1.);
+}
+
+</script>
+
+<script type="text/javascript">
+
+    window.timotuominen = { webgl: {} };
+
+    timotuominen.webgl.FromScratchDemo = function (options) {
+        var particleRenderer = new timotuominen.webgl.PlainShader(options);
+        var render = particleRenderer.render;
+        var prepareShader = particleRenderer.prepareShader;
+
+        var NUM_MAX_PARTICLES = 128;
+        var particles = new Array(NUM_MAX_PARTICLES);
+
+        function updateParticles () {
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (particles[i]) {
+                    var p = particles[i];
+                    if (p.life > 0) {
+                        p.life -= .01;
+                        if (p.life <= .01) {
+                            p.life = 0;
+                        }
+                    } else {
+                        particles[i] = null;
+                    }
+                }
+            }
+        }
+
+        function addParticle (particle) {
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (!particles[i]) {
+                    particles[i] = particle;
+                    return;
+                }
+            }
+        }
+
+        particleRenderer.render = function () {
+            if (Math.random() < .05) {
+                addParticle({
+                    life: 1.,
+                    x: Math.random()*this.viewportWidth,
+                    y: Math.random()*this.viewportHeight,
+                    size: 60.+Math.random()*30.
+                });
+            }
+            updateParticles();
+            render.apply(this);
+        };
+
+        particleRenderer.prepareShader = function () {
+            prepareShader.apply(this);
+            this.gl.uniform2f(this.getUni("lightDirection"), Math.sqrt(2), Math.sqrt(2));
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (particles[i]) {
+                    var p = particles[i];
+                    this.gl.uniform2f(this.getUni("particles["+i+"].pos"), p.x, p.y);
+                    this.gl.uniform1f(this.getUni("particles["+i+"].life"), p.life);
+                    this.gl.uniform1f(this.getUni("particles["+i+"].size"), p.size);
+                }
+            }
+        };
+
+        return particleRenderer;
+    };
+
+</script>
+
+<script src="plainShader.js"></script>
+<script src="canvasInitialize.js"></script>
+<script src="webglUtils.js"></script>
+
+</head>
+<body>
+    <a href="../explain.html#particle_ripple" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show formatted source</a>
+</body>
+</html>

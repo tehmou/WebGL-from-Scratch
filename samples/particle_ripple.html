@@ -108,6 +108,7 @@ void main(void)
                 this.startTime = new Date().getTime();
                 this.trackMouse();
                 this.gl.useProgram(this.shader);
+                this.renderLoop();
             },
 
             trackMouse: function () {
