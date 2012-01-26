@@ -40,11 +40,11 @@ float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
     float d = length(dv);
     normal = dv/d;
 
-    float r = 15.*(1.-p.life)*p.size;
-    float theta = d*d/(6.*r);
+    float r = 18.*(1.-p.life)*p.size;
     float ratio = d/r;
 
-    float thetaOffset = 1.6 + 7.*p.life*ratio;
+    float theta = d*d/(6.*r);
+    float thetaOffset = 1.6 + 7.*p.life*ratio*ratio-p.life;
     float fade = (1.-ratio)*p.life;
     return d < r ? cos(theta+thetaOffset)*fade : 0.;
 }
@@ -94,7 +94,7 @@ void main(void)
                 if (particles[i]) {
                     var p = particles[i];
                     if (p.life > 0) {
-                        p.life -= .01;
+                        p.life -= .015;
                         if (p.life <= .01) {
                             p.life = 0;
                         }
