@@ -34,28 +34,45 @@ uniform vec2 resolution;
 uniform Particle particles[128];
 uniform vec2 lightDirection;
 
-float calculateInfluence(Particle p, vec2 coord) {
-    float r = 8.*(1.-p.life)*p.size;
-    float d = length(p.pos-coord);
+float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
+{
+    vec2 dv = p.pos-coord;
+    float d = length(dv);
+    normal = dv/d;
+
+    float r = 15.*(1.-p.life)*p.size;
     float theta = d*d/(6.*r);
-    float thetaOffset = -10.*(1.-p.life);
-    float fade = (1.-d/r)*p.life;
+    float ratio = d/r;
+
+    float thetaOffset = 1.6 + 7.*p.life*ratio;
+    float fade = (1.-ratio)*p.life;
     return d < r ? cos(theta+thetaOffset)*fade : 0.;
+}
+
+vec4 dodge(vec4 bottom, vec4 top)
+{
+    return vec4(bottom.xyz/(vec3(1.)-top.xyz),1.);
 }
 
 void main(void)
 {
     vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+    vec2 uv = coord/resolution;
 
     vec3 color = vec3(0.);
+    float light = 0.;
     for (int i = 0; i < 32; i++) {
         Particle particle = particles[i];
         if (particle.life > 0.) {
-            color.x += calculateInfluence(particle, coord);
+            vec2 normal;
+            float f = calculateInfluence(particle, coord, normal);
+            uv += .06*normal*f;
+            light += clamp(f*(normal.x*lightDirection.x+normal.y*lightDirection.y),0.,.6);
         }
     }
 
-    gl_FragColor = vec4(color, 1.);
+    vec4 texColor = texture2D(tex0,uv);
+    gl_FragColor = dodge(vec4(texColor.xyz,1.),vec4(clamp(light,0.,1.)));
 }
 
 </script>
@@ -103,7 +120,7 @@ void main(void)
                     life: 1.,
                     x: Math.random()*this.viewportWidth,
                     y: Math.random()*this.viewportHeight,
-                    size: 60.+Math.random()*30.
+                    size: 40.+Math.random()*60.
                 });
             }
             updateParticles();
