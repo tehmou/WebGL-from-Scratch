@@ -98,7 +98,7 @@ function initialize () {
 
     if (window.location.hash.length > 1) {
         demoName = window.location.hash.substr(1);
-        demoUrl = demoName ? "samples/" + demoName + ".html" : "";
+        demoUrl = demoName ? "build/" + demoName + ".html" : "";
         demoLink = document.createElement("a");
         demoLink.href = demoUrl;
         demoLink.innerHTML = "Show demo";

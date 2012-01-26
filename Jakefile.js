@@ -1,4 +1,5 @@
 var fs = require("fs");
+var exec = require('child_process').exec;
 
 task ("default", function () {
     log("Building...");
@@ -35,7 +36,7 @@ task ("default", function () {
 
 function copyFile (filename) {
     log("Copying file " + filename + "..");
-    //fs.sendfileSync("samples/" + filename, "build/" + filename);
+    exec("cp samples/" + filename + " build/" + filename);
 }
 
 function processSample (name) {

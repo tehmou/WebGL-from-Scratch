@@ -1,4 +1,62 @@
 /**
+ * Basic renderer
+ * --------------
+ *
+ * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
+ * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
+ * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
+ *
+ *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
+ *
+ */
+timotuominen.webgl.Runner = function (options) {
+    options = options || {};
+    return {
+
+        // Hold the canvas element.
+        el: options.el,
+
+        // Initialize should be called to start the loop.
+        initialize: function () {
+            // First we create the WebGL object by requesting "experimental-webgl" context.
+            // If WebGL is not supported, this will either throw an error or result null.
+            // For this example we will not handle these scenarios.
+            this.gl = this.el.getContext("experimental-webgl");
+
+            this.updateSize = this.updateSize.bind(this);
+            this.updateSize();
+
+            // Color that is used to clear the whole canvas before starting to
+            // draw the frame. We use rgba here, in which all four components
+            // are from 0.0 to 1.0.
+            this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
+
+            // Bind the renderLoop to this object. Since we will be using a timeout to
+            // call renderLoop continually, it would otherwise be the window object.
+            var realRenderLoop = this.renderLoop;
+            var self = this;
+            this.renderLoop = function () {
+                realRenderLoop.apply(self);
+            };
+        },
+
+        updateSize: function () {
+            // Store the size of the canvas. DOM operation are in general expensive,
+            // and we certainly don't want to do this on every frame.
+            this.viewportWidth = this.el.width;
+            this.viewportHeight = this.el.height;
+        },
+
+        // The rendering loop that repeatedly call itself 60 times a second.
+        renderLoop: function() {
+            setTimeout(this.renderLoop, 1000/60);
+            this.render && this.render();
+        }
+
+    };
+};
+
+/**
  * Shader utilities
  * ----------------
  *
@@ -69,62 +127,4 @@ timotuominen.webgl.shaderUtils = {
         // Return our processed texture.
         return texture;
     }
-};
-
-/**
- * Basic renderer
- * --------------
- *
- * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
- * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
- * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
- *
- *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
- *
- */
-timotuominen.webgl.Runner = function (options) {
-    options = options || {};
-    return {
-
-        // Hold the canvas element.
-        el: options.el,
-
-        // Initialize should be called to start the loop.
-        initialize: function () {
-            // First we create the WebGL object by requesting "experimental-webgl" context.
-            // If WebGL is not supported, this will either throw an error or result null.
-            // For this example we will not handle these scenarios.
-            this.gl = this.el.getContext("experimental-webgl");
-
-            this.updateSize = this.updateSize.bind(this);
-            this.updateSize();
-
-            // Color that is used to clear the whole canvas before starting to
-            // draw the frame. We use rgba here, in which all four components
-            // are from 0.0 to 1.0.
-            this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
-
-            // Bind the renderLoop to this object. Since we will be using a timeout to
-            // call renderLoop continually, it would otherwise be the window object.
-            var realRenderLoop = this.renderLoop;
-            var self = this;
-            this.renderLoop = function () {
-                realRenderLoop.apply(self);
-            };
-        },
-
-        updateSize: function () {
-            // Store the size of the canvas. DOM operation are in general expensive,
-            // and we certainly don't want to do this on every frame.
-            this.viewportWidth = this.el.width;
-            this.viewportHeight = this.el.height;
-        },
-
-        // The rendering loop that repeatedly call itself 60 times a second.
-        renderLoop: function() {
-            setTimeout(this.renderLoop, 1000/60);
-            this.render && this.render();
-        }
-
-    };
 };
