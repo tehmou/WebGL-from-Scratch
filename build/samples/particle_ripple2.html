@@ -1,0 +1,437 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>WebGL from Scratch</title>
+
+<style type="text/css">
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica", "Droid Sans", "Arial", sans-serif;
+}
+
+#main-link {
+    position: fixed;
+    background: white;
+    bottom: 0;
+    right: 0;
+    text-decoration: none;
+    color: black;
+    padding: 5px 7px;
+    border-top: 2px solid black;
+    border-left:2px solid black;
+}
+</style>
+
+<script id="vs-shader" type="x-shader/x-vertex">
+
+attribute vec4 position;
+
+void main(void) {
+    gl_Position = position;
+}
+
+</script>
+
+<script id="fs-shader" type="x-shader/x-fragment">
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+struct Particle
+{
+    vec2 pos;
+    float life;
+    float size;
+};
+
+uniform sampler2D tex0;
+uniform float time;
+uniform vec2 resolution;
+uniform Particle particles[128];
+uniform vec2 lightDirection;
+
+float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
+{
+    float l = pow(p.life,3.);
+
+    vec2 dv = p.pos-coord;
+    float d = length(dv);
+    normal = dv/d;
+
+    float r = 20.*(1.-l)*p.size;
+    float ratio = d/r;
+    
+
+    float theta = 20.*pow(d,1.4)/(6.*r);
+    float thetaOffset = 1.6+2.*l*ratio+.5*pow(l,2.);
+    float fade = (1.-pow(ratio,2.))*pow(l,3.);
+    return d < r ? cos(theta+thetaOffset)*fade : 0.;
+}
+
+vec4 dodge(vec4 bottom, vec4 top)
+{
+    return vec4(bottom.xyz/(vec3(1.)-top.xyz),1.);
+}
+
+void main(void)
+{
+    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+    vec2 uv = coord/resolution;
+
+    vec3 color = vec3(0.);
+    float light = 0.;
+    for (int i = 0; i < 32; i++) {
+        Particle particle = particles[i];
+        if (particle.life > 0.) {
+            vec2 normal;
+            float f = calculateInfluence(particle, coord, normal);
+            uv += .07*normal*f;
+            light += clamp(f*(normal.x*lightDirection.x+normal.y*lightDirection.y),0.,.6);
+        }
+    }
+
+    vec4 texColor = texture2D(tex0,uv);
+    gl_FragColor = dodge(vec4(texColor.xyz,1.),vec4(clamp(pow(light,2.),0.,1.)));
+}
+
+</script>
+
+<script type="text/javascript">
+
+    window.timotuominen = { webgl: {} };
+
+    timotuominen.webgl.FromScratchDemo = function (options) {
+        var particleRenderer = new timotuominen.webgl.PlainShader(options);
+        var render = particleRenderer.render;
+        var prepareShader = particleRenderer.prepareShader;
+
+        var NUM_MAX_PARTICLES = 128;
+        var particles = new Array(NUM_MAX_PARTICLES);
+
+        function updateParticles () {
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (particles[i]) {
+                    var p = particles[i];
+                    if (p.life > 0) {
+                        p.life -= .004;
+                        if (p.life <= .01) {
+                            p.life = 0;
+                        }
+                    } else {
+                        particles[i] = null;
+                    }
+                }
+            }
+        }
+
+        function addParticle (particle) {
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (!particles[i]) {
+                    particles[i] = particle;
+                    return;
+                }
+            }
+        }
+
+        particleRenderer.render = function () {
+            if (Math.random() < .08) {
+                addParticle({
+                    life: 1.,
+                    x: Math.random()*this.viewportWidth,
+                    y: Math.random()*this.viewportHeight,
+                    size: 60.+Math.random()*30.
+                });
+            }
+            updateParticles();
+            render.apply(this);
+        };
+
+        particleRenderer.prepareShader = function () {
+            prepareShader.apply(this);
+            this.gl.uniform2f(this.getUni("lightDirection"), Math.sqrt(2), Math.sqrt(2));
+            for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
+                if (particles[i]) {
+                    var p = particles[i];
+                    this.gl.uniform2f(this.getUni("particles["+i+"].pos"), p.x, p.y);
+                    this.gl.uniform1f(this.getUni("particles["+i+"].life"), p.life);
+                    this.gl.uniform1f(this.getUni("particles["+i+"].size"), p.size);
+                }
+            }
+        };
+
+        return particleRenderer;
+    };
+
+</script>
+
+
+<script type="text/javascript">
+
+/**
+ * Plain shader
+ * ------------
+ */
+timotuominen.webgl.PlainShader = function (options) {
+    options = options || {};
+
+    return {
+        __proto__: new timotuominen.webgl.Runner(options),
+
+        shader: null,
+        vertexBuffer: null,
+        texture: null,
+        vertices: null,
+        particles: null,
+
+        initialize: function () {
+            this.__proto__.initialize.apply(this);
+
+            var shaderUtils = timotuominen.webgl.shaderUtils,
+                vsCode = options.vsCode,
+                fsCode = options.fsCode;
+
+            this.vertices = new Float32Array([
+                -1.0,-1.0, 1.0,-1.0, -1.0,1.0,
+                1.0,-1.0, 1.0,1.0, -1.0,1.0
+            ]);
+            this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
+            this.gl.enableVertexAttribArray(
+                    this.gl.getAttribLocation(this.shader, "position"));
+            this.texture = shaderUtils.createTexture(this.gl, options.image1);
+            this.vertexBuffer = this.gl.createBuffer();
+            this.startTime = new Date().getTime();
+            this.gl.useProgram(this.shader);
+            this.renderLoop();
+        },
+
+        render: function () {
+            this.prepareShader();
+            this.draw();
+        },
+
+        prepareShader: function () {
+            var gl = this.gl,
+                shader = this.shader;
+
+            gl.vertexAttribPointer(
+                    gl.getAttribLocation(shader, "position"),
+                    2, gl.FLOAT, false, 0, 0);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            gl.uniform1i(this.getUni("tex0"), 0);
+            gl.uniform2f(this.getUni("resolution"), this.viewportWidth, this.viewportHeight);
+        },
+
+        getUni: function (uniformName) {
+            return this.gl.getUniformLocation(this.shader, uniformName);
+        },
+
+        draw: function () {
+            var gl = this.gl;
+            gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+            gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
+        }
+    };
+};
+</script>
+
+<script type="text/javascript">
+
+/**
+ * Basic renderer
+ * --------------
+ *
+ * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
+ * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
+ * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
+ *
+ *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
+ *
+ */
+timotuominen.webgl.Runner = function (options) {
+    options = options || {};
+    return {
+
+        // Hold the canvas element.
+        el: options.el,
+
+        // Initialize should be called to start the loop.
+        initialize: function () {
+            // First we create the WebGL object by requesting "experimental-webgl" context.
+            // If WebGL is not supported, this will either throw an error or result null.
+            // For this example we will not handle these scenarios.
+            this.gl = this.el.getContext("experimental-webgl");
+
+            this.updateSize = this.updateSize.bind(this);
+            this.updateSize();
+
+            // Color that is used to clear the whole canvas before starting to
+            // draw the frame. We use rgba here, in which all four components
+            // are from 0.0 to 1.0.
+            this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
+
+            // Bind the renderLoop to this object. Since we will be using a timeout to
+            // call renderLoop continually, it would otherwise be the window object.
+            var realRenderLoop = this.renderLoop;
+            var self = this;
+            this.renderLoop = function () {
+                realRenderLoop.apply(self);
+            };
+        },
+
+        updateSize: function () {
+            // Store the size of the canvas. DOM operation are in general expensive,
+            // and we certainly don't want to do this on every frame.
+            this.viewportWidth = this.el.width;
+            this.viewportHeight = this.el.height;
+        },
+
+        // The rendering loop that repeatedly call itself 60 times a second.
+        renderLoop: function() {
+            setTimeout(this.renderLoop, 1000/60);
+            this.render && this.render();
+        }
+
+    };
+};
+
+/**
+ * Shader utilities
+ * ----------------
+ *
+ * Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
+ * small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
+ * using, but I find it helpful to see what is actually going on.
+ *
+ * Or, the very least, how much is going on.
+ *
+ */
+timotuominen.webgl.shaderUtils = {
+
+    // A shader program is basically vertex shader + fragment shader
+    // compiled into a bytecode that the graphics card can execute.
+    createProgram: function (gl, vsCode, fsCode) {
+        var i, vs, fs, tmpProgram = gl.createProgram();
+        try {
+            vs = this.compileShader(gl, vsCode, gl.VERTEX_SHADER);
+            fs = this.compileShader(gl, fsCode, gl.FRAGMENT_SHADER);
+        } catch (e) {
+            gl.deleteProgram( tmpProgram );
+            throw e;
+        }
+        gl.attachShader(tmpProgram, vs);
+        gl.deleteShader(vs);
+        gl.attachShader(tmpProgram, fs);
+        gl.deleteShader(fs);
+        gl.linkProgram(tmpProgram);
+        return tmpProgram;
+    },
+
+    // Compiles a single shader into bytecode.
+    compileShader: function (gl, code, type) {
+        var shader = gl.createShader(type);
+        gl.shaderSource(shader, code);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            throw "SHADER ERROR: " + gl.getShaderInfoLog(shader);
+        }
+        return shader;
+    },
+
+    // Create a texture from a loaded Image. The image is simply a
+    // reference to a DOM element, which has finished loading.
+    createTexture: function (gl, image) {
+        var texture = gl.createTexture();
+
+        // Tell WebGL we want to load activate our texture.
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        // Set the texture to match our image. Understanding the magic is not
+        // important, unless you know what you are doing with the image bytes.
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+        // Set the filters to use if the texture needs to be scaled up or down.
+        // These are the simplest ones you would want to use, and work predictably.
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+        // What should happen if we run out of texture? CLAMP_TO_EDGE makes
+        // WebGL repeat the edge pixels for the empty area.
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        // We are ready, release the texture.
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        // Return our processed texture.
+        return texture;
+    }
+};
+
+</script>
+
+<script type="text/javascript">
+
+/**
+ * Initialize hook
+ * ---------------
+ *
+ * This is simply the initialization code we will run after document as finished
+ * loading. Mainly we just set up the demo instance and give it the necessary
+ * argument, in order for it to do its job.
+ *
+ */
+window.onload = function initialize () {
+    var demo, image, canvas;
+
+    // Create a canvas for ourselves.
+    canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+
+    // Point at which everything should be loaded and we can start the application.
+    function start () {
+        demo = new timotuominen.webgl.FromScratchDemo({
+            image1: image,
+            vsCode: document.getElementById("vs-shader").innerHTML,
+            fsCode: document.getElementById("fs-shader").innerHTML,
+            el: canvas
+        });
+        demo.initialize();
+
+        window.onresize = updateCanvasSize;
+        updateCanvasSize();
+    }
+
+    // Call this whenever there are changes in canvas size.
+    function updateCanvasSize () {
+        // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
+        // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
+        // to manually set the properties width and height of the canvas element accordingly.
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Tell the demo that its canvas has changed its size.
+        demo.updateSize();
+    }
+
+    // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
+    image = new Image();
+    image.onload = start;
+    image.src = "IMG_2235.JPG";
+};
+
+</script>
+
+</head>
+<body>
+    <a id="main-link" href="../explain.html#particle_ripple2">Show formatted source</a>
+</body>
+</html>
