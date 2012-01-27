@@ -36,6 +36,8 @@ uniform vec2 lightDirection;
 
 float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
 {
+    // TODO: Calculate the angle and apply maybe sin
+
     float l = pow(p.life,3.);
 
     vec2 dv = p.pos-coord;

@@ -68,6 +68,8 @@ uniform vec2 lightDirection;
 
 float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
 {
+    // TODO: Calculate the angle and apply maybe sin
+
     float l = pow(p.life,3.);
 
     vec2 dv = p.pos-coord;
@@ -388,6 +390,13 @@ timotuominen.webgl.shaderUtils = {
     }
 };
 
+// Polyfil for bind function on Safari.
+Function.prototype.bind = Function.prototype.bind || function (obj) {
+    var fnc = this;
+    return function () {
+        fnc.apply(obj, arguments);
+    };
+};
 </script>
 
 <script type="text/javascript">
