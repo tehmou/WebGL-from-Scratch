@@ -1,50 +1,58 @@
 var fs = require("fs");
 var exec = require('child_process').exec;
 
-task ("default", function () {
-    log("Building...");
-    logIntend++;
+var SRC_DIR = "src";
+var BUILD_DIR = "build";
+var SAMPLES_DIR = BUILD_DIR + "/samples";
 
-    var buildDirStat = fs.statSync("build");
-    if (buildDirStat && buildDirStat.isDirectory()) {
-        var files = fs.readdirSync("build");
-        for (var i = 0; i < files.length; i++) {
-            fs.unlinkSync("build/" + files[i]);
-        }
-        fs.rmdirSync("build");
-    }
-    
-    fs.mkdirSync("build", 0777);
 
-    var samples = fs.readdirSync("samples");
-    for (var i = 0; i < samples.length; i++) {
-        var filename = samples[i],
-            filetype = getFileType(filename);
+task ("default", ["reset-build-directory", "process-samples", "clean-samples"], function () {
+    startLog("default");
 
-        log("Found file " + filename + " of type " + filetype);
-        logIntend++;
-        if (filetype === "html") {
-            processSample(filename);
-        } else if (filetype && filetype !== "js") {
-            copyFile(filename);
-        }
-        logIntend--;
-    }
-
-    logIntend--;
+    endLog();
 });
 
-function copyFile (filename) {
-    log("Copying file " + filename + "..");
-    exec("cp samples/" + filename + " build/" + filename);
-}
+task ("reset-build-directory", function () {
+    startLog("reset-build-directory");
 
-function processSample (name) {
-    log("Writing sample " + name + "..");
-    var fileContents = fs.readFileSync("samples/" + name, "utf-8");
+    log("Removing '" + BUILD_DIR + "'..");
+    exec("rm -rf " + BUILD_DIR, function () {
+        log("Creating '" + BUILD_DIR + "'..");
+        exec("cp -r " + SRC_DIR + " " + BUILD_DIR, function () {
+            endLog();
+            complete();
+        });
+    });
+}, true);
+
+task ("process-samples", function () {
+    startLog("process-samples");
+
+    fs.readdirSync(SAMPLES_DIR).forEach(function (filename) {
+        var filetype = getFileType(filename);
+        startLog("Found file " + filename + " of type " + filetype);
+        if (filetype === "html") {
+            processSample(filename);
+        }
+        endLog();
+    });
+
+    endLog();
+});
+
+task ("clean-samples", function () {
+    startLog("clean-samples");
+
+    endLog();
+});
+
+function processSample (filename) {
+    log("Writing sample " + filename + "..");
+    var path = SAMPLES_DIR + "/" + filename,
+        fileContents = fs.readFileSync(path, "utf-8");
     fileContents = expandScripts(fileContents);
     fileContents = expandCSS(fileContents);
-    fs.writeFileSync("build/" + name, fileContents, "utf-8");
+    fs.writeFileSync(path, fileContents, "utf-8");
 }
 
 function expandScripts (inputString) {
@@ -83,7 +91,7 @@ function expandFileReferences (options) {
 
     while (scriptTag = regex.exec(inputString)) {
         var tag = scriptTag[0];
-        var src = "samples/" + scriptTag[1];
+        var src = SAMPLES_DIR + "/" + scriptTag[1];
         matchArray.push({
             pos: inputString.indexOf(tag),
             tag: tag,
@@ -111,4 +119,13 @@ function log (msg) {
     var intend = "";
     for (var i = 0; i < logIntend; i++) { intend += "  "; }
     console.log(intend + msg);
+}
+
+function startLog (msg) {
+    log(msg);
+    logIntend++;
+}
+
+function endLog () {
+    logIntend--;
 }

@@ -36,16 +36,19 @@ uniform vec2 lightDirection;
 
 float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
 {
+    float l = pow(p.life,3.);
+
     vec2 dv = p.pos-coord;
     float d = length(dv);
     normal = dv/d;
 
-    float r = 18.*(1.-p.life)*p.size;
+    float r = 20.*(1.-l)*p.size;
     float ratio = d/r;
+    
 
-    float theta = d*d/(6.*r);
-    float thetaOffset = 1.6 + 5.*p.life*ratio*ratio-p.life;
-    float fade = (1.-ratio)*p.life;
+    float theta = 20.*pow(d,1.4)/(6.*r);
+    float thetaOffset = 1.6+2.*l*ratio+.5*pow(l,2.);
+    float fade = (1.-pow(ratio,2.))*pow(l,3.);
     return d < r ? cos(theta+thetaOffset)*fade : 0.;
 }
 
@@ -66,13 +69,13 @@ void main(void)
         if (particle.life > 0.) {
             vec2 normal;
             float f = calculateInfluence(particle, coord, normal);
-            uv += .06*normal*f;
+            uv += .07*normal*f;
             light += clamp(f*(normal.x*lightDirection.x+normal.y*lightDirection.y),0.,.6);
         }
     }
 
     vec4 texColor = texture2D(tex0,uv);
-    gl_FragColor = dodge(vec4(texColor.xyz,1.),vec4(clamp(light,0.,1.)));
+    gl_FragColor = dodge(vec4(texColor.xyz,1.),vec4(clamp(pow(light,2.),0.,1.)));
 }
 
 </script>
@@ -94,7 +97,7 @@ void main(void)
                 if (particles[i]) {
                     var p = particles[i];
                     if (p.life > 0) {
-                        p.life -= .015;
+                        p.life -= .004;
                         if (p.life <= .01) {
                             p.life = 0;
                         }
@@ -115,12 +118,12 @@ void main(void)
         }
 
         particleRenderer.render = function () {
-            if (Math.random() < .1) {
+            if (Math.random() < .08) {
                 addParticle({
                     life: 1.,
                     x: Math.random()*this.viewportWidth,
                     y: Math.random()*this.viewportHeight,
-                    size: 40.+Math.random()*60.
+                    size: 60.+Math.random()*30.
                 });
             }
             updateParticles();
@@ -151,6 +154,6 @@ void main(void)
 
 </head>
 <body>
-    <a href="../explain.html#particle_ripple2" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show formatted source</a>
+    <a id="main-link" href="../explain.html#particle_ripple2">Show formatted source</a>
 </body>
 </html>

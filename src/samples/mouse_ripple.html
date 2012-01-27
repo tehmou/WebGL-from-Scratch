@@ -50,12 +50,7 @@ This example will be a single HTML page, with no external dependencies.
 <head>
 <title>WebGL from Scratch</title>
 
-<style type="text/css">
-    body {
-        margin: 0;
-        padding: 0;
-    }
-</style>
+<link href="style.css" rel="stylesheet" type="text/css">
 
 <!--
 
@@ -77,15 +72,15 @@ Notice that the type of the script block is arbitrary; it is treated as pure tex
 -->
 <script id="vs-shader" type="x-shader/x-vertex">
 
-// Position on the surface of the model.
-attribute vec4 position;
+    // Position on the surface of the model.
+    attribute vec4 position;
 
-// Entry point for shader is always the method main.
-// It does not return anything, nor does it take arguments.
-void main(void) {
+    // Entry point for shader is always the method main.
+    // It does not return anything, nor does it take arguments.
+    void main(void) {
     // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
     gl_Position = position;
-}
+    }
 
 </script>
 
@@ -103,26 +98,26 @@ If you are wondering about all the keywords, here is a quick list of what the on
 -->
 <script id="fs-shader" type="x-shader/x-fragment">
 
-// Some boilerplate code; just include it.
-#ifdef GL_ES
-precision highp float;
-#endif
+    // Some boilerplate code; just include it.
+    #ifdef GL_ES
+    precision highp float;
+    #endif
 
-// Texture we want to use.
-uniform sampler2D tex0;
+    // Texture we want to use.
+    uniform sampler2D tex0;
 
-// System absolute milliseconds passed from JavaScript.
-uniform float time;
+    // System absolute milliseconds passed from JavaScript.
+    uniform float time;
 
-// Screen size in pixels.
-uniform vec2 resolution;
+    // Screen size in pixels.
+    uniform vec2 resolution;
 
-// Absolute mouse position.
-uniform vec2 mouse;
+    // Absolute mouse position.
+    uniform vec2 mouse;
 
-// Entry point for all shaders.
-void main(void)
-{
+    // Entry point for all shaders.
+    void main(void)
+    {
     // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
     vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
 
@@ -152,7 +147,7 @@ void main(void)
 
     // Return the color in the result variable gl_FragColor.
     gl_FragColor = vec4(col,1.0);
-}
+    }
 
 </script>
 
@@ -205,9 +200,9 @@ actual docs for uniforms in WebGL specifically :)
                 this.__proto__.initialize.apply(this);
 
                 var shaderUtils = timotuominen.webgl.shaderUtils,
-                    vsCode = options.vsCode,
-                    fsCode = options.fsCode,
-                    mousePos = this.mousePos;
+                        vsCode = options.vsCode,
+                        fsCode = options.fsCode,
+                        mousePos = this.mousePos;
 
                 // Create a flat plane spanning from (-1.0,-1.0) to (1.0,1.0).
                 // This consist of two triangles, so six (x,y) points in total.
@@ -299,193 +294,193 @@ actual docs for uniforms in WebGL specifically :)
 
 <script type="text/javascript">
 
-/**
- * Initialize hook
- * ---------------
- *
- * This is simply the initialization code we will run after document as finished
- * loading. Mainly we just set up the demo instance and give it the necessary
- * argument, in order for it to do its job.
- *
- */
-window.onload = function initialize () {
-    var demo, image, canvas;
+    /**
+     * Initialize hook
+     * ---------------
+     *
+     * This is simply the initialization code we will run after document as finished
+     * loading. Mainly we just set up the demo instance and give it the necessary
+     * argument, in order for it to do its job.
+     *
+     */
+    window.onload = function initialize () {
+        var demo, image, canvas;
 
-    // Create a canvas for ourselves.
-    canvas = document.createElement('canvas');
-    document.body.appendChild(canvas);
+        // Create a canvas for ourselves.
+        canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
 
-    // Point at which everything should be loaded and we can start the application.
-    function start () {
-        demo = new timotuominen.webgl.FromScratchDemo({
-            image1: image,
-            vsCode: document.getElementById("vs-shader").innerHTML,
-            fsCode: document.getElementById("fs-shader").innerHTML,
-            el: canvas
-        });
-        demo.initialize();
+        // Point at which everything should be loaded and we can start the application.
+        function start () {
+            demo = new timotuominen.webgl.FromScratchDemo({
+                image1: image,
+                vsCode: document.getElementById("vs-shader").innerHTML,
+                fsCode: document.getElementById("fs-shader").innerHTML,
+                el: canvas
+            });
+            demo.initialize();
 
-        window.onresize = updateCanvasSize;
-        updateCanvasSize();
-    }
+            window.onresize = updateCanvasSize;
+            updateCanvasSize();
+        }
 
-    // Call this whenever there are changes in canvas size.
-    function updateCanvasSize () {
-        // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
-        // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
-        // to manually set the properties width and height of the canvas element accordingly.
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Call this whenever there are changes in canvas size.
+        function updateCanvasSize () {
+            // Set the canvas size to match the window size. Notice that canvas.width and canvas.height are not the
+            // same as the CSS width and height of the canvas! If you use CSS to size your canvas, you will always have
+            // to manually set the properties width and height of the canvas element accordingly.
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-        // Tell the demo that its canvas has changed its size.
-        demo.updateSize();
-    }
+            // Tell the demo that its canvas has changed its size.
+            demo.updateSize();
+        }
 
-    // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
-    image = new Image();
-    image.onload = start;
-    image.src = "IMG_2235.JPG";
-};
+        // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
+        image = new Image();
+        image.onload = start;
+        image.src = "IMG_2235.JPG";
+    };
 
 </script>
 
 <script type="text/javascript">
 
-/**
- * Basic renderer
- * --------------
- *
- * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
- * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
- * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
- *
- *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
- *
- */
-timotuominen.webgl.Runner = function (options) {
-    options = options || {};
-    return {
+    /**
+     * Basic renderer
+     * --------------
+     *
+     * Another utility class; this time for initializing and continuously rendering the view. It tries to run at 60 fps,
+     * and does not have any funny optimizations regarding this. In real life you may want to use the experimental feature
+     * some browsers have, [requestAnimationFrame], or reduce fps in case the browser cannot handle it.
+     *
+     *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
+     *
+     */
+    timotuominen.webgl.Runner = function (options) {
+        options = options || {};
+        return {
 
-        // Hold the canvas element.
-        el: options.el,
+            // Hold the canvas element.
+            el: options.el,
 
-        // Initialize should be called to start the loop.
-        initialize: function () {
-            // First we create the WebGL object by requesting "experimental-webgl" context.
-            // If WebGL is not supported, this will either throw an error or result null.
-            // For this example we will not handle these scenarios.
-            this.gl = this.el.getContext("experimental-webgl");
+            // Initialize should be called to start the loop.
+            initialize: function () {
+                // First we create the WebGL object by requesting "experimental-webgl" context.
+                // If WebGL is not supported, this will either throw an error or result null.
+                // For this example we will not handle these scenarios.
+                this.gl = this.el.getContext("experimental-webgl");
 
-            this.updateSize = this.updateSize.bind(this);
-            this.updateSize();
+                this.updateSize = this.updateSize.bind(this);
+                this.updateSize();
 
-            // Color that is used to clear the whole canvas before starting to
-            // draw the frame. We use rgba here, in which all four components
-            // are from 0.0 to 1.0.
-            this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
+                // Color that is used to clear the whole canvas before starting to
+                // draw the frame. We use rgba here, in which all four components
+                // are from 0.0 to 1.0.
+                this.gl.clearColor(0.3, 0.3, 0.3, 1.0);
 
-            // Bind the renderLoop to this object. Since we will be using a timeout to
-            // call renderLoop continually, it would otherwise be the window object.
-            var realRenderLoop = this.renderLoop;
-            var self = this;
-            this.renderLoop = function () {
-                realRenderLoop.apply(self);
-            };
-        },
+                // Bind the renderLoop to this object. Since we will be using a timeout to
+                // call renderLoop continually, it would otherwise be the window object.
+                var realRenderLoop = this.renderLoop;
+                var self = this;
+                this.renderLoop = function () {
+                    realRenderLoop.apply(self);
+                };
+            },
 
-        updateSize: function () {
-            // Store the size of the canvas. DOM operation are in general expensive,
-            // and we certainly don't want to do this on every frame.
-            this.viewportWidth = this.el.width;
-            this.viewportHeight = this.el.height;
-        },
+            updateSize: function () {
+                // Store the size of the canvas. DOM operation are in general expensive,
+                // and we certainly don't want to do this on every frame.
+                this.viewportWidth = this.el.width;
+                this.viewportHeight = this.el.height;
+            },
 
-        // The rendering loop that repeatedly call itself 60 times a second.
-        renderLoop: function() {
-            setTimeout(this.renderLoop, 1000/60);
-            this.render && this.render();
-        }
+            // The rendering loop that repeatedly call itself 60 times a second.
+            renderLoop: function() {
+                setTimeout(this.renderLoop, 1000/60);
+                this.render && this.render();
+            }
 
+        };
     };
-};
 
-/**
- * Shader utilities
- * ----------------
- *
- * Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
- * small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
- * using, but I find it helpful to see what is actually going on.
- *
- * Or, the very least, how much is going on.
- *
- */
-timotuominen.webgl.shaderUtils = {
+    /**
+     * Shader utilities
+     * ----------------
+     *
+     * Unfortunately we have to prepare our shader with some boilerplate code, of which cannot really go around. Here is a
+     * small utilities that help us to initialize the shaders. Usually this would be buried in some library code you are
+     * using, but I find it helpful to see what is actually going on.
+     *
+     * Or, the very least, how much is going on.
+     *
+     */
+    timotuominen.webgl.shaderUtils = {
 
-    // A shader program is basically vertex shader + fragment shader
-    // compiled into a bytecode that the graphics card can execute.
-    createProgram: function (gl, vsCode, fsCode) {
-        var i, vs, fs, tmpProgram = gl.createProgram();
-        try {
-            vs = this.compileShader(gl, vsCode, gl.VERTEX_SHADER);
-            fs = this.compileShader(gl, fsCode, gl.FRAGMENT_SHADER);
-        } catch (e) {
-            gl.deleteProgram( tmpProgram );
-            throw e;
+        // A shader program is basically vertex shader + fragment shader
+        // compiled into a bytecode that the graphics card can execute.
+        createProgram: function (gl, vsCode, fsCode) {
+            var i, vs, fs, tmpProgram = gl.createProgram();
+            try {
+                vs = this.compileShader(gl, vsCode, gl.VERTEX_SHADER);
+                fs = this.compileShader(gl, fsCode, gl.FRAGMENT_SHADER);
+            } catch (e) {
+                gl.deleteProgram( tmpProgram );
+                throw e;
+            }
+            gl.attachShader(tmpProgram, vs);
+            gl.deleteShader(vs);
+            gl.attachShader(tmpProgram, fs);
+            gl.deleteShader(fs);
+            gl.linkProgram(tmpProgram);
+            return tmpProgram;
+        },
+
+        // Compiles a single shader into bytecode.
+        compileShader: function (gl, code, type) {
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, code);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                throw "SHADER ERROR: " + gl.getShaderInfoLog(shader);
+            }
+            return shader;
+        },
+
+        // Create a texture from a loaded Image. The image is simply a
+        // reference to a DOM element, which has finished loading.
+        createTexture: function (gl, image) {
+            var texture = gl.createTexture();
+
+            // Tell WebGL we want to load activate our texture.
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            // Set the texture to match our image. Understanding the magic is not
+            // important, unless you know what you are doing with the image bytes.
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+            // Set the filters to use if the texture needs to be scaled up or down.
+            // These are the simplest ones you would want to use, and work predictably.
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+            // What should happen if we run out of texture? CLAMP_TO_EDGE makes
+            // WebGL repeat the edge pixels for the empty area.
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+            // We are ready, release the texture.
+            gl.bindTexture(gl.TEXTURE_2D, null);
+
+            // Return our processed texture.
+            return texture;
         }
-        gl.attachShader(tmpProgram, vs);
-        gl.deleteShader(vs);
-        gl.attachShader(tmpProgram, fs);
-        gl.deleteShader(fs);
-        gl.linkProgram(tmpProgram);
-        return tmpProgram;
-    },
-
-    // Compiles a single shader into bytecode.
-    compileShader: function (gl, code, type) {
-        var shader = gl.createShader(type);
-        gl.shaderSource(shader, code);
-        gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            throw "SHADER ERROR: " + gl.getShaderInfoLog(shader);
-        }
-        return shader;
-    },
-
-    // Create a texture from a loaded Image. The image is simply a
-    // reference to a DOM element, which has finished loading.
-    createTexture: function (gl, image) {
-        var texture = gl.createTexture();
-
-        // Tell WebGL we want to load activate our texture.
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-
-        // Set the texture to match our image. Understanding the magic is not
-        // important, unless you know what you are doing with the image bytes.
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-
-        // Set the filters to use if the texture needs to be scaled up or down.
-        // These are the simplest ones you would want to use, and work predictably.
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-
-        // What should happen if we run out of texture? CLAMP_TO_EDGE makes
-        // WebGL repeat the edge pixels for the empty area.
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        // We are ready, release the texture.
-        gl.bindTexture(gl.TEXTURE_2D, null);
-
-        // Return our processed texture.
-        return texture;
-    }
-};
+    };
 
 </script>
 
 </head>
 <body>
-    <a href="../explain.html#mouse_ripple" style="position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;">Show formatted source</a>
+<a id="main-link" href="../explain.html#mouse_ripple">Show formatted source</a>
 </body>
 </html>

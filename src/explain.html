@@ -13,7 +13,6 @@
         height: 100%;
         text-shadow: rgba(0, 0, 0, .1) 2px 1px 2px;
         overflow-x: hidden;
-        font-family: "Helvetica", "Droid Sans", "Arial", sans-serif;
         font-size: 11pt;
         line-height: 1.4rem;
     }
@@ -80,6 +79,7 @@
 
 </style>
 
+<link href="samples/style.css" rel="stylesheet" type="text/css">
 <link href="style/default.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="lib/showdown.js"></script>
 <script type="text/javascript" src="lib/highlight.js"></script>
@@ -94,16 +94,16 @@
 <script type="text/javascript">
 
 function initialize () {
-    var demoUrl, demoName, demoLink;
+    var demoUrl, demoName, demoLink, githubLink;
 
     if (window.location.hash.length > 1) {
         demoName = window.location.hash.substr(1);
-        demoUrl = demoName ? "build/" + demoName + ".html" : "";
-        demoLink = document.createElement("a");
+        demoUrl = demoName ? "samples/" + demoName + ".html" : "";
+        demoLink = document.getElementById("main-link");
         demoLink.href = demoUrl;
         demoLink.innerHTML = "Show demo";
-        demoLink.style.cssText = "position:fixed;background:white;top:0;right:0;text-decoration:none;color:black;padding:5px 7px;border-bottom:2px solid black;border-left:2px solid black;";
-        document.body.appendChild(demoLink);
+        githubLink = document.getElementById("fork-me-on-github");
+        githubLink.href = "https://github.com/tehmou/WebGL-from-Scratch/blob/master/build/" + demoName + ".html";
     } else {
         demoUrl = "";
     }
@@ -170,6 +170,8 @@ function initialize () {
 
 </head>
 <body onload="initialize()">
+<a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub"></a>
+<a id="main-link"></a>
 <div id="content"></div>
 </body>
 </html>
