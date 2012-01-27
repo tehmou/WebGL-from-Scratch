@@ -128,3 +128,11 @@ timotuominen.webgl.shaderUtils = {
         return texture;
     }
 };
+
+// Polyfil for bind function on Safari.
+Function.prototype.bind = Function.prototype.bind || function (obj) {
+    var fnc = this;
+    return function () {
+        fnc.apply(obj, arguments);
+    };
+};
