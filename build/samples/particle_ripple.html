@@ -53,10 +53,16 @@ void main(void) {
 precision highp float;
 #endif
 
+// Define a class for our particles. This is a C-style struct.
 struct Particle
 {
+    // xy screen coordinate of the particle.
     vec2 pos;
+
+    // Progress of this particle, from 1.0 to 0.0. After it reaches 0, it is deleted.
     float life;
+
+    // Size relative to other particles. Does not necessarily imply absolute screen size.
     float size;
 };
 
@@ -64,25 +70,25 @@ uniform sampler2D tex0;
 uniform float time;
 uniform vec2 resolution;
 uniform Particle particles[128];
+
+// xy vector that ideally has the length of 1.0.
 uniform vec2 lightDirection;
 
 float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
 {
-    // TODO: Calculate the angle and apply maybe sin
-
-    float l = pow(p.life,3.);
+    float life = pow(p.life,3.);
 
     vec2 dv = p.pos-coord;
     float d = length(dv);
     normal = dv/d;
 
-    float r = 20.*(1.-l)*p.size;
+    float r = 20.*(1.-life)*p.size;
     float ratio = d/r;
     
 
     float theta = 20.*pow(d,1.4)/(6.*r);
-    float thetaOffset = 1.6+2.*l*ratio+.5*pow(l,2.);
-    float fade = (1.-pow(ratio,2.))*pow(l,3.);
+    float thetaOffset = -1.6+2.*life*ratio-.5*pow(life,2.);
+    float fade = (1.-pow(ratio,2.))*pow(life,3.);
     return d < r ? cos(theta+thetaOffset)*fade : 0.;
 }
 
@@ -104,7 +110,7 @@ void main(void)
             vec2 normal;
             float f = calculateInfluence(particle, coord, normal);
             uv += .07*normal*f;
-            light += clamp(f*(normal.x*lightDirection.x+normal.y*lightDirection.y),0.,.6);
+            light += clamp(f*(normal.x*-lightDirection.x+normal.y*-lightDirection.y),0.,.6);
         }
     }
 
