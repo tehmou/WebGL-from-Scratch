@@ -21,7 +21,7 @@ void main(void) {
 precision highp float;
 #endif
 
-// Define a class for our particles. This is a C-style struct.
+// Define a class for our particles. This is a C-style struct, much like a class.
 struct Particle
 {
     // xy screen coordinate of the particle.
@@ -39,51 +39,140 @@ uniform float time;
 uniform vec2 resolution;
 uniform Particle particles[128];
 
-// xy vector that ideally has the length of 1.0.
+// Usually a unit vector that points to the direction of the light.
+// The longer the vector, the stronger the light.
 uniform vec2 lightDirection;
 
+// Calculates the influence this particles has to the coordinate on
+// on the screen. Returns a value between -1 and 1.
+//
+// In shader language you can define an argument to be for output.
+// this means that by setting the variable normal, the variable
+// given as argument changes. It may be a bit confusing, as there
+// is no equivalent in JS, but you can think of variables being
+// either input or output.
 float calculateInfluence(Particle p, vec2 coord, out vec2 normal)
 {
+    // Let's make the effect a bit slower at first.
+    // The function pow is the same as Math.pow, or "to the power of".
     float life = pow(p.life,3.);
 
-    vec2 dv = p.pos-coord;
-    float d = length(dv);
-    normal = dv/d;
+    // Vector from the current screen coordinate to the position of this particle.
+    vec2 delta = p.pos-coord;
 
-    float r = 20.*(1.-life)*p.size;
-    float ratio = d/r;
-    
+    // Simple length of the vector dv, in other words the distance between
+    // the current screen coordinate and the current particle.
+    float distance = length(delta);
 
-    float theta = 20.*pow(d,1.4)/(6.*r);
-    float thetaOffset = -1.6+2.*life*ratio-.5*pow(life,2.);
-    float fade = (1.-pow(ratio,2.))*pow(life,3.);
-    return d < r ? cos(theta+thetaOffset)*fade : 0.;
+    // Calculate the radius of the particle based on its size and life expectancy.
+    // It gets the bigger the longer has passed; when life hits 0 the particle
+    // reaches the radius of 20 times its parameter "size" and dies.
+    float radius = 20.*(1.-life)*p.size;
+
+    // Check whether or not this pixel is close enough to actually show an effect.
+    if (distance < radius) {
+        // Set the output vector "normal", so that we won't have to calculate
+        // the length of dv again somewhere else. Lengths of vectors are not
+        // very cheap, as they involve the square root function.
+        normal = delta/distance;
+
+        // Ratio between the distance of this pixel from the particle, and the
+        // current radius of the particle. Since we already figured out that
+        // r is bigger than d, it will be less than 1.0.
+        float ratio = distance/radius;
+
+        // Angle to use in the cosine function we use to calculate the ripple effect.
+        // This is a bit complicated to visualize, as how it looks mainly depends on
+        // how fast it is changing at a given point, but look at the demo and remember
+        // that this makes the ripples the more spread the further away they are. On the other
+        // hand, the smaller the particle is of radius, the tighter the ripples.
+        float theta = 20.*pow(distance,1.4)/(6.*radius);
+
+        // How much to "push" the cosine function. This mostly affects how the center
+        // of ripples appears. It's a subtle effect, but I found it worthwhile.
+        float thetaOffset = -1.7 + .5*pow(life,2.);
+
+        // Opacity of the effect at this distance and point of life.
+        // The further away from the particle, the weaker.
+        float opacity = (1.-pow(ratio,2.)) * pow(life,3.);
+
+        // Make the ripple with cosine, and return the magnitude of the ripple
+        // at this coordinate. The final value is between -1 and 1.
+        return cos(theta+thetaOffset)*opacity;
+    } else {
+        // Too far away!
+        return 0.;
+    }
 }
 
-vec4 dodge(vec4 bottom, vec4 top)
+// A more interesting way to combine two colors than simply adding them.
+// for more, see <a href="http://en.wikipedia.org/wiki/Blend_modes">blend modes</a>.
+vec3 dodge(vec3 bottom, vec3 top)
 {
-    return vec4(bottom.xyz/(vec3(1.)-top.xyz),1.);
+    return bottom/(vec3(1.)-top);
 }
 
+// Entry point for the shader.
 void main(void)
 {
+    // Flip the y coordinate of the given gl_FragCoord. These is
+    // a better approach to this, but it requires changing the
+    // vertex shader to supple us with this information.
     vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+
+    // Texture coordinate. The texture ranges from (0,0) to (1,1),
+    // hence we have to divide the coordinates respectively by the screen resolution.
     vec2 uv = coord/resolution;
 
-    vec3 color = vec3(0.);
+    // Amount of light that shines on this pixel.
     float light = 0.;
-    for (int i = 0; i < 32; i++) {
+
+    // Loop through all our particles.
+    for (int i = 0; i < 128; i++) {
         Particle particle = particles[i];
+
+        // Is this particle even alive?
         if (particle.life > 0.) {
+
+            // Place to store the unit vector (normal) that points
+            // from this pixel to the center of ripple.
             vec2 normal;
+
+            // Calculate how much ripple we are seeing. It should be
+            // from -1 (min) to 1 (max).
             float f = calculateInfluence(particle, coord, normal);
-            uv += .07*normal*f;
-            light += clamp(f*(normal.x*-lightDirection.x+normal.y*-lightDirection.y),0.,.6);
+
+            // Are we seeing any effect?
+            if (f != 0.) {
+
+                // Damp if magnitude is negative. Don't ask, it's just for aesthetics.
+                if (f < 0.) {
+                    f *= .5;
+                }
+
+                // Take the texture a bit closer to the center of ripple.
+                uv += .07*normal*f;
+
+                // How strong the light is at this point of the ripple. This is a simple
+                // dot product of two unit vectors multiplied by the magnitude of the ripple.
+                // Basically if the vector normal is parallel to lightDirection, we get the maximum light.
+                float addLight = f*(normal.x*-lightDirection.x + normal.y*-lightDirection.y);
+
+                // Increase the amount of light, but make sure our value is more than 0 and less than 0.7.
+                // It just looks better if one ripple alone cannot be fully lit.
+                light += clamp(addLight,0.,.7);
+            }
         }
     }
 
+    // Retrieve the texture pixel from our calculated point.
     vec4 texColor = texture2D(tex0,uv);
-    gl_FragColor = dodge(vec4(texColor.xyz,1.),vec4(clamp(pow(light,2.),0.,1.)));
+
+    // Make the light slightly nonlinear.
+    float finalLight = clamp(pow(light,1.5),0.,1.);
+
+    // Return the color of this pixel.
+    gl_FragColor = vec4(dodge(texColor.xyz,vec3(finalLight)),1.);
 }
 
 </script>
@@ -92,14 +181,25 @@ void main(void)
 
     window.timotuominen = { webgl: {} };
 
+    /**
+     * The JavaScript part of this sample is fairly straight-forward.
+     * We need a collection of particles, which change over time. Each frame
+     * we then pass our array to the shader, so that it can render them.
+     *
+     */
     timotuominen.webgl.FromScratchDemo = function (options) {
         var particleRenderer = new timotuominen.webgl.PlainShader(options);
         var render = particleRenderer.render;
         var prepareShader = particleRenderer.prepareShader;
 
+        // Magic number which matches that of the shader.
         var NUM_MAX_PARTICLES = 128;
+
+        // Create an array of particles. Of course in JS we don't need to type anything,
+        // unlike we did in the shader language.
         var particles = new Array(NUM_MAX_PARTICLES);
 
+        // Decrease the life of each particle, until they reach 0 and die.
         function updateParticles () {
             for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
                 if (particles[i]) {
@@ -116,17 +216,25 @@ void main(void)
             }
         }
 
+        // Add a particle to a free slot in our array of particles.
+        // Return true if there was still room, and false if there was not.
+        // Usually with particle engines if you run out of space at some
+        // point, you don't really care. They are just particles :)
         function addParticle (particle) {
             for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
                 if (!particles[i]) {
                     particles[i] = particle;
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
+        // Override the render function to do our own rendering.
         particleRenderer.render = function () {
-            if (Math.random() < .08) {
+
+            // Create a new particle on average every 10th frame.
+            if (Math.random() < .1) {
                 addParticle({
                     life: 1.,
                     x: Math.random()*this.viewportWidth,
@@ -134,13 +242,25 @@ void main(void)
                     size: 60.+Math.random()*30.
                 });
             }
+
+            // Make particles get old and eventually die.
             updateParticles();
+
+            // Call the original render function, which will then do the WebGL stuff.
             render.apply(this);
         };
 
+        // Prepare the shader for rendering.
         particleRenderer.prepareShader = function () {
             prepareShader.apply(this);
+
+            // Direction of light is a unit vector pointing southwest.
             this.gl.uniform2f(this.getUni("lightDirection"), Math.sqrt(2), Math.sqrt(2));
+
+            // Copy all the particles to the shader. This could be done more efficiently
+            // with copying plain arrays using uniform1fv, but then we would have to
+            // give up the Particle struct. This would become relevant if we had thousands
+            // or millions particles, but not with a maximum of 128.
             for (var i = 0; i < NUM_MAX_PARTICLES; i++) {
                 if (particles[i]) {
                     var p = particles[i];
@@ -151,6 +271,7 @@ void main(void)
             }
         };
 
+        // Return the initialized object.
         return particleRenderer;
     };
 
