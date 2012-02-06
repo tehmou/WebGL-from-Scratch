@@ -1,10 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+
+Particle Ripple Example
+=======================
+
+_The WebGL tutorial written from scratch&mdash;without any external libraries.
+Below you can see a preview. If not even after reloading, you may not have
+a WebGL compatible browser or it is turned off; try [Google Chrome]._
+
+You can report any errors or improvement ideas at [github].
+
+
+  [Google Chrome]: http://www.google.com/chrome/
+  [github]: http://github.com/tehmou/WebGL-from-Scratch/
+
+-->
 <html>
 <head>
 <title>WebGL from Scratch</title>
 <link href="style.css" rel="stylesheet" type="text/css">
 
+<!--
+
+Vertex shader
+-------------
+
+Operates on 3D models.
+
+
+-->
 <script id="vs-shader" type="x-shader/x-vertex">
 
 attribute vec4 position;
@@ -15,6 +40,15 @@ void main(void) {
 
 </script>
 
+<!--
+
+Fragment shader
+---------------
+
+Operates on individual pixels.
+
+
+-->
 <script id="fs-shader" type="x-shader/x-fragment">
 
 #ifdef GL_ES
@@ -45,7 +79,6 @@ uniform vec2 lightDirection;
 
 // Calculates the influence this particles has to the coordinate on
 // on the screen. Returns a value between -1 and 1.
-//
 // In shader language you can define an argument to be for output.
 // this means that by setting the variable normal, the variable
 // given as argument changes. It may be a bit confusing, as there
@@ -182,6 +215,10 @@ void main(void)
     window.timotuominen = { webgl: {} };
 
     /**
+     *
+     * Main JavaScript
+     * ---------------
+     *
      * The JavaScript part of this sample is fairly straight-forward.
      * We need a collection of particles, which change over time. Each frame
      * we then pass our array to the shader, so that it can render them.
@@ -284,12 +321,6 @@ void main(void)
 </head>
 <body>
     <a id="back-link" href="../index.html">Back to Index</a>
-    <!--
-
-    This not nicely formatted yet, disable for now :)
-
     <a id="main-link" href="../explain.html#particle_ripple">Show formatted source</a>
-
-    -->
 </body>
 </html>
