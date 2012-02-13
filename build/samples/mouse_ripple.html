@@ -11,7 +11,9 @@ a WebGL compatible browser or it is turned off; try [Google Chrome]._
 
 You can report any errors or improvement ideas at [github].
 
-
+-->
+ 
+<!--
 Introduction
 ------------
 
@@ -183,33 +185,33 @@ If you are wondering about all the keywords, here is a quick list of what the on
 
 </script>
 
-<!--
-
-The code that runs around the shaders
--------------------------------------
-
-The shaders need to provided with the necessary information from JavaScript.
-They cannot directly access any code outside of their own block.
-
-You can give the shaders your custom input in **uniforms**. These are shared
-between the shaders in the same program/chain, and there can be any number of them
-of varying types. "uniform1f" sets one variable of type "float" in the shader code.
-"uniform2f" sets a "vec2", which is a vector of two floats. However, "uniform1i"
-does something different; it takes in a slot number for a texture, and sets a
-corresponding sampler to the shader. You can see how it works in the code below.
-
-To set the uniforms, you have supple a parameter called "location", which
-tells WebGL into variable of which name you want to put this value.
-
-For more info, try to go through the original [OpenGL glUniform docs], even if they
-are not so straight-forward and are written for C. Please let me know if you find
-actual docs for uniforms in WebGL specifically :)
-
-  [OpenGL glUniform docs]: http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml
-
--->
 <script type="text/javascript">
 
+    /**
+     * 
+     * The code that runs around the shaders
+     * -------------------------------------
+     *
+     * The shaders need to provided with the necessary information from JavaScript.
+     * They cannot directly access any code outside of their own block.
+     *
+     * You can give the shaders your custom input in **uniforms**. These are shared
+     * between the shaders in the same program/chain, and there can be any number of them
+     * of varying types. "uniform1f" sets one variable of type "float" in the shader code.
+     * "uniform2f" sets a "vec2", which is a vector of two floats. However, "uniform1i"
+     * does something different; it takes in a slot number for a texture, and sets a
+     * corresponding sampler to the shader. You can see how it works in the code below.
+     *
+     * To set the uniforms, you have supple a parameter called "location", which
+     * tells WebGL into variable of which name you want to put this value.
+     *
+     * For more info, try to go through the original [OpenGL glUniform docs], even if they
+     * are not so straight-forward and are written for C. Please let me know if you find
+     * actual docs for uniforms in WebGL specifically :)
+     *
+     *   [OpenGL glUniform docs]: http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml
+     *
+     */
     window.timotuominen = { webgl: {} };
 
     timotuominen.webgl.FromScratchDemo = function (options) {

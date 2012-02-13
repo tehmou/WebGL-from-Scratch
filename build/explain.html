@@ -5,67 +5,9 @@
 <title></title>
     <link href="style/main.css" rel="stylesheet" type="text/css">
     <link href="samples/style.css" rel="stylesheet" type="text/css">
-    <style type="text/css">
-
-        body {
-            padding-top: 40px;
-        }
-        
-        #content {
-            margin: 20px;
-        }
-
-        #content > div {
-        }
-
-        #content .comment, #content .code {
-            display: inline-block;
-            vertical-align: top;
-        }
-        #content .comment {
-            text-align: left;
-            width: 35%;
-        }
-        #content .code {
-            margin: 0 0 0 1%;
-            padding: 0;
-            font-size: 13px;
-            line-height: 20px;
-            width: 63%;
-            min-width: 500px;
-            overflow: hidden;
-        }
-
-        #content .html-comment {
-            margin-bottom: 4px;
-        }
-
-        #content .html-comment>span {
-            padding-bottom: 40px;
-        }
-
-        #content .html-comment>span, #content .html-comment .code {
-            vertical-align: top;
-        }
-
-        #content .html-comment pre {
-            margin-bottom: 12px;
-        }
-
-        #content .script-comment {
-            padding: 3px 0;
-        }
-
-        #content .script-comment>span {
-            text-align: right;
-            margin-bottom: 10px;
-            font-style: italic;
-            cursor: default;
-        }
-
-    </style>
-
+    <link href="style/explain.css" rel="stylesheet" type="text/css">
     <link href="style/default.css" rel="stylesheet" type="text/css">
+    
     <script type="text/javascript" src="lib/showdown.js"></script>
     <script type="text/javascript" src="lib/highlight.js"></script>
     <script type="text/javascript" src="lib/highlight.pack.js"></script>
@@ -113,21 +55,34 @@
             return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
+        function printBlock (commentEl, codeEl, cssClass) {
+            var el = document.createElement("tr"),
+                left = document.createElement("td"),
+                right = document.createElement("td");
+
+            left.appendChild(commentEl);
+            left.className = "comment";
+
+            right.appendChild(codeEl);
+            right.className = "code";
+
+            el.appendChild(left);
+            el.appendChild(right);
+            document.getElementById("content").appendChild(el);
+            el.className = cssClass;
+        }
+
         function displayCode (code) {
             htmlProcessor.extractComments(code).splice(1).forEach(addComment);
 
             function addComment (block) {
                 var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);
                 var cssClass = isMajorComment ? "html-comment" : "script-comment";
-                var el = document.createElement("div"),
-                    commentEl = document.createElement("span"),
+                var commentEl = document.createElement("div"),
                     outerCodeEl = document.createElement("pre"),
                     codeEl = document.createElement("code");
 
-                commentEl.className = "comment";
                 commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
-
-                outerCodeEl.className = "code";
                 outerCodeEl.appendChild(codeEl);
 
                 if (block.language === "html") {
@@ -143,10 +98,7 @@
                     hljs.highlightBlock(codeEl);
                 }
 
-                el.appendChild(commentEl);
-                el.appendChild(outerCodeEl);
-                document.getElementById("content").appendChild(el);
-                el.className = cssClass;
+                printBlock(commentEl, outerCodeEl, cssClass);
             }
         }
     }
@@ -158,6 +110,6 @@
 <a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="https://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub"></a>
 <a id="back-link" href="index.html">Back to Index</a>
 <a id="main-link"></a>
-<div id="content"></div>
+<table id="content" cellpadding="0" cellspacing="0"></table>
 </body>
 </html>
