@@ -1,0 +1,45 @@
+h1, h2, p, pre {
+    margin: 0;
+}
+
+h1, h2 {
+    padding-bottom: .6em;
+}
+
+#content {
+    padding: 5em 2em 4em;
+}
+
+.comment, .code {
+    vertical-align: top;
+    padding: 1em;
+}
+
+.comment {
+    line-height: 1.7em;
+    min-width: 400px;
+    margin-right: .5em;
+    background: #fafafa;
+    border-right: .7em solid #f6f6f6;
+}
+
+.code {
+    font-size: 13px;
+}
+
+.html-comment .comment, .html-comment .code{
+    padding-top: 2em;
+}
+
+.html-comment .comment h2 {
+    margin-top: 1em;
+}
+
+.html-comment .comment p {
+    margin-bottom: .8em;
+}
+
+.script-comment .comment p {
+    text-align: right;
+    font-style: italic;
+}
