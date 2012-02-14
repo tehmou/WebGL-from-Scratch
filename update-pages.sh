@@ -1,3 +1,4 @@
+jake
 cp -r build/* ../WebGL-from-Scratch-pages/*
 cd ../WebGL-from-Scratch-pages
 git checkout gh-pages
