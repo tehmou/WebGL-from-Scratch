@@ -10,6 +10,14 @@ h1, h2 {
     padding: 5em 2em 4em;
 }
 
+#content>:first-child .comment {
+    border-top: .3em solid #f6f6f6;
+}
+
+#content>:last-child .comment {
+    border-bottom: .3em solid #f6f6f6;
+}
+
 .comment, .code {
     vertical-align: top;
     padding: 1em;
@@ -20,6 +28,7 @@ h1, h2 {
     min-width: 400px;
     margin-right: .5em;
     background: #fafafa;
+    border-left: .7em solid #f6f6f6;
     border-right: .7em solid #f6f6f6;
 }
 
