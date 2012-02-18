@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>WebGL from Scratch</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script src="simplexNoise.js" type="text/javascript"></script>
+</head>
+<body>
+    <script type="text/javascript">
+
+        var generator = new SimplexNoise().noise2D;
+
+        var canvas = document.createElement("canvas");
+        document.body.appendChild(canvas);
+        var ctx = canvas.getContext('2d');
+
+        var w = canvas.width = window.innerWidth;
+        var h = canvas.height = window.innerHeight;
+        var imageData = ctx.createImageData(w, h);
+
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+
+                var c = (generator(.01*x, .01*y) + 1)*128;
+                imageData.data[idx + 0] = c;
+                imageData.data[idx + 1] = c;
+                imageData.data[idx + 2] = c;
+                imageData.data[idx + 3] = 255;
+             }
+        }
+
+        
+
+        ctx.putImageData(imageData, 0, 0);
+
+    </script>
+</body>
+</html>
