@@ -23,7 +23,7 @@
             for (var y = 0; y < h; y++) {
                 var idx = (x + y * w) * 4;
 
-                var c = (generator(.01*x, .01*y) + 1)*128;
+                var c = (generator(x, y) + 1)*128;
                 imageData.data[idx + 0] = c;
                 imageData.data[idx + 1] = c;
                 imageData.data[idx + 2] = c;

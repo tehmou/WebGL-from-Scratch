@@ -1,76 +1,92 @@
-var SimplexNoise = function(random) {
-    random = random || Math.random;
+(function () {
 
-    var SQRT_3 = Math.sqrt(3);
-    var F2 = .5 * (SQRT_3 - 1);
-    var G2 = (3 - SQRT_3) / 6;
-
-    var grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
-    var perm = [];
-
-    for(var i = 0; i < 512; i++) {
-        perm[i] = ~~(random()*256);
-    }
-
-    function dot (g, x, y, z) {
-        return g[0]*(x||0) + g[1]*(y||0) + g[2]*(z||0);
-    }
-
-    function getGradientAt (i, j, i1, j1) {
-        var ii = i % 255;
-        var jj = j % 255;
-        return [
-            perm[ii+perm[jj]] % 12,
-            perm[ii+i1+perm[jj+j1]] % 12,
-            perm[ii+1+perm[jj+1]] % 12
-        ];
-    }
-
-    function calculateEffect (x0, y0, g) {
-        var t0 = 0.5 - x0*x0-y0*y0;
-        if(t0 < 0) {
-            return 0.0;
+    function calculateEffect (coord, grad) {
+        var contribution = .5 - coord[0]*coord[0] - coord[1]*coord[1];
+        if (contribution < 0) {
+            return 0;
         } else {
-            t0 *= t0;
-            return t0 * t0 * dot(grad3[g], x0, y0);
+            return Math.pow(contribution, 4) * (grad[0]*coord[0] + grad[1]*coord[1]);
         }
     }
-
-    function noise2D (xin, yin) {
-        var s = (xin+yin)*F2;
-        var i = ~~(xin+s);
-        var j = ~~(yin+s);
-        var t = (i+j)*G2;
-
-        var X0 = i-t;
-        var Y0 = j-t;
-        var x0 = xin-X0;
-        var y0 = yin-Y0;
-
-        var i1, j1;
-        if (x0 > y0) {
-            i1=1;
-            j1=0;
-        } else {
-            i1=0;
-            j1=1;
-        }
-
-        var x1 = x0 - i1 + G2;
-        var y1 = y0 - j1 + G2;
-        var x2 = x0 - 1.0 + 2.0 * G2;
-        var y2 = y0 - 1.0 + 2.0 * G2;
-
-        var g = getGradientAt(i, j, i1, j1);
-
-        var n0 = calculateEffect(x0, y0, g[0]);
-        var n1 = calculateEffect(x1, y1, g[1]);
-        var n2 = calculateEffect(x2, y2, g[2]);
-
-        return 70.0 * (n0 + n1 + n2);
+    function floor (x) {
+        return ~~x;
     }
-    
-    return {
-        noise2D: noise2D
-    };
-};
+    function skew (x, y, factor) {
+        var s = (x+y) * factor;
+        return [x+s, y+s];
+    }
+
+    (function () {
+        
+        SimplexNoise = function(options) {
+            options = options || {};
+
+            var getGradientsAt = (function (random) {
+                var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];
+                var NUM_GRADIENTS_2D = GRADIENTS_2D.length;
+                var randomKernel = [];
+
+                for(var i = 0; i < 512; i++) {
+                    randomKernel[i] = floor(random()*256);
+                }
+
+                return function (tileIndex, triangleFactor) {
+                    var ii = tileIndex[0] % 255;
+                    var jj = tileIndex[1] % 255;
+                    var index0 = randomKernel[ii+randomKernel[jj]];
+                    var index1 = randomKernel[ii+triangleFactor[0]+randomKernel[jj+triangleFactor[1]]];
+                    var index2 = randomKernel[ii+1+randomKernel[jj+1]];
+                    return [
+                        GRADIENTS_2D[index0 % NUM_GRADIENTS_2D],
+                        GRADIENTS_2D[index1 % NUM_GRADIENTS_2D],
+                        GRADIENTS_2D[index2 % NUM_GRADIENTS_2D]
+                    ];
+                };
+            })(options.random || Math.random);
+
+            return {
+                noise2D: (function (triangleSize) {
+                    var SQRT_3 = Math.sqrt(3);
+                    var SKEW_PIXEL_TO_GRID_2D = (SQRT_3 - 1) / 2;
+                    var SKEW_GRID_TO_PIXEL_2D = (SQRT_3 - 3) / 6;
+                    var scaleFactor = SKEW_PIXEL_TO_GRID_2D / triangleSize;
+
+                    return function (xin, yin) {
+                        xin *= scaleFactor;
+                        yin *= scaleFactor;
+
+                        var posOnTileGrid = skew(xin, yin, SKEW_PIXEL_TO_GRID_2D);
+                        var tileOrigin = [floor(posOnTileGrid[0]), floor(posOnTileGrid[1])];
+                        var pixOrigin = skew(tileOrigin[0], tileOrigin[1], SKEW_GRID_TO_PIXEL_2D);
+
+                        var pixDeltaFromOrigin = [xin-pixOrigin[0], yin-pixOrigin[1]];
+                        var triangleFactor = pixDeltaFromOrigin[0] > pixDeltaFromOrigin[1] ? [1,0] : [0,1];
+
+                        var corners = [
+                            [
+                                pixDeltaFromOrigin[0],
+                                pixDeltaFromOrigin[1]
+                            ],
+                            [
+                                pixDeltaFromOrigin[0] - triangleFactor[0] - SKEW_GRID_TO_PIXEL_2D,
+                                pixDeltaFromOrigin[1] - triangleFactor[1] - SKEW_GRID_TO_PIXEL_2D
+                            ],
+                            [
+                                pixDeltaFromOrigin[0] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D,
+                                pixDeltaFromOrigin[1] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D
+                            ]
+                        ];
+                        var cornerGradients = getGradientsAt(tileOrigin, triangleFactor);
+                        
+                        var totalMagnitude = 0;
+                        for (var i = 0; i < corners.length; i++) {
+                            totalMagnitude += calculateEffect(corners[i], cornerGradients[i]);
+                        }
+                        return 70.0 * totalMagnitude;
+                    }
+                })(options.triangleSize || 64)
+            };
+        };
+    })();
+
+})();
