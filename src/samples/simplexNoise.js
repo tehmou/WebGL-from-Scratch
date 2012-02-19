@@ -1,92 +1,229 @@
+/**
+ *
+ * Abstact
+ * -------
+ *
+ * Cover a surface with organic-looking noise.
+ *
+ *
+ * Highlevel
+ * ---------
+ *
+ * Consider the surface to be covered with equilateral triangles (with all sides of
+ * same length) and have each corner point have a random influence. Let us have
+ * each corner point represented by a black and white linear gradient. Of course,
+ * each corner only affects the pixels close to it.
+ *
+ * For mathematical simplicity, we will make the triangles so that their sides
+ * together make 45 degree lines. See the sample or [Simplex Noise Demystified]
+ * for a graphical representation.
+ *
+ *
+ * Technical
+ * ---------
+ *
+ * For setup we will create a random set of corner points. We don't want
+ * them to change in the middle of rendering.
+ *
+ * Then for each pixel we do the following:
+ * 1. Scale the pixel to create an effect of wanted dimensions.
+ * 2. Skew the pixel onto the rectangular grid.
+ * 3. See on which tile it lands.
+ * 4. Each tile is two triangles, figure out on which of the triangles it landed.
+ * 5. Skew back onto the triangular grid.
+ * 6. Get the gradients for all corner points of this triangle.
+ * 7. Calculate and add the effects the cornerts points have on this pixel.
+ * 8. Return the value between -1 and 1.
+ *
+ * 
+ * For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified] by Stefan Gustavson.
+ *
+ *   [Ken Perlin's original paper]: http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+ *   [Simplex Noise Demystified]: http://www.google.co.uk/url?sa=t&rct=j&q=simplex%20noise&source=web&cd=7&ved=0CEUQFjAG&url=http%3A%2F%2Fwww.itn.liu.se%2F~stegu%2Fsimplexnoise%2Fsimplexnoise.pdf&ei=Xs9AT83iEcSp0QW5wfmODw&usg=AFQjCNEVzOM03haFrTgLrjJp-jPkQyTOKA
+ *
+ */
+
 (function () {
 
-    function calculateEffect (coord, grad) {
-        var contribution = .5 - coord[0]*coord[0] - coord[1]*coord[1];
-        if (contribution < 0) {
-            return 0;
-        } else {
-            return Math.pow(contribution, 4) * (grad[0]*coord[0] + grad[1]*coord[1]);
-        }
+    // 2-dimensional dot product of two vectors disguised as arrays.
+    // Dot product is a very funny function, see [wikipedia].
+    //   [wikipedia]: http://en.wikipedia.org/wiki/Dot_product
+    function dot2D (a, b) {
+        return a[0]*b[0] + a[1]*b[1];
     }
-    function floor (x) {
-        return ~~x;
-    }
-    function skew (x, y, factor) {
+
+    // Changes the coordinate system (makes an [affine transformation])
+    // by skewing it parallel to y=x+b. Think of it by grabbing a point on
+    // the line y=x and dragging along the line.
+    //   [affine transformation]: http://www.quantdec.com/GIS/affine.htm
+    function skew45degree2D (x, y, factor) {
         var s = (x+y) * factor;
         return [x+s, y+s];
     }
 
     (function () {
-        
-        SimplexNoise = function(options) {
+
+        timotuominen.webgl.simplexNoise.SimplexNoise2D = function(options) {
             options = options || {};
 
-            var getGradientsAt = (function (random) {
-                var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];
-                var NUM_GRADIENTS_2D = GRADIENTS_2D.length;
-                var randomKernel = [];
+            // Considering we want to be able to skew the triangles in to a
+            // rectangular grid, the height of a triangle has to be half the
+            // length of the diagonal of the 1x1 square: sqrt(2)/2.
+            // However, for most of the time we only need the square, which then is
+            // (sqrt(2)/2)*(sqrt(2)/2)=1/2!
+            //
+            var TRIANGLE_HEIGHT = Math.sqrt(2)/2;
+            var TRIANGLE_HEIGHT_SQUARED = .5;
 
-                for(var i = 0; i < 512; i++) {
-                    randomKernel[i] = floor(random()*256);
+            // The side we can calculate from the height, and the knowledge
+            // we have an equilateral triangle. Our old friend [Pythagoras]
+            // helps us here, or you can check [Equilater triangle].
+            //
+            //   [Equilater triangle]: http://en.wikipedia.org/wiki/Equilateral_triangle
+            //   [Pythagoras]: http://en.wikipedia.org/wiki/Pythagorean_theorem
+            //
+            var TRIANGLE_SIDE = 2*TRIANGLE_HEIGHT/Math.sqrt(3);
+
+            // The value with which we have to multiply each pixel to get the
+            // requested size of the effect. The default here is 64, since at that
+            // level one can usually see the effect clearly.
+            var SCALE_FACTOR = TRIANGLE_SIDE / (options.requestedTriangleSize || 64);
+
+            // Calculate the skew factors that we use to switch between the
+            // triangular and the rectangular grids.
+            // FIXME: Magic formulas.
+            var SKEW_PIXEL_TO_GRID_2D = (Math.sqrt(3) - 1) / 2;
+            var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
+
+            // Create a set of pseudo random gradients.
+            var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+
+            // Given the vector from this corner of a triangle to the pixel at hand,
+            // calculate how much it should effect. However, if the distance is
+            // greater than the height of the triangle, don't do anything. Otherwise
+            // we would end up with nasty artifacts, since then other triangles
+            // than the one that contains this pixel should start to affect.
+            function calculateEffect (delta, grad) {
+                // Dot product of a vector onto itself yields the square of its
+                // length. We can compare it to the square of the height of the
+                // triangle to be fair.
+                var magnitude = TRIANGLE_HEIGHT_SQUARED - dot2D(delta, delta);
+
+                if (magnitude < 0) {
+                    // Too far, ignore this corner.
+                    return 0;
+                } else {
+                    // The further we go, the weaker the effect becomes (magnitude is
+                    // always < 0.5). The dot product here gives takes into account the
+                    // direction of the gradient.
+                    return Math.pow(magnitude, 4) * dot2D(delta, grad);
                 }
-
-                return function (tileIndex, triangleFactor) {
-                    var ii = tileIndex[0] % 255;
-                    var jj = tileIndex[1] % 255;
-                    var index0 = randomKernel[ii+randomKernel[jj]];
-                    var index1 = randomKernel[ii+triangleFactor[0]+randomKernel[jj+triangleFactor[1]]];
-                    var index2 = randomKernel[ii+1+randomKernel[jj+1]];
-                    return [
-                        GRADIENTS_2D[index0 % NUM_GRADIENTS_2D],
-                        GRADIENTS_2D[index1 % NUM_GRADIENTS_2D],
-                        GRADIENTS_2D[index2 % NUM_GRADIENTS_2D]
-                    ];
-                };
-            })(options.random || Math.random);
+            }
 
             return {
-                noise2D: (function (triangleSize) {
-                    var SQRT_3 = Math.sqrt(3);
-                    var SKEW_PIXEL_TO_GRID_2D = (SQRT_3 - 1) / 2;
-                    var SKEW_GRID_TO_PIXEL_2D = (SQRT_3 - 3) / 6;
-                    var scaleFactor = SKEW_PIXEL_TO_GRID_2D / triangleSize;
+                // Takes an xy-coordinate and returns the magnitude of the effect between -1 and 1.
+                processPixel: function (xin, yin) {
 
-                    return function (xin, yin) {
-                        xin *= scaleFactor;
-                        yin *= scaleFactor;
+                    // Scale to get the correct size for our effect.
+                    xin *= SCALE_FACTOR;
+                    yin *= SCALE_FACTOR;
 
-                        var posOnTileGrid = skew(xin, yin, SKEW_PIXEL_TO_GRID_2D);
-                        var tileOrigin = [floor(posOnTileGrid[0]), floor(posOnTileGrid[1])];
-                        var pixOrigin = skew(tileOrigin[0], tileOrigin[1], SKEW_GRID_TO_PIXEL_2D);
+                    // Skew the coordinates onto the rectangular tile grid.
+                    var posOnTileGrid = skew45degree2D(xin, yin, SKEW_PIXEL_TO_GRID_2D);
 
-                        var pixDeltaFromOrigin = [xin-pixOrigin[0], yin-pixOrigin[1]];
-                        var triangleFactor = pixDeltaFromOrigin[0] > pixDeltaFromOrigin[1] ? [1,0] : [0,1];
+                    // Resolve the index _and_ origin of this tile--we are using tiles
+                    // of the size of 1.0 x 1.0. The function ~~ is only a faster Math.floor.
+                    var tileOrigin = [~~(posOnTileGrid[0]), ~~(posOnTileGrid[1])];
 
-                        var corners = [
-                            [
-                                pixDeltaFromOrigin[0],
-                                pixDeltaFromOrigin[1]
-                            ],
-                            [
-                                pixDeltaFromOrigin[0] - triangleFactor[0] - SKEW_GRID_TO_PIXEL_2D,
-                                pixDeltaFromOrigin[1] - triangleFactor[1] - SKEW_GRID_TO_PIXEL_2D
-                            ],
-                            [
-                                pixDeltaFromOrigin[0] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D,
-                                pixDeltaFromOrigin[1] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D
-                            ]
-                        ];
-                        var cornerGradients = getGradientsAt(tileOrigin, triangleFactor);
-                        
-                        var totalMagnitude = 0;
-                        for (var i = 0; i < corners.length; i++) {
-                            totalMagnitude += calculateEffect(corners[i], cornerGradients[i]);
-                        }
-                        return 70.0 * totalMagnitude;
-                    }
-                })(options.triangleSize || 64)
+                    // The position of the origin of the tile on the pixel grid, from which
+                    // we came. This is now actually one of the corners of the triangle on
+                    // which this pixel landed.
+                    var pixOrigin = skew45degree2D(tileOrigin[0], tileOrigin[1], SKEW_GRID_TO_PIXEL_2D);
+
+                    // Vector from the "origin" to the pixel we have.
+                    var pixDeltaFromOrigin = [xin-pixOrigin[0], yin-pixOrigin[1]];
+
+                    // Whether we are dealing with the upper left or lower right triangle of
+                    // the rectangular grid. We can do this even now that we are back to the
+                    // triangular grid, since the skew left all 45 degree lines untouched.
+                    var triangleFactor = pixDeltaFromOrigin[0] > pixDeltaFromOrigin[1] ? [1,0] : [0,1];
+
+                    // The distance from the upper left or lower right corner of the imaginary tile,
+                    // depending on on which of them our pixel is. "Imaginary" because when we are back
+                    // in the triangular grid, we don't really have tiles anymore, but we can still
+                    // identify the two triangles that made up the tile.
+                    var pixDeltaFromTriangleCorner = [
+                        pixDeltaFromOrigin[0] - triangleFactor[0] - SKEW_GRID_TO_PIXEL_2D,
+                        pixDeltaFromOrigin[1] - triangleFactor[1] - SKEW_GRID_TO_PIXEL_2D
+                    ];
+
+                    // Distance from the opposing corner of the tile. This is the same for both of
+                    // the triangles of our tile.
+                    var pixDeltaFromOpposingCorner = [
+                        pixDeltaFromOrigin[0] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D,
+                        pixDeltaFromOrigin[1] - 1.0 + 2.0*-SKEW_GRID_TO_PIXEL_2D
+                    ];
+
+                    // Retrieve the set of three gradients for this triangle. We need both
+                    // tileOrigin and triangleFactor to identify the unique set.
+                    var cornerGradients = gradientKernel.getGradientsAt(tileOrigin, triangleFactor);
+
+                    // Count all the effects.
+                    var totalMagnitude = 0;
+                    totalMagnitude += calculateEffect(pixDeltaFromOrigin, cornerGradients[0]);
+                    totalMagnitude += calculateEffect(pixDeltaFromTriangleCorner, cornerGradients[1]);
+                    totalMagnitude += calculateEffect(pixDeltaFromOpposingCorner, cornerGradients[2]);
+
+                    // Scale the final effect to be on a scale from -1 to 1.
+                    // FIXME: 60 here is a magic number.
+                    return 60 * totalMagnitude;
+                }
             };
         };
     })();
 
 })();
+
+//
+// Little module to contain a fixed set of random gradients.
+// Internally it has a list of possible gradients it uses.
+//
+// Takes a random function as an argument, which defaults to Math.random.
+//
+timotuominen.webgl.simplexNoise.GradientKernel  = function (random) {
+    random = random || Math.random;
+
+    var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];
+    var NUM_GRADIENTS_2D = GRADIENTS_2D.length;
+
+    // Initialize a list of random numbers to use, each from 0 to 256.
+    var randomKernel = [];
+    for(var i = 0; i < 512; i++) {
+        randomKernel[i] = ~~(random()*256);
+    }
+
+    return {
+        // Takes the xy index of a tile on the rectangular grid,
+        // as well as a triangleFactor that determines on which
+        // of the two triangles of the tile we are.
+        getGradientsAt: function (tileIndex, triangleFactor) {
+
+            // We only have so many random numbers generated,
+            // if an an index exceeds 255, start from 0 again.
+            var ii = tileIndex[0] % 255;
+            var jj = tileIndex[1] % 255;
+
+            // A hash function that gets a random gradient for each of the
+            // corners, but one that also ascertains the gradient is the same
+            // for all triangles which share the same corner.
+            var index0 = randomKernel[ii+randomKernel[jj]];
+            var index1 = randomKernel[ii+triangleFactor[0]+randomKernel[jj+triangleFactor[1]]];
+            var index2 = randomKernel[ii+1+randomKernel[jj+1]];
+            return [
+                GRADIENTS_2D[index0 % NUM_GRADIENTS_2D],
+                GRADIENTS_2D[index1 % NUM_GRADIENTS_2D],
+                GRADIENTS_2D[index2 % NUM_GRADIENTS_2D]
+            ];
+        }
+    };
+};
