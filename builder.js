@@ -6,7 +6,7 @@
         startLog("Expanding all script tags..");
         inputString = expandFileReferences({
             inputString: inputString,
-            regex: /<script src="([a-zA-Z\.\/]*)"><\/script>/g,
+            regex: /<script src="([a-zA-Z\.\/]*)".*?><\/script>/g,
             addStart: '\n<script type="text/javascript">\n\n',
             addEnd: '\n</script>',
             directory: directory

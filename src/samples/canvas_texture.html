@@ -1,12 +1,64 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+
+Simplex Noise on Canvas
+=======================
+
+[Wikipedia]:
+_"Simplex noise is a method for constructing an n-dimensional noise function comparable to Perlin noise ("classic" noise) but with a lower computational overhead, especially in larger dimensions. Ken Perlin designed the algorithm in 2001[1] to address the limitations of his classic noise function, especially in higher dimensions."_
+
+  [Wikipedia]: http://en.wikipedia.org/wiki/Simplex_noise
+
+
+Abstact
+-------
+
+Cover a surface with organic-looking noise. We are only aiming for 2D noise
+here, though the principle is the same, other dimensions are to come later.
+
+
+High level
+----------
+
+Consider the surface to be covered with equilateral triangles (with all sides of
+same length) and have each corner point have a random influence. Let us have
+each corner point represented by a black and white linear gradient. Of course,
+each corner only affects the pixels close to it.
+
+For mathematical simplicity, we will make the triangles so that their sides
+together make 45 degree lines. See the sample or [Simplex Noise Demystified]
+for a graphical representation.  
+
+
+Technical
+---------
+
+For setup we will create a random set of corner points. We don't want
+them to change in the middle of rendering.
+
+Then for each pixel we do the following:
+
+  1.  Scale the pixel to create an effect of wanted dimensions.
+  2.  Skew the pixel onto the rectangular grid.
+  3.  See on which tile it lands.
+  4.  Each tile is two triangles, figure out on which of the triangles it landed.
+  5.  Skew back onto the triangular grid.
+  6.  Get the gradients for all corner points of this triangle.
+  7.  Calculate and add the effects the cornerts points have on this pixel.
+  8.  Return the value between -1 and 1.
+
+
+For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified] by Stefan Gustavson.
+
+  [Ken Perlin's original paper]: http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+  [Simplex Noise Demystified]: http://www.google.co.uk/url?sa=t&rct=j&q=simplex%20noise&source=web&cd=7&ved=0CEUQFjAG&url=http%3A%2F%2Fwww.itn.liu.se%2F~stegu%2Fsimplexnoise%2Fsimplexnoise.pdf&ei=Xs9AT83iEcSp0QW5wfmODw&usg=AFQjCNEVzOM03haFrTgLrjJp-jPkQyTOKA
+
+ -->
 <html>
 <head>
 <title>WebGL from Scratch</title>
 <link href="style.css" rel="stylesheet" type="text/css">
-<script type="text/javascript">
-    window.timotuominen = { webgl: { simplexNoise: {} } };
-</script>
 <script src="simplexNoise.js" type="text/javascript"></script>
 </head>
 <body>
@@ -34,10 +86,10 @@
              }
         }
 
-        
-
         ctx.putImageData(imageData, 0, 0);
 
     </script>
+    <a id="back-link" href="../index.html">Back to Index</a>
+    <a id="main-link" href="../explain.html#canvas_texture">Show formatted source</a>
 </body>
 </html>

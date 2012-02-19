@@ -90,6 +90,9 @@ var htmlProcessor = {
             wholeStringIsWhiteSpace = /^\s*$/;
 
         pieces.forEach(function (piece) {
+            if (!piece.text) {
+                return;
+            }
             if (piece.type === "code") {
                 code = piece.text.replace(codeCleaner, "");
                 if (code !== "") {
