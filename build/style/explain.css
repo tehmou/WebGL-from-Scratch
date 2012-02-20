@@ -47,4 +47,5 @@ h1, h2 {
 .script-comment .comment p {
     text-align: right;
     font-style: italic;
+    font-size: 10pt;
 }
