@@ -3,6 +3,7 @@
     <head>
         <title>wru</title>
         <!-- https://github.com/WebReflection/wru -->
+        <script src="../src/js/namespace.js" type="text/javascript"></script>
         <script src="../src/js/htmlProcessor.js" type="text/javascript"></script>
         <script>function wru(wru){var assert=wru.assert,async=wru.async;
 
@@ -59,7 +60,7 @@ function runtest (mockResultFile) {
             name: "Test language block recognition",
             test: function () {
                 var data = mockResultFile.replace(/\*{6}/g, ""),
-                    result = htmlProcessor.sliceHTML(data),
+                    result = timotuominen.htmlProcessor.sliceHTML(data),
                     expectedData = mockResultFile.split("******"),
                     expected = [
                         {
@@ -108,7 +109,7 @@ function runtest (mockResultFile) {
                         '    Vertex shader\n' +
                         '    -->\n' +
                         '    <script id="vs-shader" type="x-shader/x-vertex">',
-                    result = htmlProcessor.processBlock({ language: "html", text: data }),
+                    result = timotuominen.htmlProcessor.processBlock({ language: "html", text: data }),
                     expected = [
                         {
                             text: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n        "http://www.w3.org/TR/html4/loose.dtd">\n',
@@ -188,7 +189,7 @@ function runtest (mockResultFile) {
                             language: "text/javascript"
                         }
                     ],
-                    result = htmlProcessor.processBlock({ language: "text/javascript", text: data });
+                    result = timotuominen.htmlProcessor.processBlock({ language: "text/javascript", text: data });
 
                 assertArraysEqual(expected, result);
             }
@@ -248,7 +249,7 @@ function runtest (mockResultFile) {
                             language: "random"
                         }
                     ],
-                    result = htmlProcessor.processComments(data),
+                    result = timotuominen.htmlProcessor.processComments(data),
                     expected = [
                         {
                             comment: "Test line 1 that is\nsplit into two.",

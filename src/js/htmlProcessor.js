@@ -1,4 +1,4 @@
-var htmlProcessor = {
+timotuominen.define("htmlProcessor", {
     extractComments: function (code) {
         var result = [],
             blocks = htmlProcessor.sliceHTML(code);
@@ -117,4 +117,4 @@ var htmlProcessor = {
         }
         return result;
     }
-};
+});
