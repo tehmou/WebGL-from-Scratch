@@ -9,7 +9,7 @@
  *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
  *
  */
-timotuominen.webgl.Runner = function (options) {
+timotuominen.define("webgl.Runner", function (options) {
     options = options || {};
     return {
 
@@ -54,7 +54,7 @@ timotuominen.webgl.Runner = function (options) {
         }
 
     };
-};
+});
 
 /**
  * Shader utilities
@@ -67,7 +67,7 @@ timotuominen.webgl.Runner = function (options) {
  * Or, the very least, how much is going on.
  *
  */
-timotuominen.webgl.shaderUtils = {
+timotuominen.define("webgl.shaderUtils", {
 
     // A shader program is basically vertex shader + fragment shader
     // compiled into a bytecode that the graphics card can execute.
@@ -127,7 +127,7 @@ timotuominen.webgl.shaderUtils = {
         // Return our processed texture.
         return texture;
     }
-};
+});
 
 // Polyfil for bind function on Safari.
 Function.prototype.bind = Function.prototype.bind || function (obj) {

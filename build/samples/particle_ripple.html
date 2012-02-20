@@ -242,9 +242,23 @@ void main(void)
 
 </script>
 
+
 <script type="text/javascript">
 
-    window.timotuominen = { webgl: {} };
+// Define the basic namespace, and a way to safely define more.
+var timotuominen = {
+    defineWithRoot: function (root, path, obj) {
+        var part, parts = path.split(".");
+        while (part = parts.shift()) {
+            root = root[part] = parts.length ? (root.hasOwnProperty(part) ? root[part] : {}) : obj;
+        }
+    },
+    define: function (path, obj) {
+        timotuominen.defineWithRoot(timotuominen, path, obj)
+    }
+};
+</script>
+<script type="text/javascript">
 
     /**
      *
@@ -256,7 +270,7 @@ void main(void)
      * we then pass our array to the shader, so that it can render them.
      *
      */
-    timotuominen.webgl.FromScratchDemo = function (options) {
+    timotuominen.define("webgl.FromScratchDemo", function (options) {
         var particleRenderer = new timotuominen.webgl.PlainShader(options);
         var render = particleRenderer.render;
         var prepareShader = particleRenderer.prepareShader;
@@ -342,7 +356,7 @@ void main(void)
 
         // Return the initialized object.
         return particleRenderer;
-    };
+    });
 
 </script>
 
@@ -434,7 +448,7 @@ timotuominen.webgl.PlainShader = function (options) {
  *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
  *
  */
-timotuominen.webgl.Runner = function (options) {
+timotuominen.define("webgl.Runner", function (options) {
     options = options || {};
     return {
 
@@ -479,7 +493,7 @@ timotuominen.webgl.Runner = function (options) {
         }
 
     };
-};
+});
 
 /**
  * Shader utilities
@@ -492,7 +506,7 @@ timotuominen.webgl.Runner = function (options) {
  * Or, the very least, how much is going on.
  *
  */
-timotuominen.webgl.shaderUtils = {
+timotuominen.define("webgl.shaderUtils", {
 
     // A shader program is basically vertex shader + fragment shader
     // compiled into a bytecode that the graphics card can execute.
@@ -552,7 +566,7 @@ timotuominen.webgl.shaderUtils = {
         // Return our processed texture.
         return texture;
     }
-};
+});
 
 // Polyfil for bind function on Safari.
 Function.prototype.bind = Function.prototype.bind || function (obj) {

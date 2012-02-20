@@ -153,6 +153,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
 
 </script>
 
+<script src="assets/namespace.js" type="text/javascript"></script>
 <script type="text/javascript">
 
     /**
@@ -180,9 +181,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
      *   [OpenGL glUniform docs]: http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml
      *
      */
-    window.timotuominen = { webgl: {} };
-
-    timotuominen.webgl.FromScratchDemo = function (options) {
+    timotuominen.define("webgl.FromScratchDemo", function (options) {
         options = options || {};
         return {
             __proto__: new timotuominen.webgl.Runner(options),
@@ -289,7 +288,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
                 gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length/2);
             }
         };
-    };
+    });
 
 </script>
 
@@ -359,7 +358,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
      *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
      *
      */
-    timotuominen.webgl.Runner = function (options) {
+    timotuominen.define("webgl.Runner", function (options) {
         options = options || {};
         return {
 
@@ -404,7 +403,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
             }
 
         };
-    };
+    });
 
     /**
      * Shader utilities
@@ -417,7 +416,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
      * Or, the very least, how much is going on.
      *
      */
-    timotuominen.webgl.shaderUtils = {
+    timotuominen.define("webgl.shaderUtils", {
 
         // A shader program is basically vertex shader + fragment shader
         // compiled into a bytecode that the graphics card can execute.
@@ -477,7 +476,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
             // Return our processed texture.
             return texture;
         }
-    };
+    });
 
 </script>
 
