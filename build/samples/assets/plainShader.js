@@ -1,6 +1,9 @@
 /**
  * Plain shader
  * ------------
+ *
+ * This is a more concise version 
+ *
  */
 timotuominen.webgl.PlainShader = function (options) {
     options = options || {};

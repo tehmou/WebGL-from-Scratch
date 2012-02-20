@@ -11,11 +11,11 @@ h1, h2 {
 }
 
 #content>:first-child .comment {
-    border-top: .3em solid #f6f6f6;
+    border-top: .3em solid #f6f0f0;
 }
 
 #content>:last-child .comment {
-    border-bottom: .3em solid #f6f6f6;
+    border-bottom: .3em solid #f6f0f0;
 }
 
 .comment, .code {
@@ -27,9 +27,9 @@ h1, h2 {
     line-height: 1.7em;
     min-width: 400px;
     margin-right: .5em;
-    background: #fafafa;
-    border-left: .3em solid #f6f6f6;
-    border-right: .7em solid #f6f6f6;
+    background: #fafaf9;
+    border-left: .3em solid #f6f0f0;
+    border-right: .7em solid #f6f0f0;
 }
 
 .code {
