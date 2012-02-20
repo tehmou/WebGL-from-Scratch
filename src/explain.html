@@ -31,6 +31,29 @@
             demoUrl = "";
         }
 
+        (function () {
+            var sampleFrame = document.getElementById("sample-frame");
+            var toggleDemo = document.getElementById("toggle-demo");
+            var fullScreenDemo = document.getElementById("full-screen-demo");
+            var showingSample = true;
+
+            function updateSampleFrame () {
+                sampleFrame.src = showingSample ? demoUrl : "";
+                toggleDemo.innerHTML = showingSample ? "HIDE DEMO" : "SHOW DEMO";
+            }
+            toggleDemo.onclick = function () {
+                showingSample = !showingSample;
+                updateSampleFrame();
+            };
+            updateSampleFrame();
+
+            fullScreenDemo.innerHTML = "FULL SCREEN DEMO";
+            fullScreenDemo.onclick = function () {
+                window.open(demoUrl, "_blank");
+            };
+
+        })();
+
         var xmlHttp = new XMLHttpRequest();
         if (xmlHttp) {
             xmlHttp.open("GET", demoUrl, true);
@@ -102,6 +125,8 @@
 </script>
 </head>
 <body onload="initialize()">
+<iframe id="sample-frame"></iframe>
+<span id="full-screen-demo"></span><span id="toggle-demo"></span>
 <a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="images/fork_me_on_github.png" alt="Fork me on GitHub"></a>
 <a id="back-link" href="index.html">Back to Index</a>
 <a id="main-link"></a>
