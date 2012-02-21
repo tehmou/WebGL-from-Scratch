@@ -35,7 +35,7 @@
             var showingSample = true;
 
             function updateSampleFrame () {
-                sampleFrame.src = showingSample ? demoUrl : "";
+                sampleFrame.src = showingSample ? demoUrl + "#thumbnail" : "";
                 toggleDemo.innerHTML = showingSample ? "HIDE DEMO" : "SHOW DEMO";
             }
             toggleDemo.onclick = function () {

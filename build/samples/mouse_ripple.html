@@ -536,6 +536,9 @@ window.onload = function initialize () {
 
 </head>
 <body>
-<a id="main-link" href="../explain.html#mouse_ripple">Explain</a>
+    <a id="main-link" href="../explain.html#mouse_ripple">Explain</a>
+    <script type="text/javascript">
+        if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
+    </script>
 </body>
 </html>
