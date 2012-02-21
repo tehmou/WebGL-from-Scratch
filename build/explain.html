@@ -22,9 +22,6 @@
         if (window.location.hash.length > 1) {
             demoName = window.location.hash.substr(1);
             demoUrl = demoName ? "samples/" + demoName + ".html" : "";
-            demoLink = document.getElementById("main-link");
-            demoLink.href = demoUrl;
-            demoLink.innerHTML = "Show demo";
             githubLink = document.getElementById("fork-me-on-github");
             githubLink.href = "https://github.com/tehmou/WebGL-from-Scratch/blob/master/build/samples/" + demoName + ".html";
         } else {
@@ -129,7 +126,6 @@
 <span id="full-screen-demo"></span><span id="toggle-demo"></span>
 <a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="images/fork_me_on_github.png" alt="Fork me on GitHub"></a>
 <a id="back-link" href="index.html">Back to Index</a>
-<a id="main-link"></a>
 <table id="content" cellpadding="0" cellspacing="0"></table>
 </body>
 </html>
