@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title></title>
+<link href="style/main.css" rel="stylesheet" type="text/css">
+<link href="samples/assets/style.css" rel="stylesheet" type="text/css">
+<link href="style/explain.css" rel="stylesheet" type="text/css">
+<link href="style/default.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="lib/showdown.js"></script>
+<script type="text/javascript" src="lib/highlight.js"></script>
+<script type="text/javascript" src="lib/highlight.pack.js"></script>
+
+<script type="text/javascript" src="js/namespace.js"></script>
+<script type="text/javascript" src="js/htmlProcessor.js"></script>
+<script type="text/javascript">
+
+    function initialize () {
+        var demoUrl, demoName, demoLink, githubLink;
+
+        if (window.location.hash.length > 1) {
+            demoName = window.location.hash.substr(1);
+            demoUrl = demoName ? "samples/" + demoName + ".html" : "";
+            demoLink = document.getElementById("main-link");
+            demoLink.href = demoUrl;
+            demoLink.innerHTML = "Show demo";
+            githubLink = document.getElementById("fork-me-on-github");
+            githubLink.href = "https://github.com/tehmou/WebGL-from-Scratch/blob/master/build/samples/" + demoName + ".html";
+        } else {
+            demoUrl = "";
+        }
+
+        (function () {
+            var sampleFrame = document.getElementById("sample-frame");
+            var toggleDemo = document.getElementById("toggle-demo");
+            var fullScreenDemo = document.getElementById("full-screen-demo");
+            var showingSample = true;
+
+            function updateSampleFrame () {
+                sampleFrame.src = showingSample ? demoUrl : "";
+                toggleDemo.innerHTML = showingSample ? "HIDE DEMO" : "SHOW DEMO";
+            }
+            toggleDemo.onclick = function () {
+                showingSample = !showingSample;
+                updateSampleFrame();
+            };
+            updateSampleFrame();
+
+            fullScreenDemo.innerHTML = "FULL SCREEN DEMO";
+            fullScreenDemo.onclick = function () {
+                window.open(demoUrl, "_blank");
+            };
+
+        })();
+
+        var xmlHttp = new XMLHttpRequest();
+        if (xmlHttp) {
+            xmlHttp.open("GET", demoUrl, true);
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState === 4) {
+                    displayCode(xmlHttp.responseText);
+                }
+            };
+            xmlHttp.send(null);
+        }
+
+
+        function numLines (str) {
+            return (str.match(/[^\n]*\n[^\n]*/gi) || "").length;
+        }
+
+        function escapeCode (code) {
+            return code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function printBlock (commentEl, codeEl, cssClass) {
+            var el = document.createElement("tr"),
+                left = document.createElement("td"),
+                right = document.createElement("td");
+
+            left.appendChild(commentEl);
+            left.className = "comment";
+
+            right.appendChild(codeEl);
+            right.className = "code";
+
+            el.appendChild(left);
+            el.appendChild(right);
+            document.getElementById("content").appendChild(el);
+            el.className = cssClass;
+        }
+
+        function displayCode (code) {
+            timotuominen.htmlProcessor.extractComments(code).splice(1).forEach(addComment);
+
+            function addComment (block) {
+                var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);
+                var cssClass = isMajorComment ? "html-comment" : "script-comment";
+                var commentEl = document.createElement("div"),
+                    outerCodeEl = document.createElement("pre"),
+                    codeEl = document.createElement("code");
+
+                commentEl.innerHTML = new Showdown.converter().makeHtml(block.comment);
+                outerCodeEl.appendChild(codeEl);
+
+                if (block.language === "html") {
+                    codeEl.className = "html;";
+                } else if (block.language === "text/javascript") {
+                    codeEl.className = "javascript;";
+                } else {
+                    codeEl.className = "cpp;";
+                }
+                codeEl.innerHTML = escapeCode(block.text);
+
+                if (codeEl) {
+                    hljs.highlightBlock(codeEl);
+                }
+
+                printBlock(commentEl, outerCodeEl, cssClass);
+            }
+        }
+    }
+    
+</script>
+</head>
+<body onload="initialize()">
+<iframe id="sample-frame"></iframe>
+<span id="full-screen-demo"></span><span id="toggle-demo"></span>
+<a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="images/fork_me_on_github.png" alt="Fork me on GitHub"></a>
+<a id="back-link" href="index.html">Back to Index</a>
+<a id="main-link"></a>
+<table id="content" cellpadding="0" cellspacing="0"></table>
+</body>
+</html>
