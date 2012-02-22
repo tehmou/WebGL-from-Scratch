@@ -22,9 +22,6 @@
         if (window.location.hash.length > 1) {
             demoName = window.location.hash.substr(1);
             demoUrl = demoName ? "samples/" + demoName + ".html" : "";
-            demoLink = document.getElementById("main-link");
-            demoLink.href = demoUrl;
-            demoLink.innerHTML = "Show demo";
             githubLink = document.getElementById("fork-me-on-github");
             githubLink.href = "https://github.com/tehmou/WebGL-from-Scratch/blob/master/build/samples/" + demoName + ".html";
         } else {
@@ -35,23 +32,30 @@
             var sampleFrame = document.getElementById("sample-frame");
             var toggleDemo = document.getElementById("toggle-demo");
             var fullScreenDemo = document.getElementById("full-screen-demo");
+            var reloadDemo = document.getElementById("reload-demo");
             var showingSample = true;
 
             function updateSampleFrame () {
-                sampleFrame.src = showingSample ? demoUrl : "";
-                toggleDemo.innerHTML = showingSample ? "HIDE DEMO" : "SHOW DEMO";
+                sampleFrame.src = showingSample ? demoUrl + "#thumbnail" : "";
+                toggleDemo.innerHTML = showingSample ? "HIDE" : "SHOW";
             }
+
             toggleDemo.onclick = function () {
                 showingSample = !showingSample;
                 updateSampleFrame();
             };
-            updateSampleFrame();
 
-            fullScreenDemo.innerHTML = "FULL SCREEN DEMO";
             fullScreenDemo.onclick = function () {
                 window.open(demoUrl, "_blank");
             };
 
+            reloadDemo.onclick = function () {
+                sampleFrame.src = "";
+                showingSample = true;
+                setTimeout(updateSampleFrame, 15);
+            };
+
+            updateSampleFrame();
         })();
 
         var xmlHttp = new XMLHttpRequest();
@@ -126,10 +130,11 @@
 </head>
 <body onload="initialize()">
 <iframe id="sample-frame"></iframe>
-<span id="full-screen-demo"></span><span id="toggle-demo"></span>
+<div id="demo-controls">
+    <span id="toggle-demo"></span><span id="full-screen-demo">FULL SCREEN</span><span id="reload-demo">RELOAD</span>
+</div>
 <a id="fork-me-on-github" href="http://github.com/tehmou/WebGL-from-scratch"><img style="position: fixed; top: 0; right: 0; border: 0;" src="images/fork_me_on_github.png" alt="Fork me on GitHub"></a>
 <a id="back-link" href="index.html">Back to Index</a>
-<a id="main-link"></a>
 <table id="content" cellpadding="0" cellspacing="0"></table>
 </body>
 </html>
