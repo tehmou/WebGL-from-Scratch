@@ -36,7 +36,7 @@
         return [x+s, y+s];
     }
 
-    timotuominen.define("webgl.simplexNoise.SimplexNoise2D", function(options) {
+    timotuominen.define("html5.simplexNoise.SimplexNoise2D", function(options) {
         options = options || {};
 
         // Considering we want to be able to skew the triangles in to a
@@ -54,7 +54,7 @@
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.html5.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is
@@ -142,7 +142,7 @@
 //
 // Takes a random function as an argument, which defaults to Math.random.
 //
-timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
+timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
     random = random || Math.random;
 
     var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];

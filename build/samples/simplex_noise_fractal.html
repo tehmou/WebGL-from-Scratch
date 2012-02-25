@@ -114,7 +114,7 @@ var timotuominen = {
         };
     }
 
-    timotuominen.define("webgl.simplexNoise.SimplexNoise3D", function(options) {
+    timotuominen.define("html5.simplexNoise.SimplexNoise3D", function(options) {
         options = options || {};
 
         var SKEW_PIXEL_TO_GRID_3D = 1/3;
@@ -206,7 +206,7 @@ window.onload = function initialize () {
         document.body.appendChild(canvas);
         var ctx = canvas.getContext('2d');
 
-        var simplexNoise = new timotuominen.webgl.simplexNoise.SimplexNoise3D();
+        var simplexNoise = new timotuominen.html5.simplexNoise.SimplexNoise3D();
 
         var imageData, w, h, time = 0;
 

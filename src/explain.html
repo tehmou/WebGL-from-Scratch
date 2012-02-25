@@ -21,6 +21,7 @@
 
         if (window.location.hash.length > 1) {
             demoName = window.location.hash.substr(1);
+            document.title = "Explaining " + demoName;
             demoUrl = demoName ? "samples/" + demoName + ".html" : "";
             githubLink = document.getElementById("fork-me-on-github");
             githubLink.href = "https://github.com/tehmou/WebGL-from-Scratch/blob/master/build/samples/" + demoName + ".html";
@@ -96,7 +97,7 @@
         }
 
         function displayCode (code) {
-            timotuominen.htmlProcessor.extractComments(code).splice(1).forEach(addComment);
+            timotuominen.html5.htmlProcessor.extractComments(code).splice(1).forEach(addComment);
 
             function addComment (block) {
                 var isMajorComment = block.language === "html" || (block.language === "text/javascript" && block.matchPos === 1);

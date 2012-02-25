@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-Simplex Noise on Canvas
+Simplex Noise 2D on Canvas
 =======================
 
 [Wikipedia]:
@@ -75,7 +75,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
         // Create a gradient kernel that holds the random values
         // the generators use. This is so we can have the same
         // randomness on all noise generators we create.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
+        var gradientKernel = new timotuominen.html5.simplexNoise.GradientKernel();
 
         // Create some canvases to use for rendering.
         var canvases = createCanvases(3);
@@ -115,7 +115,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
     // Effectively we run the noise function on each pixel and then
     // scale the value to render nicely grayscale.
     function fillWith2DNoise (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
         fillCanvasGrayscale({
@@ -132,7 +132,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
     // the original Perlin Noise and the improved Simplex Noise. In Perlin
     // Noise the surflets would be arranged into a rectangular grid.
     function fillWithSurflets (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel,
             triangleHeightSquared: .25
         });
@@ -149,7 +149,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
     // each subsequent pass being half the size and strength.
     function fillWithFractal (canvas, scale, gradientKernel, passes) {
         passes = passes || 10;
-        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
         fillCanvasGrayscale({

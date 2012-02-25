@@ -2,8 +2,8 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-WebGL standalone example
-========================
+Mouse Ripple on WebGL
+=====================
 
 _The WebGL tutorial written from scratch&mdash;without any external libraries.
 Below you can see a preview. If not even after reloading, you may not have
@@ -50,7 +50,7 @@ This example will be a single HTML page, with no external dependencies.
 -->
 <html>
 <head>
-<title>WebGL from Scratch</title>
+<title>Mouse Ripple on WebGL</title>
 
 
 <style type="text/css">
@@ -228,10 +228,10 @@ var timotuominen = {
      *   [OpenGL glUniform docs]: http://www.opengl.org/sdk/docs/man/xhtml/glUniform.xml
      *
      */
-    timotuominen.define("webgl.FromScratchDemo", function (options) {
+    timotuominen.define("html5.FromScratchDemo", function (options) {
         options = options || {};
         return {
-            __proto__: new timotuominen.webgl.Runner(options),
+            __proto__: new timotuominen.html5.Runner(options),
 
             // Declare some variables for clarity.
             shader: null,
@@ -247,7 +247,7 @@ var timotuominen = {
             initialize: function () {
                 this.__proto__.initialize.apply(this);
 
-                var shaderUtils = timotuominen.webgl.shaderUtils,
+                var shaderUtils = timotuominen.html5.shaderUtils,
                         vsCode = options.vsCode,
                         fsCode = options.fsCode,
                         mousePos = this.mousePos;
@@ -353,7 +353,7 @@ var timotuominen = {
  *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
  *
  */
-timotuominen.define("webgl.Runner", function (options) {
+timotuominen.define("html5.Runner", function (options) {
     options = options || {};
     return {
 
@@ -411,7 +411,7 @@ timotuominen.define("webgl.Runner", function (options) {
  * Or, the very least, how much is going on.
  *
  */
-timotuominen.define("webgl.shaderUtils", {
+timotuominen.define("html5.shaderUtils", {
 
     // A shader program is basically vertex shader + fragment shader
     // compiled into a bytecode that the graphics card can execute.
@@ -502,7 +502,7 @@ window.onload = function initialize () {
 
     // Point at which everything should be loaded and we can start the application.
     function start () {
-        demo = new timotuominen.webgl.FromScratchDemo({
+        demo = new timotuominen.html5.FromScratchDemo({
             image1: image,
             vsCode: document.getElementById("vs-shader").innerHTML,
             fsCode: document.getElementById("fs-shader").innerHTML,

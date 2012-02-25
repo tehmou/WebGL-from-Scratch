@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-Simplex Noise on Canvas
+Simplex Noise 2D on Canvas
 =======================
 
 [Wikipedia]:
@@ -148,7 +148,7 @@ var timotuominen = {
         return [x+s, y+s];
     }
 
-    timotuominen.define("webgl.simplexNoise.SimplexNoise2D", function(options) {
+    timotuominen.define("html5.simplexNoise.SimplexNoise2D", function(options) {
         options = options || {};
 
         // Considering we want to be able to skew the triangles in to a
@@ -166,7 +166,7 @@ var timotuominen = {
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.html5.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is
@@ -254,7 +254,7 @@ var timotuominen = {
 //
 // Takes a random function as an argument, which defaults to Math.random.
 //
-timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
+timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
     random = random || Math.random;
 
     var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];
@@ -307,7 +307,7 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
         // Create a gradient kernel that holds the random values
         // the generators use. This is so we can have the same
         // randomness on all noise generators we create.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
+        var gradientKernel = new timotuominen.html5.simplexNoise.GradientKernel();
 
         // Create some canvases to use for rendering.
         var canvases = createCanvases(3);
@@ -347,7 +347,7 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
     // Effectively we run the noise function on each pixel and then
     // scale the value to render nicely grayscale.
     function fillWith2DNoise (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
         fillCanvasGrayscale({
@@ -364,7 +364,7 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
     // the original Perlin Noise and the improved Simplex Noise. In Perlin
     // Noise the surflets would be arranged into a rectangular grid.
     function fillWithSurflets (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel,
             triangleHeightSquared: .25
         });
@@ -381,7 +381,7 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
     // each subsequent pass being half the size and strength.
     function fillWithFractal (canvas, scale, gradientKernel, passes) {
         passes = passes || 10;
-        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+        var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
         fillCanvasGrayscale({

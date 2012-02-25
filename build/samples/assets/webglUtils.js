@@ -9,7 +9,7 @@
  *  [requestAnimationFrame]: https://developer.mozilla.org/en/DOM/window.requestAnimationFrame
  *
  */
-timotuominen.define("webgl.Runner", function (options) {
+timotuominen.define("html5.Runner", function (options) {
     options = options || {};
     return {
 
@@ -67,7 +67,7 @@ timotuominen.define("webgl.Runner", function (options) {
  * Or, the very least, how much is going on.
  *
  */
-timotuominen.define("webgl.shaderUtils", {
+timotuominen.define("html5.shaderUtils", {
 
     // A shader program is basically vertex shader + fragment shader
     // compiled into a bytecode that the graphics card can execute.

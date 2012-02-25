@@ -49,7 +49,7 @@
         };
     }
 
-    timotuominen.define("webgl.simplexNoise.SimplexNoise3D", function(options) {
+    timotuominen.define("html5.simplexNoise.SimplexNoise3D", function(options) {
         options = options || {};
 
         var SKEW_PIXEL_TO_GRID_3D = 1/3;

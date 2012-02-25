@@ -2,8 +2,8 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-Particle Ripple Example
-=======================
+Particle Ripple on WebGL
+========================
 
 _The WebGL tutorial written from scratch&mdash;without any external libraries.
 Below you can see a preview. If not even after reloading, you may not have
@@ -18,7 +18,7 @@ You can report any errors or improvement ideas at [github].
 -->
 <html>
 <head>
-<title>WebGL from Scratch</title>
+<title>Particle Ripple on WebGL</title>
 <link href="assets/style.css" rel="stylesheet" type="text/css">
 
 <!--
@@ -223,8 +223,8 @@ void main(void)
      * we then pass our array to the shader, so that it can render them.
      *
      */
-    timotuominen.define("webgl.FromScratchDemo", function (options) {
-        var particleRenderer = new timotuominen.webgl.PlainShader(options);
+    timotuominen.define("html5.FromScratchDemo", function (options) {
+        var particleRenderer = new timotuominen.html5.PlainShader(options);
         var render = particleRenderer.render;
         var prepareShader = particleRenderer.prepareShader;
 

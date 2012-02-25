@@ -3,7 +3,7 @@
  * ------------
  *
  * Initialize a 2D canvas and use the function defined in
- * timotuominen.webgl.canvasGeneratorFunction to fill the screen.
+ * timotuominen.html5.canvasGeneratorFunction to fill the screen.
  *
  * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
  * but that happened only the first time the full screen link was opened.
@@ -22,7 +22,7 @@ window.onload = function initialize () {
             for (var x = 0; x < w; x++) {
                 for (var y = 0; y < h; y++) {
                     var idx = (x + y * w) * 4;
-                    var c = (timotuominen.webgl.canvasGeneratorFunction(x, y) + 1)*128;
+                    var c = (timotuominen.html5.canvasGeneratorFunction(x, y) + 1)*128;
                     imageData.data[idx + 0] = c;
                     imageData.data[idx + 1] = c;
                     imageData.data[idx + 2] = c;

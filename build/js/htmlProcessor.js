@@ -1,9 +1,9 @@
-timotuominen.define("htmlProcessor", {
+timotuominen.define("html5.htmlProcessor", {
     extractComments: function (code) {
         var result = [],
-            blocks = timotuominen.htmlProcessor.sliceHTML(code);
+            blocks = timotuominen.html5.htmlProcessor.sliceHTML(code);
         blocks.forEach(function (block) {
-            result = result.concat(timotuominen.htmlProcessor.processComments(timotuominen.htmlProcessor.processBlock(block)));
+            result = result.concat(timotuominen.html5.htmlProcessor.processComments(timotuominen.html5.htmlProcessor.processBlock(block)));
         });
         return result;
     },

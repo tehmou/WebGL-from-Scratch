@@ -5,11 +5,11 @@
  * This is a more concise version 
  *
  */
-timotuominen.webgl.PlainShader = function (options) {
+timotuominen.html5.PlainShader = function (options) {
     options = options || {};
 
     return {
-        __proto__: new timotuominen.webgl.Runner(options),
+        __proto__: new timotuominen.html5.Runner(options),
 
         shader: null,
         vertexBuffer: null,
@@ -20,7 +20,7 @@ timotuominen.webgl.PlainShader = function (options) {
         initialize: function () {
             this.__proto__.initialize.apply(this);
 
-            var shaderUtils = timotuominen.webgl.shaderUtils,
+            var shaderUtils = timotuominen.html5.shaderUtils,
                 vsCode = options.vsCode,
                 fsCode = options.fsCode;
 

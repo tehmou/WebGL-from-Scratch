@@ -30,7 +30,7 @@
 
     (function () {
 
-        timotuominen.define("webgl.simplexNoise.SimplexNoise", function(options) {
+        timotuominen.define("html5.simplexNoise.SimplexNoise", function(options) {
             options = options || {};
             var SKEW_PIXEL_TO_GRID_2D = (Math.sqrt(3) - 1) / 2;
             var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
@@ -38,7 +38,7 @@
             var SKEW_PIXEL_TO_GRID_3D = 1/3;
             var SKEW_GRID_TO_PIXEL_3D = -1/6;
 
-            var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+            var gradientKernel = new timotuominen.html5.simplexNoise.GradientKernel(options.random);
 
             function calculateEffect2D (delta, grad) {
                 var magnitude = .5 - dot2D(delta, delta);
@@ -134,7 +134,7 @@
 
 })();
 
-timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
+timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
     random = random || Math.random;
 
     var GRADIENTS_2D = [[1,1],[-1,1],[1,-1],[-1,-1],[0,1],[1,0],[0,-1],[-1,0]];
