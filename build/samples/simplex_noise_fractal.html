@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+
+Simplex Noise 3D
+================
+
+_Disclaimer: This is not WebGL but canvas._
+
+ -->
+<html>
+<head>
+<title>WebGL from Scratch</title>
+
+<style type="text/css">
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica", "Droid Sans", "Arial", sans-serif;
+}
+
+#main-link {
+    position: fixed;
+    background: white;
+    bottom: 0;
+    right: 0;
+    text-decoration: none;
+    color: black;
+    padding: 5px 7px;
+    border-top: 2px solid black;
+    border-left:2px solid black;
+}
+
+#back-link {
+    position: absolute;
+    background: white;
+    top: 0;
+    left: 0;
+    text-decoration: none;
+    color: black;
+    padding: 5px 7px;
+    border-bottom: 2px solid black;
+    border-right:2px solid black;
+}
+</style>
+
+<script type="text/javascript">
+
+// Define the basic namespace, and a way to safely define more.
+var timotuominen = {
+    defineWithRoot: function (root, path, obj) {
+        var part, parts = path.split(".");
+        while (part = parts.shift()) {
+            root = root[part] = parts.length ? (root.hasOwnProperty(part) ? root[part] : {}) : obj;
+        }
+    },
+    define: function (path, obj) {
+        timotuominen.defineWithRoot(timotuominen, path, obj)
+    }
+};
+</script>
+
+<script type="text/javascript">
+
+/**
+ *
+ * Simplex Noise 3D
+ * -----------------------
+ *
+ * For a more detailed Simplex Noise sample, see [Simplex Noise 2D].
+ *
+ *   [Simplex Noise 2D]: simplex_noise.html
+ *
+ */
+(function () {
+
+    function dot3D (a, b) {
+        return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    }
+
+    function skew45degree3D (coord, factor) {
+        var s = (coord[0]+coord[1]+coord[2]) * factor;
+        return [coord[0]+s, coord[1]+s, coord[2]+s];
+    }
+
+    function GradientKernel (random) {
+        random = random || Math.random;
+
+        var GRADIENTS_3D = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+        var NUM_GRADIENTS_3D = GRADIENTS_3D.length;
+
+        var randomKernel = [];
+        for(var i = 0; i < 512; i++) {
+            randomKernel[i] = ~~(random()*256);
+        }
+
+        return {
+            get3DGradientsAt: function (tileIndex, triangleFactor) {
+                var ii = tileIndex[0] % 255;
+                var jj = tileIndex[1] % 255;
+                var kk = tileIndex[2] % 255;
+                var index0 = randomKernel[ii+randomKernel[jj+randomKernel[kk]]] % 12;
+                var index1 = randomKernel[ii+triangleFactor[0][0]+randomKernel[jj+triangleFactor[0][1]+randomKernel[kk+triangleFactor[0][2]]]] % 12;
+                var index2 = randomKernel[ii+triangleFactor[1][0]+randomKernel[jj+triangleFactor[1][1]+randomKernel[kk+triangleFactor[1][2]]]] % 12;
+                var index3 = randomKernel[ii+1+randomKernel[jj+1+randomKernel[kk+1]]] % 12;
+                return [
+                    GRADIENTS_3D[index0 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index1 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index2 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index3 % NUM_GRADIENTS_3D],
+                ];
+            }
+        };
+    }
+
+    timotuominen.define("webgl.simplexNoise.SimplexNoise3D", function(options) {
+        options = options || {};
+
+        var SKEW_PIXEL_TO_GRID_3D = 1/3;
+        var SKEW_GRID_TO_PIXEL_3D = -1/6;
+
+        var gradientKernel = new GradientKernel(options.random);
+
+        function calculateEffect3D (delta, grad) {
+            var magnitude = 0.6 - dot3D(delta, delta);
+            if (magnitude < 0) {
+                return 0;
+            } else {
+                return Math.pow(magnitude, 4) * dot3D(delta, grad);
+            }
+        }
+
+        function calculateTriangleFactor3D (pixDeltaFromOrigin) {
+            if (pixDeltaFromOrigin[0]>=pixDeltaFromOrigin[1]) {
+                if (pixDeltaFromOrigin[1]>=pixDeltaFromOrigin[2]) {
+                    return [[1,0,0],[1,1,0]];
+                } else if (pixDeltaFromOrigin[0]>=pixDeltaFromOrigin[2]) {
+                    return [[1,0,0],[1,0,1]];
+                } else {
+                    return [[0,0,1],[1,0,1]];
+                }
+            } else {
+                if (pixDeltaFromOrigin[1]<pixDeltaFromOrigin[2]) {
+                    return [[0,0,1],[0,1,1]];
+                } else if (pixDeltaFromOrigin[0]<pixDeltaFromOrigin[2]) {
+                    return [[0,1,0],[0,1,1]];
+                } else {
+                    return [[0,1,0],[1,1,0]];
+                }
+            }
+        }
+
+        return {
+            processPixel: function (xin, yin, zin) {
+                var posOnTileGrid = skew45degree3D([xin, yin, zin], SKEW_PIXEL_TO_GRID_3D);
+                var tileOrigin = [~~posOnTileGrid[0], ~~posOnTileGrid[1], ~~posOnTileGrid[2]];
+                var pixOrigin = skew45degree3D(tileOrigin, SKEW_GRID_TO_PIXEL_3D);
+                var pixDeltaFromOrigin = [xin-pixOrigin[0], yin-pixOrigin[1], zin-pixOrigin[2]];
+
+                var triangleFactor = calculateTriangleFactor3D(pixDeltaFromOrigin);
+
+                var x1 = pixDeltaFromOrigin[0] - triangleFactor[0][0] - SKEW_GRID_TO_PIXEL_3D;
+                var y1 = pixDeltaFromOrigin[1] - triangleFactor[0][1] - SKEW_GRID_TO_PIXEL_3D;
+                var z1 = pixDeltaFromOrigin[2] - triangleFactor[0][2] - SKEW_GRID_TO_PIXEL_3D;
+
+                var x2 = pixDeltaFromOrigin[0] - triangleFactor[1][0] - 2.0*SKEW_GRID_TO_PIXEL_3D;
+                var y2 = pixDeltaFromOrigin[1] - triangleFactor[1][1] - 2.0*SKEW_GRID_TO_PIXEL_3D;
+                var z2 = pixDeltaFromOrigin[2] - triangleFactor[1][2] - 2.0*SKEW_GRID_TO_PIXEL_3D;
+
+                var x3 = pixDeltaFromOrigin[0] - 1.0 - 3.0*SKEW_GRID_TO_PIXEL_3D;
+                var y3 = pixDeltaFromOrigin[1] - 1.0 - 3.0*SKEW_GRID_TO_PIXEL_3D;
+                var z3 = pixDeltaFromOrigin[2] - 1.0 - 3.0*SKEW_GRID_TO_PIXEL_3D;
+
+                var cornerGradients = gradientKernel.get3DGradientsAt(tileOrigin, triangleFactor);
+                var totalMagnitude = 0;
+                totalMagnitude += calculateEffect3D(pixDeltaFromOrigin, cornerGradients[0]);
+                totalMagnitude += calculateEffect3D([x1, y1, z1], cornerGradients[1]);
+                totalMagnitude += calculateEffect3D([x2, y2, z2], cornerGradients[2]);
+                totalMagnitude += calculateEffect3D([x3, y3, z3], cornerGradients[3]);
+                return 32.0*totalMagnitude;
+            }
+        };
+    });
+
+})();
+</script>
+
+<script type="text/javascript">
+
+// Polyfill for requesting the drawing time for the next frame.
+window.requestAnimationFrame = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (f) {
+        window.setTimeout(f, 1000 / 60);
+    };
+</script>
+<script type="text/javascript">
+
+window.onload = function initialize () {
+    setTimeout(function () {
+        var canvas = document.createElement("canvas");
+        document.body.appendChild(canvas);
+        var ctx = canvas.getContext('2d');
+
+        var simplexNoise = new timotuominen.webgl.simplexNoise.SimplexNoise3D();
+
+        var imageData, w, h, time = 0;
+
+        function resize () {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            imageData = ctx.createImageData(w, h);
+        }
+
+        function draw () {
+            time++;
+            for (var x = 0; x < w; x++) {
+                for (var y = 0; y < h; y++) {
+                    var idx = (x + y * w) * 4;
+                    var c = 0;
+                    var s = .005;
+                    for (var i = 0; i < 14; i++) {
+                        c += (simplexNoise.processPixel(x*s, y*s, time*s) + 1)*64*Math.pow(.5,i);
+                        s *= 2;
+                    }
+                    imageData.data[idx + 0] = c;
+                    imageData.data[idx + 1] = c;
+                    imageData.data[idx + 2] = c;
+                    imageData.data[idx + 3] = 255;
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        window.onresize = resize;
+        resize();
+        draw();
+        
+    }, 15);
+};
+
+</script>
+</head>
+<body>
+    <a id="main-link" href="../explain.html#simplex_noise">Explain</a>
+    <script type="text/javascript">
+        if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
+    </script>
+</body>
+</html>

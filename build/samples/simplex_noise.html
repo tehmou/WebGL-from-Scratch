@@ -57,7 +57,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
  -->
 <html>
 <head>
-<title>WebGL from Scratch</title>
+<title>Simplex Noise 2D on Canvas</title>
 
 <style type="text/css">
 
@@ -157,22 +157,7 @@ var timotuominen = {
         // However, for most of the time we only need the square, which then is
         // (sqrt(2)/2)*(sqrt(2)/2)=1/2!
         //
-        var TRIANGLE_HEIGHT = Math.sqrt(2)/2;
-        var TRIANGLE_HEIGHT_SQUARED = .5;
-
-        // The side we can calculate from the height, and the knowledge
-        // we have an equilateral triangle. Our old friend [Pythagoras]
-        // helps us here, or you can check [Equilater triangle].
-        //
-        //   [Equilater triangle]: http://en.wikipedia.org/wiki/Equilateral_triangle
-        //   [Pythagoras]: http://en.wikipedia.org/wiki/Pythagorean_theorem
-        //
-        var TRIANGLE_SIDE = 2*TRIANGLE_HEIGHT/Math.sqrt(3);
-
-        // The value with which we have to multiply each pixel to get the
-        // requested size of the effect. The default here is 64, since at that
-        // level one can usually see the effect clearly.
-        var SCALE_FACTOR = TRIANGLE_SIDE / (options.requestedTriangleSize || 64);
+        var TRIANGLE_HEIGHT_SQUARED = options.triangleHeightSquared || .5;
 
         // Calculate the skew factors that we use to switch between the
         // triangular and the rectangular grids.
@@ -208,10 +193,6 @@ var timotuominen = {
         return {
             // Takes an xy-coordinate and returns the magnitude of the effect between -1 and 1.
             processPixel: function (xin, yin) {
-
-                // Scale to get the correct size for our effect.
-                xin *= SCALE_FACTOR;
-                yin *= SCALE_FACTOR;
 
                 // Skew the coordinates onto the rectangular tile grid.
                 var posOnTileGrid = skew45degree2D(xin, yin, SKEW_PIXEL_TO_GRID_2D);
@@ -312,54 +293,79 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
 });
 
 </script>
-
 <script type="text/javascript">
 
-/**
- * Show results
- * ------------
- *
- * Initialize a 2D canvas and use the function defined in
- * timotuominen.webgl.canvasGeneratorFunction to fill the screen.
- *
- * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
- * but that happened only the first time the full screen link was opened.
- *
- */
-window.onload = function initialize () {
-    setTimeout(function () {
+    /**
+     * Show results
+     * ------------
+     *
+     * Initialize a 2D canvas and use the function defined in
+     * timotuominen.webgl.canvasGeneratorFunction to fill the screen.
+     *
+     * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
+     * but that happened only the first time the full screen link was opened.
+     *
+     */
+    function initialize () {
         var canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
         var ctx = canvas.getContext('2d');
+
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D();
+        var messedUpGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            triangleHeightSquared: .9
+        });
+        var scale = .005;
+        var numFractalPasses = 10;
 
         function draw () {
             var w = canvas.width = window.innerWidth;
             var h = canvas.height = window.innerHeight;
             var imageData = ctx.createImageData(w, h);
+
             for (var x = 0; x < w; x++) {
                 for (var y = 0; y < h; y++) {
                     var idx = (x + y * w) * 4;
-                    var c = (timotuominen.webgl.canvasGeneratorFunction(x, y) + 1)*128;
+                    var c = 0;
+                    if (x < w/3) {
+                        c = (generator.processPixel(x*scale, y*scale) + 1)*128;
+                    } else if (x < 2*w/3) {
+                        c = (messedUpGenerator.processPixel(x*scale, y*scale) + 12)*10;
+                    } else {
+                        for (var i = 0; i < numFractalPasses; i++) {
+                            var s = Math.pow(2, i);
+                            c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
+                        }
+                    }
                     imageData.data[idx + 0] = c;
                     imageData.data[idx + 1] = c;
                     imageData.data[idx + 2] = c;
                     imageData.data[idx + 3] = 255;
                 }
             }
+
             ctx.putImageData(imageData, 0, 0);
+            ctx.font = "14px Arial";
+
+            ctx.fillStyle = "black";
+            ctx.fillText("Effect at " + 1/scale + "x", 16, 21);
+            ctx.fillText("With triangle artifacts", w/3+16, 21);
+            ctx.fillText("With " + numFractalPasses + " fractal passes", 2*w/3+16, 21);
+
+            ctx.fillStyle = "white";
+            ctx.fillText("Effect at " + 1/scale + "x", 15, 20);
+            ctx.fillText("With triangle artifacts", w/3+15, 20);
+            ctx.fillText("With " + numFractalPasses + " fractal passes", 2*w/3+15, 20);
         }
 
         window.onresize = draw;
         draw();
-    }, 15);
-};
-</script>
-<script type="text/javascript">
-    // Setup the demo.
-    timotuominen.define("webgl.canvasGeneratorFunction", new timotuominen.webgl.simplexNoise.SimplexNoise2D().processPixel);
+    }
+
+
 </script>
 </head>
-<body>
+<body onload="setTimeout(initialize, 15)">
     <a id="main-link" href="../explain.html#simplex_noise">Explain</a>
     <script type="text/javascript">
         if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
