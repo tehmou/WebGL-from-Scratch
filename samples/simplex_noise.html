@@ -304,21 +304,27 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
      *
      */
     function initialize () {
+        // Create a gradient kernel that holds the random values
+        // the generators use. This is so we can have the same
+        // randomness on all noise generators we create.
         var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
 
-        var canvases = [], NUM_CANVASES = 3;
-        for (var i = 0; i < NUM_CANVASES; i++) {
-            var canvas = document.createElement("canvas");
-            document.body.appendChild(canvas);
-            canvases.push(canvas);
-        }
+        // Create some canvases to use for rendering.
+        var canvases = createCanvases(3);
 
         function draw () {
             var w = window.innerWidth;
             var h = window.innerHeight;
+
+            // Calculate the scale of the effect. This is a purely
+            // experimental value that adjusts to the height of the viewport.
             var scale = 3/h;
-            canvases[0].width = canvases[1].width = canvases[2].width = w/3;
+
+            // Size the canvases to fit next to each other.
+            canvases[0].width = canvases[1].width = canvases[2].width = w/canvases.length;
             canvases[0].height = canvases[1].height = canvases[2].height = h;
+
+            // Render the effects onto respective canvases.
             fillWith2DNoise(canvases[0], scale, gradientKernel);
             fillWithSurflets(canvases[1], scale, gradientKernel);
             fillWithFractal(canvases[2], scale, gradientKernel);
@@ -328,73 +334,98 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
         draw();
     }
 
+    function createCanvases (num) {
+        var canvases = [];
+        for (var i = 0; i < num; i++) {
+            canvases[i] = document.createElement("canvas");
+            document.body.appendChild(canvases[i]);
+        }
+        return canvases;
+    }
+
     // Fill a canvas with simplex 2D noise with the wanted scale.
     // Effectively we run the noise function on each pixel and then
     // scale the value to render nicely grayscale.
-    function fillWith2DNoise (canvas, scale, kernel) {
-        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
-            gradientKernel: kernel
+    function fillWith2DNoise (canvas, scale, gradientKernel) {
+        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: gradientKernel
         });
-        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
-        var imgData = ctx.createImageData(w, h);
-        for (var x = 0; x < w; x++) {
-            for (var y = 0; y < h; y++) {
-                var idx = (x + y * w) * 4;
-                var c = (generator.processPixel(x*scale, y*scale) + 1)*128;
-                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
-                imgData.data[idx+3] = 255;
+        fillCanvasGrayscale({
+            canvas: canvas,
+            text: "Plain noise at " + ~~(1/scale) + "x",
+            processPixel: function (x, y) {
+                return 128*(noiseGenerator.processPixel(x*scale, y*scale)+1);
             }
-        }
-        ctx.putImageData(imgData, 0, 0);
-        drawStatus(ctx, "Plain noise at " + ~~(1/scale) + "x");
+        });
     }
 
     // In this fill we tweak the noise generator a bit, and tell it to halve the
     // effect radius each of our "surflets" has. These dots are the core of both
     // the original Perlin Noise and the improved Simplex Noise. In Perlin
     // Noise the surflets would be arranged into a rectangular grid.
-    function fillWithSurflets (canvas, scale, kernel) {
-        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
-            gradientKernel: kernel,
+    function fillWithSurflets (canvas, scale, gradientKernel) {
+        var noiseGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: gradientKernel,
             triangleHeightSquared: .25
         });
-        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
-        var imgData = ctx.createImageData(w, h);
-        for (var x = 0; x < w; x++) {
-            for (var y = 0; y < h; y++) {
-                var idx = (x + y * w) * 4;
-                var c = (generator.processPixel(x*scale, y*scale)*100 + 1)*128;
-                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
-                imgData.data[idx + 3] = 255;
+        fillCanvasGrayscale({
+            canvas: canvas,
+            text: "\"Surflets\" that create the noise",
+            processPixel: function (x, y) {
+                return (noiseGenerator.processPixel(x*scale, y*scale)*100 + 1)*128;
             }
-        }
-        ctx.putImageData(imgData, 0, 0);
-        drawStatus(ctx, "\"Surflets\" that create the noise");
+        });
     }
 
     // Fill canvas using the normal noise function, but run it multiple times,
     // each subsequent pass being half the size and strength.
-    function fillWithFractal (canvas, scale, kernel, passes) {
+    function fillWithFractal (canvas, scale, gradientKernel, passes) {
         passes = passes || 10;
         var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
-            gradientKernel: kernel
+            gradientKernel: gradientKernel
         });
-        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
-        var imgData = ctx.createImageData(w, h);
-        for (var x = 0; x < w; x++) {
-            for (var y = 0; y < h; y++) {
-                var idx = (x + y * w) * 4;
+        fillCanvasGrayscale({
+            canvas: canvas,
+            text: "With " + passes + " fractal passes",
+            processPixel: function (x, y) {
                 var c = 0;
                 for (var i = 0; i < passes; i++) {
                     var s = Math.pow(2, i);
                     c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
                 }
+                return c;
+            }
+        });
+    }
+
+    // Runs options.processPixel on all pixels on this canvas. Can
+    // also render a little status text to the top-left corner (I was lazy).
+    // Draws everything asynchronously one column at a time, lest the
+    // function be slow.
+    function fillCanvasGrayscale (options) {
+        var canvas = options.canvas;
+        var processPixel = options.processPixel;
+        var text = options.text || "";
+
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+
+        var x = 0;
+        function processNextColumn () {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = processPixel(x, y);
                 imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
-                imgData.data[idx + 3] = 255;
+                imgData.data[idx+3] = 255;
+            }
+            ctx.putImageData(imgData, 0, 0);
+            drawStatus(ctx, text);
+            x++;
+            if (x <= w) {
+                setTimeout(processNextColumn, 0);
             }
         }
-        ctx.putImageData(imgData, 0, 0);
-        drawStatus(ctx, "With " + passes + " fractal passes");
+        processNextColumn();
     }
 
     function drawStatus (ctx, text) {
