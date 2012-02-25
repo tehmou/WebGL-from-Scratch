@@ -54,7 +54,7 @@
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is

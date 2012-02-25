@@ -166,7 +166,7 @@ var timotuominen = {
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is
@@ -306,56 +306,94 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
      * but that happened only the first time the full screen link was opened.
      *
      */
-    function initialize () {
-        var canvas = document.createElement("canvas");
-        document.body.appendChild(canvas);
-        var ctx = canvas.getContext('2d');
 
-        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D();
-        var messedUpGenerator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
-            triangleHeightSquared: .9
+    function drawStatus (ctx, text) {
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(text, 16, 21);
+        ctx.fillStyle = "white";
+        ctx.fillText(text, 15, 20);
+    }
+
+    function fillWith2DNoise (canvas, kernel, scale) {
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel
         });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = (generator.processPixel(x*scale, y*scale) + 1)*128;
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx+3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "Plain noise at " + 1/scale + "x");
+    }
+
+    function fillWithSurflets (canvas, kernel, scale) {
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel,
+            triangleHeightSquared: .24
+        });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = (generator.processPixel(x*scale, y*scale)*100 + 1)*128;
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx + 3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "Surflets that make up the noise");
+    }
+
+    function fillWithFractal (canvas, kernel, scale, passes) {
+        passes = passes || 10;
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel
+        });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = 0;
+                for (var i = 0; i < passes; i++) {
+                    var s = Math.pow(2, i);
+                    c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
+                }
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx + 3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "With " + passes + " fractal passes");
+    }
+
+    function initialize () {
         var scale = .005;
-        var numFractalPasses = 10;
+        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
+
+        var canvases = [], NUM_CANVASES = 3;
+        for (var i = 0; i < NUM_CANVASES; i++) {
+            var canvas = document.createElement("canvas");
+            document.body.appendChild(canvas);
+            canvases.push(canvas);
+        }
 
         function draw () {
-            var w = canvas.width = window.innerWidth;
-            var h = canvas.height = window.innerHeight;
-            var imageData = ctx.createImageData(w, h);
-
-            for (var x = 0; x < w; x++) {
-                for (var y = 0; y < h; y++) {
-                    var idx = (x + y * w) * 4;
-                    var c = 0;
-                    if (x < w/3) {
-                        c = (generator.processPixel(x*scale, y*scale) + 1)*128;
-                    } else if (x < 2*w/3) {
-                        c = (messedUpGenerator.processPixel(x*scale, y*scale) + 12)*10;
-                    } else {
-                        for (var i = 0; i < numFractalPasses; i++) {
-                            var s = Math.pow(2, i);
-                            c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
-                        }
-                    }
-                    imageData.data[idx + 0] = c;
-                    imageData.data[idx + 1] = c;
-                    imageData.data[idx + 2] = c;
-                    imageData.data[idx + 3] = 255;
-                }
-            }
-
-            ctx.putImageData(imageData, 0, 0);
-            ctx.font = "14px Arial";
-
-            ctx.fillStyle = "black";
-            ctx.fillText("Effect at " + 1/scale + "x", 16, 21);
-            ctx.fillText("With triangle artifacts", w/3+16, 21);
-            ctx.fillText("With " + numFractalPasses + " fractal passes", 2*w/3+16, 21);
-
-            ctx.fillStyle = "white";
-            ctx.fillText("Effect at " + 1/scale + "x", 15, 20);
-            ctx.fillText("With triangle artifacts", w/3+15, 20);
-            ctx.fillText("With " + numFractalPasses + " fractal passes", 2*w/3+15, 20);
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            canvases[0].width = canvases[1].width = canvases[2].width = w/3;
+            canvases[0].height = canvases[1].height = canvases[2].height = h;
+            fillWith2DNoise(canvases[0], gradientKernel, scale);
+            fillWithSurflets(canvases[1], gradientKernel, scale);
+            fillWithFractal(canvases[2], gradientKernel, scale);
         }
 
         window.onresize = draw;
