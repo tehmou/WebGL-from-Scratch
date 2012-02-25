@@ -67,13 +67,37 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
      * Show results
      * ------------
      *
-     * Initialize a 2D canvas and use the function defined in
-     * timotuominen.webgl.canvasGeneratorFunction to fill the screen.
+     * Initialize a three 2D canvases and use the noise in a slightly different
+     * way on each of them.
      *
      * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
      * but that happened only the first time the full screen link was opened.
      *
      */
+    function initialize () {
+        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
+
+        var canvases = [], NUM_CANVASES = 3;
+        for (var i = 0; i < NUM_CANVASES; i++) {
+            var canvas = document.createElement("canvas");
+            document.body.appendChild(canvas);
+            canvases.push(canvas);
+        }
+
+        function draw () {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            var scale = 3/h;
+            canvases[0].width = canvases[1].width = canvases[2].width = w/3;
+            canvases[0].height = canvases[1].height = canvases[2].height = h;
+            fillWith2DNoise(canvases[0], gradientKernel, scale);
+            fillWithSurflets(canvases[1], gradientKernel, scale);
+            fillWithFractal(canvases[2], gradientKernel, scale);
+        }
+
+        window.onresize = draw;
+        draw();
+    }
 
     function drawStatus (ctx, text) {
         ctx.font = "14px Arial";
@@ -98,7 +122,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             }
         }
         ctx.putImageData(imgData, 0, 0);
-        drawStatus(ctx, "Plain noise at " + 1/scale + "x");
+        drawStatus(ctx, "Plain noise at " + ~~(1/scale) + "x");
     }
 
     function fillWithSurflets (canvas, kernel, scale) {
@@ -117,7 +141,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             }
         }
         ctx.putImageData(imgData, 0, 0);
-        drawStatus(ctx, "Surflets that make up the noise");
+        drawStatus(ctx, "\"Surflets\" that create the noise");
     }
 
     function fillWithFractal (canvas, kernel, scale, passes) {
@@ -142,32 +166,6 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
         ctx.putImageData(imgData, 0, 0);
         drawStatus(ctx, "With " + passes + " fractal passes");
     }
-
-    function initialize () {
-        var scale = .005;
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
-
-        var canvases = [], NUM_CANVASES = 3;
-        for (var i = 0; i < NUM_CANVASES; i++) {
-            var canvas = document.createElement("canvas");
-            document.body.appendChild(canvas);
-            canvases.push(canvas);
-        }
-
-        function draw () {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-            canvases[0].width = canvases[1].width = canvases[2].width = w/3;
-            canvases[0].height = canvases[1].height = canvases[2].height = h;
-            fillWith2DNoise(canvases[0], gradientKernel, scale);
-            fillWithSurflets(canvases[1], gradientKernel, scale);
-            fillWithFractal(canvases[2], gradientKernel, scale);
-        }
-
-        window.onresize = draw;
-        draw();
-    }
-
 
 </script>
 </head>
