@@ -38,7 +38,12 @@ window.onload = function initialize () {
             for (var x = 0; x < w; x++) {
                 for (var y = 0; y < h; y++) {
                     var idx = (x + y * w) * 4;
-                    var c = (simplexNoise.processPixel(x*.01, y*.01, time*.01) + 1)*128;
+                    var c = 0;
+                    var s = .005;
+                    for (var i = 1; i < 10; i++) {
+                        c += (simplexNoise.processPixel(x*s, y*s, time*s) + 1)*64/(i*2);
+                        s *= 2;
+                    }
                     imageData.data[idx + 0] = c;
                     imageData.data[idx + 1] = c;
                     imageData.data[idx + 2] = c;
@@ -46,7 +51,7 @@ window.onload = function initialize () {
                 }
             }
             ctx.putImageData(imageData, 0, 0);
-            requestAnimationFrame(draw);
+            //requestAnimationFrame(draw);
         }
 
         window.onresize = resize;
