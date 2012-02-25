@@ -6,7 +6,7 @@
         startLog("Expanding all script tags..");
         inputString = expandFileReferences({
             inputString: inputString,
-            regex: /<script src="([a-zA-Z\.\/]*)".*?><\/script>/g,
+            regex: /<script.*?src="([a-zA-Z0-9\.\/]*)".*?><\/script>/g,
             addStart: '\n<script type="text/javascript">\n\n',
             addEnd: '\n</script>',
             directory: directory
@@ -19,7 +19,7 @@
         startLog("Expanding linked CSS..");
         inputString = expandFileReferences({
             inputString: inputString,
-            regex: /<link href="([a-zA-Z\.\/]*)" rel="stylesheet" type="text\/css">/g,
+            regex: /<link href="([a-zA-Z0-9\.\/]*)" rel="stylesheet" type="text\/css">/g,
             addStart: '\n<style type="text/css">\n\n',
             addEnd: '\n</style>',
             directory: directory
