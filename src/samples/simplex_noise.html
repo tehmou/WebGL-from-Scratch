@@ -67,11 +67,8 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
      * Show results
      * ------------
      *
-     * Initialize a three 2D canvases and use the noise in a slightly different
+     * Initialize three canvases and use the noise in a slightly different
      * way on each of them.
-     *
-     * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
-     * but that happened only the first time the full screen link was opened.
      *
      */
     function initialize () {
@@ -90,24 +87,19 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             var scale = 3/h;
             canvases[0].width = canvases[1].width = canvases[2].width = w/3;
             canvases[0].height = canvases[1].height = canvases[2].height = h;
-            fillWith2DNoise(canvases[0], gradientKernel, scale);
-            fillWithSurflets(canvases[1], gradientKernel, scale);
-            fillWithFractal(canvases[2], gradientKernel, scale);
+            fillWith2DNoise(canvases[0], scale, gradientKernel);
+            fillWithSurflets(canvases[1], scale, gradientKernel);
+            fillWithFractal(canvases[2], scale, gradientKernel);
         }
 
         window.onresize = draw;
         draw();
     }
 
-    function drawStatus (ctx, text) {
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "black";
-        ctx.fillText(text, 16, 21);
-        ctx.fillStyle = "white";
-        ctx.fillText(text, 15, 20);
-    }
-
-    function fillWith2DNoise (canvas, kernel, scale) {
+    // Fill a canvas with simplex 2D noise with the wanted scale.
+    // Effectively we run the noise function on each pixel and then
+    // scale the value to render nicely grayscale.
+    function fillWith2DNoise (canvas, scale, kernel) {
         var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
             gradientKernel: kernel
         });
@@ -125,10 +117,14 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
         drawStatus(ctx, "Plain noise at " + ~~(1/scale) + "x");
     }
 
-    function fillWithSurflets (canvas, kernel, scale) {
+    // In this fill we tweak the noise generator a bit, and tell it to halve the
+    // effect radius each of our "surflets" has. These dots are the core of both
+    // the original Perlin Noise and the improved Simplex Noise. In Perlin
+    // Noise the surflets would be arranged into a rectangular grid.
+    function fillWithSurflets (canvas, scale, kernel) {
         var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
             gradientKernel: kernel,
-            triangleHeightSquared: .24
+            triangleHeightSquared: .25
         });
         var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
         var imgData = ctx.createImageData(w, h);
@@ -144,7 +140,9 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
         drawStatus(ctx, "\"Surflets\" that create the noise");
     }
 
-    function fillWithFractal (canvas, kernel, scale, passes) {
+    // Fill canvas using the normal noise function, but run it multiple times,
+    // each subsequent pass being half the size and strength.
+    function fillWithFractal (canvas, scale, kernel, passes) {
         passes = passes || 10;
         var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
             gradientKernel: kernel
@@ -165,6 +163,14 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
         }
         ctx.putImageData(imgData, 0, 0);
         drawStatus(ctx, "With " + passes + " fractal passes");
+    }
+
+    function drawStatus (ctx, text) {
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(text, 16, 21);
+        ctx.fillStyle = "white";
+        ctx.fillText(text, 15, 20);
     }
 
 </script>
