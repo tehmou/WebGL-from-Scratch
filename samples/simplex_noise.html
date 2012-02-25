@@ -57,7 +57,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
  -->
 <html>
 <head>
-<title>WebGL from Scratch</title>
+<title>Simplex Noise 2D on Canvas</title>
 
 <style type="text/css">
 
@@ -157,22 +157,7 @@ var timotuominen = {
         // However, for most of the time we only need the square, which then is
         // (sqrt(2)/2)*(sqrt(2)/2)=1/2!
         //
-        var TRIANGLE_HEIGHT = Math.sqrt(2)/2;
-        var TRIANGLE_HEIGHT_SQUARED = .5;
-
-        // The side we can calculate from the height, and the knowledge
-        // we have an equilateral triangle. Our old friend [Pythagoras]
-        // helps us here, or you can check [Equilater triangle].
-        //
-        //   [Equilater triangle]: http://en.wikipedia.org/wiki/Equilateral_triangle
-        //   [Pythagoras]: http://en.wikipedia.org/wiki/Pythagorean_theorem
-        //
-        var TRIANGLE_SIDE = 2*TRIANGLE_HEIGHT/Math.sqrt(3);
-
-        // The value with which we have to multiply each pixel to get the
-        // requested size of the effect. The default here is 64, since at that
-        // level one can usually see the effect clearly.
-        var SCALE_FACTOR = TRIANGLE_SIDE / (options.requestedTriangleSize || 64);
+        var TRIANGLE_HEIGHT_SQUARED = options.triangleHeightSquared || .5;
 
         // Calculate the skew factors that we use to switch between the
         // triangular and the rectangular grids.
@@ -181,7 +166,7 @@ var timotuominen = {
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is
@@ -208,10 +193,6 @@ var timotuominen = {
         return {
             // Takes an xy-coordinate and returns the magnitude of the effect between -1 and 1.
             processPixel: function (xin, yin) {
-
-                // Scale to get the correct size for our effect.
-                xin *= SCALE_FACTOR;
-                yin *= SCALE_FACTOR;
 
                 // Skew the coordinates onto the rectangular tile grid.
                 var posOnTileGrid = skew45degree2D(xin, yin, SKEW_PIXEL_TO_GRID_2D);
@@ -312,54 +293,121 @@ timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
 });
 
 </script>
-
 <script type="text/javascript">
 
-/**
- * Show results
- * ------------
- *
- * Initialize a 2D canvas and use the function defined in
- * timotuominen.webgl.canvasGeneratorFunction to fill the screen.
- *
- * The timeout is a workaround for a strange "INDEX_SIZE_ERR: DOM Exception 1"
- * but that happened only the first time the full screen link was opened.
- *
- */
-window.onload = function initialize () {
-    setTimeout(function () {
-        var canvas = document.createElement("canvas");
-        document.body.appendChild(canvas);
-        var ctx = canvas.getContext('2d');
+    /**
+     * Show results
+     * ------------
+     *
+     * Initialize three canvases and use the noise in a slightly different
+     * way on each of them.
+     *
+     */
+    function initialize () {
+        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel();
+
+        var canvases = [], NUM_CANVASES = 3;
+        for (var i = 0; i < NUM_CANVASES; i++) {
+            var canvas = document.createElement("canvas");
+            document.body.appendChild(canvas);
+            canvases.push(canvas);
+        }
 
         function draw () {
-            var w = canvas.width = window.innerWidth;
-            var h = canvas.height = window.innerHeight;
-            var imageData = ctx.createImageData(w, h);
-            for (var x = 0; x < w; x++) {
-                for (var y = 0; y < h; y++) {
-                    var idx = (x + y * w) * 4;
-                    var c = (timotuominen.webgl.canvasGeneratorFunction(x, y) + 1)*128;
-                    imageData.data[idx + 0] = c;
-                    imageData.data[idx + 1] = c;
-                    imageData.data[idx + 2] = c;
-                    imageData.data[idx + 3] = 255;
-                }
-            }
-            ctx.putImageData(imageData, 0, 0);
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            var scale = 3/h;
+            canvases[0].width = canvases[1].width = canvases[2].width = w/3;
+            canvases[0].height = canvases[1].height = canvases[2].height = h;
+            fillWith2DNoise(canvases[0], scale, gradientKernel);
+            fillWithSurflets(canvases[1], scale, gradientKernel);
+            fillWithFractal(canvases[2], scale, gradientKernel);
         }
 
         window.onresize = draw;
         draw();
-    }, 15);
-};
-</script>
-<script type="text/javascript">
-    // Setup the demo.
-    timotuominen.define("webgl.canvasGeneratorFunction", new timotuominen.webgl.simplexNoise.SimplexNoise2D().processPixel);
+    }
+
+    // Fill a canvas with simplex 2D noise with the wanted scale.
+    // Effectively we run the noise function on each pixel and then
+    // scale the value to render nicely grayscale.
+    function fillWith2DNoise (canvas, scale, kernel) {
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel
+        });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = (generator.processPixel(x*scale, y*scale) + 1)*128;
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx+3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "Plain noise at " + ~~(1/scale) + "x");
+    }
+
+    // In this fill we tweak the noise generator a bit, and tell it to halve the
+    // effect radius each of our "surflets" has. These dots are the core of both
+    // the original Perlin Noise and the improved Simplex Noise. In Perlin
+    // Noise the surflets would be arranged into a rectangular grid.
+    function fillWithSurflets (canvas, scale, kernel) {
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel,
+            triangleHeightSquared: .25
+        });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = (generator.processPixel(x*scale, y*scale)*100 + 1)*128;
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx + 3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "\"Surflets\" that create the noise");
+    }
+
+    // Fill canvas using the normal noise function, but run it multiple times,
+    // each subsequent pass being half the size and strength.
+    function fillWithFractal (canvas, scale, kernel, passes) {
+        passes = passes || 10;
+        var generator = new timotuominen.webgl.simplexNoise.SimplexNoise2D({
+            gradientKernel: kernel
+        });
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
+        var imgData = ctx.createImageData(w, h);
+        for (var x = 0; x < w; x++) {
+            for (var y = 0; y < h; y++) {
+                var idx = (x + y * w) * 4;
+                var c = 0;
+                for (var i = 0; i < passes; i++) {
+                    var s = Math.pow(2, i);
+                    c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
+                }
+                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                imgData.data[idx + 3] = 255;
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        drawStatus(ctx, "With " + passes + " fractal passes");
+    }
+
+    function drawStatus (ctx, text) {
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(text, 16, 21);
+        ctx.fillStyle = "white";
+        ctx.fillText(text, 15, 20);
+    }
+
 </script>
 </head>
-<body>
+<body onload="setTimeout(initialize, 15)">
     <a id="main-link" href="../explain.html#simplex_noise">Explain</a>
     <script type="text/javascript">
         if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }

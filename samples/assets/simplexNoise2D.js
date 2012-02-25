@@ -45,22 +45,7 @@
         // However, for most of the time we only need the square, which then is
         // (sqrt(2)/2)*(sqrt(2)/2)=1/2!
         //
-        var TRIANGLE_HEIGHT = Math.sqrt(2)/2;
-        var TRIANGLE_HEIGHT_SQUARED = .5;
-
-        // The side we can calculate from the height, and the knowledge
-        // we have an equilateral triangle. Our old friend [Pythagoras]
-        // helps us here, or you can check [Equilater triangle].
-        //
-        //   [Equilater triangle]: http://en.wikipedia.org/wiki/Equilateral_triangle
-        //   [Pythagoras]: http://en.wikipedia.org/wiki/Pythagorean_theorem
-        //
-        var TRIANGLE_SIDE = 2*TRIANGLE_HEIGHT/Math.sqrt(3);
-
-        // The value with which we have to multiply each pixel to get the
-        // requested size of the effect. The default here is 64, since at that
-        // level one can usually see the effect clearly.
-        var SCALE_FACTOR = TRIANGLE_SIDE / (options.requestedTriangleSize || 64);
+        var TRIANGLE_HEIGHT_SQUARED = options.triangleHeightSquared || .5;
 
         // Calculate the skew factors that we use to switch between the
         // triangular and the rectangular grids.
@@ -69,7 +54,7 @@
         var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
         // Create a set of pseudo random gradients.
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = options.gradientKernel || new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
 
         // Given the vector from this corner of a triangle to the pixel at hand,
         // calculate how much it should effect. However, if the distance is
@@ -96,10 +81,6 @@
         return {
             // Takes an xy-coordinate and returns the magnitude of the effect between -1 and 1.
             processPixel: function (xin, yin) {
-
-                // Scale to get the correct size for our effect.
-                xin *= SCALE_FACTOR;
-                yin *= SCALE_FACTOR;
 
                 // Skew the coordinates onto the rectangular tile grid.
                 var posOnTileGrid = skew45degree2D(xin, yin, SKEW_PIXEL_TO_GRID_2D);
