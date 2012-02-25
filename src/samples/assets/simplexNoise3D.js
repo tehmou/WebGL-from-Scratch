@@ -1,9 +1,9 @@
 /**
  *
- * Simplex Noise 2D + 3D
+ * Simplex Noise 3D
  * -----------------------
  *
- * For a detailed Simplex Noise sample, see [Simplex Noise 2D].
+ * For a more detailed Simplex Noise sample, see [Simplex Noise 2D].
  *
  *   [Simplex Noise 2D]: simplex_noise.html
  *
@@ -19,13 +19,43 @@
         return [coord[0]+s, coord[1]+s, coord[2]+s];
     }
 
+    function GradientKernel (random) {
+        random = random || Math.random;
+
+        var GRADIENTS_3D = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+        var NUM_GRADIENTS_3D = GRADIENTS_3D.length;
+
+        var randomKernel = [];
+        for(var i = 0; i < 512; i++) {
+            randomKernel[i] = ~~(random()*256);
+        }
+
+        return {
+            get3DGradientsAt: function (tileIndex, triangleFactor) {
+                var ii = tileIndex[0] % 255;
+                var jj = tileIndex[1] % 255;
+                var kk = tileIndex[2] % 255;
+                var index0 = randomKernel[ii+randomKernel[jj+randomKernel[kk]]] % 12;
+                var index1 = randomKernel[ii+triangleFactor[0][0]+randomKernel[jj+triangleFactor[0][1]+randomKernel[kk+triangleFactor[0][2]]]] % 12;
+                var index2 = randomKernel[ii+triangleFactor[1][0]+randomKernel[jj+triangleFactor[1][1]+randomKernel[kk+triangleFactor[1][2]]]] % 12;
+                var index3 = randomKernel[ii+1+randomKernel[jj+1+randomKernel[kk+1]]] % 12;
+                return [
+                    GRADIENTS_3D[index0 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index1 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index2 % NUM_GRADIENTS_3D],
+                    GRADIENTS_3D[index3 % NUM_GRADIENTS_3D],
+                ];
+            }
+        };
+    }
+
     timotuominen.define("webgl.simplexNoise.SimplexNoise3D", function(options) {
         options = options || {};
 
         var SKEW_PIXEL_TO_GRID_3D = 1/3;
         var SKEW_GRID_TO_PIXEL_3D = -1/6;
 
-        var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
+        var gradientKernel = new GradientKernel(options.random);
 
         function calculateEffect3D (delta, grad) {
             var magnitude = 0.6 - dot3D(delta, delta);
@@ -89,34 +119,3 @@
     });
 
 })();
-
-timotuominen.define("webgl.simplexNoise.GradientKernel", function (random) {
-    random = random || Math.random;
-
-    var GRADIENTS_3D = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
-    var NUM_GRADIENTS_3D = GRADIENTS_3D.length;
-
-    var randomKernel = [];
-    for(var i = 0; i < 512; i++) {
-        randomKernel[i] = ~~(random()*256);
-    }
-
-    return {
-        randomKernel: randomKernel,
-        get3DGradientsAt: function (tileIndex, triangleFactor) {
-            var ii = tileIndex[0] % 255;
-            var jj = tileIndex[1] % 255;
-            var kk = tileIndex[2] % 255;
-            var index0 = randomKernel[ii+randomKernel[jj+randomKernel[kk]]] % 12;
-            var index1 = randomKernel[ii+triangleFactor[0][0]+randomKernel[jj+triangleFactor[0][1]+randomKernel[kk+triangleFactor[0][2]]]] % 12;
-            var index2 = randomKernel[ii+triangleFactor[1][0]+randomKernel[jj+triangleFactor[1][1]+randomKernel[kk+triangleFactor[1][2]]]] % 12;
-            var index3 = randomKernel[ii+1+randomKernel[jj+1+randomKernel[kk+1]]] % 12;
-            return [
-                GRADIENTS_3D[index0 % NUM_GRADIENTS_3D],
-                GRADIENTS_3D[index1 % NUM_GRADIENTS_3D],
-                GRADIENTS_3D[index2 % NUM_GRADIENTS_3D],
-                GRADIENTS_3D[index3 % NUM_GRADIENTS_3D],
-            ];
-        }
-    };
-});
