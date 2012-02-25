@@ -32,11 +32,6 @@
 
         timotuominen.define("webgl.simplexNoise.SimplexNoise", function(options) {
             options = options || {};
-            var TRIANGLE_HEIGHT = Math.sqrt(2)/2;
-            var TRIANGLE_HEIGHT_SQUARED = .5;
-            var TRIANGLE_SIDE = 2*TRIANGLE_HEIGHT/Math.sqrt(3);
-            var SCALE_FACTOR = TRIANGLE_SIDE / (options.requestedTriangleSize || 64);
-
             var SKEW_PIXEL_TO_GRID_2D = (Math.sqrt(3) - 1) / 2;
             var SKEW_GRID_TO_PIXEL_2D = (Math.sqrt(3) - 3) / 6;
 
@@ -46,7 +41,7 @@
             var gradientKernel = new timotuominen.webgl.simplexNoise.GradientKernel(options.random);
 
             function calculateEffect2D (delta, grad) {
-                var magnitude = TRIANGLE_HEIGHT_SQUARED - dot2D(delta, delta);
+                var magnitude = .5 - dot2D(delta, delta);
                 if (magnitude < 0) {
                     return 0;
                 } else {
@@ -65,9 +60,6 @@
 
             return {
                 processPixel2D: function (xin, yin) {
-                    xin *= SCALE_FACTOR;
-                    yin *= SCALE_FACTOR;
-
                     var posOnTileGrid = skew45degree2D(xin, yin, SKEW_PIXEL_TO_GRID_2D);
                     var tileOrigin = [~~(posOnTileGrid[0]), ~~(posOnTileGrid[1])];
                     var pixOrigin = skew45degree2D(tileOrigin[0], tileOrigin[1], SKEW_GRID_TO_PIXEL_2D);
@@ -91,10 +83,6 @@
                     return 60 * totalMagnitude;
                 },
                 processPixel3D: function (xin, yin, zin) {
-                    xin *= SCALE_FACTOR;
-                    yin *= SCALE_FACTOR;
-                    zin *= SCALE_FACTOR;
-
                     var posOnTileGrid = skew45degree3D([xin, yin, zin], SKEW_PIXEL_TO_GRID_3D);
                     var tileOrigin = [~~posOnTileGrid[0], ~~posOnTileGrid[1], ~~posOnTileGrid[2]];
                     var pixOrigin = skew45degree3D(tileOrigin, SKEW_GRID_TO_PIXEL_3D);

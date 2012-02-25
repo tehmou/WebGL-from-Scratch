@@ -13,7 +13,7 @@ _Disclaimer: This is not WebGL but canvas._
 <title>WebGL from Scratch</title>
 <link href="assets/style.css" rel="stylesheet" type="text/css">
 <script src="../js/namespace.js" type="text/javascript"></script>
-<script src="assets/simplexNoiseOptimized.js" type="text/javascript"></script>
+<script src="assets/simplexNoise3D.js" type="text/javascript"></script>
 <script src="assets/requestAnimationFrame.js" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -23,7 +23,7 @@ window.onload = function initialize () {
         document.body.appendChild(canvas);
         var ctx = canvas.getContext('2d');
 
-        var simplexNoise = new timotuominen.webgl.simplexNoise.SimplexNoise();
+        var simplexNoise = new timotuominen.webgl.simplexNoise.SimplexNoise3D();
 
         var imageData, w, h, time = 0;
 
@@ -38,7 +38,7 @@ window.onload = function initialize () {
             for (var x = 0; x < w; x++) {
                 for (var y = 0; y < h; y++) {
                     var idx = (x + y * w) * 4;
-                    var c = (simplexNoise.processPixel3D(x, y, time) + 1)*128;
+                    var c = (simplexNoise.processPixel(x*.01, y*.01, time*.01) + 1)*128;
                     imageData.data[idx + 0] = c;
                     imageData.data[idx + 1] = c;
                     imageData.data[idx + 2] = c;
