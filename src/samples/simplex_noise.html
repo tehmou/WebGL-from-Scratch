@@ -58,9 +58,9 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
 <html>
 <head>
 <title>Simplex Noise 2D on Canvas</title>
-<link href="assets/style.css" rel="stylesheet" type="text/css">
+<link href="lib/style.css" rel="stylesheet" type="text/css">
 <script src="../js/namespace.js" type="text/javascript"></script>
-<script src="assets/simplexNoise2D.js" type="text/javascript"></script>
+<script src="lib/simplexNoise2D.js" type="text/javascript" expand-type="none"></script>
 <script type="text/javascript">
 
     /**
@@ -89,7 +89,8 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             var scale = 3/h;
 
             // Size the canvases to fit next to each other.
-            canvases[0].width = canvases[1].width = canvases[2].width = w/canvases.length;
+            canvases[0].width = canvases[1].width = w/canvases.length;
+            canvases[2].width = w-canvases[0].width-canvases[1].width;
             canvases[0].height = canvases[1].height = canvases[2].height = h;
 
             // Render the effects onto respective canvases.

@@ -321,7 +321,8 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             var scale = 3/h;
 
             // Size the canvases to fit next to each other.
-            canvases[0].width = canvases[1].width = canvases[2].width = w/canvases.length;
+            canvases[0].width = canvases[1].width = w/canvases.length;
+            canvases[2].width = w-canvases[0].width-canvases[1].width;
             canvases[0].height = canvases[1].height = canvases[2].height = h;
 
             // Render the effects onto respective canvases.
