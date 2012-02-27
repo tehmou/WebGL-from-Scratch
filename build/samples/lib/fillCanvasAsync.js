@@ -13,7 +13,6 @@
     timotuominen.define("html5.fillCanvasGrayscale", function (options) {
         var canvas = options.canvas;
         var processPixel = options.processPixel;
-        var text = options.text || "";
         var finishCallback = options.finishCallback;
 
         var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");

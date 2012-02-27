@@ -10,39 +10,148 @@ Burn
 <head>
 <title>Burn on WebGL</title>
 <link href="lib/style.css" rel="stylesheet" type="text/css">
+
+<script id="vs-shader" type="x-shader/x-vertex">
+
+    // Position on the surface of the model.
+    attribute vec4 position;
+
+    // Entry point for shader is always the method main.
+    // It does not return anything, nor does it take arguments.
+    void main(void) {
+    // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
+    gl_Position = position;
+    }
+
+</script>
+
+<script id="fs-shader" type="x-shader/x-fragment">
+
+    // Some boilerplate code; just include it.
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    // Texture we want to use.
+    uniform sampler2D tex0;
+
+    // System absolute milliseconds passed from JavaScript.
+    uniform float time;
+
+    // Screen size in pixels.
+    uniform vec2 resolution;
+
+    // Absolute mouse position.
+    uniform vec2 mouse;
+
+    // Entry point for all shaders.
+    void main(void)
+    {
+    // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
+    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
+
+    // Vector from mouse position to this pixel.
+    vec2 delta = vec2(coord.x-mouse.x,coord.y-mouse.y);
+
+    // Save distance from mouse position.
+    float distance = length(delta);
+
+    // Normalized delta.
+    vec2 deltaNormal = delta/distance;
+
+    // WebGL considers the texture to be from (0,0) to (1,1), so we need to calculate
+    // this coordinate from the pixel coordinates we have.
+    vec2 uv = coord.xy/resolution.xy;
+
+    // Distort the texture coordinate to create a ripple effect.
+    uv += deltaNormal*sin(distance*.025-time*4.0)*.025;
+
+    // Retrieve the texture pixel at the right location.
+    vec3 col = texture2D(tex0,uv).xyz;
+
+    // Apply some lighting effects depending on the distance from mouse; this
+    // simply multiplies all components of the colors, making ones closer brighter,
+    // and the ones further away darker. The circle that stays unmodified is of radius 50px.
+    col *= 100.0/distance;
+
+    // Return the color in the result variable gl_FragColor.
+    gl_FragColor = vec4(col,1.0);
+    }
+
+</script>
+
 <script src="../js/namespace.js" type="text/javascript"></script>
+
 <script type="text/javascript">
+
+    timotuominen.define("html5.BurnDemo", function (options) {
+        var plainShader = new timotuominen.html5.PlainShader(options);
+        var mousePos = {};
+
+        // Keep track of mouse coordinates.
+        options.el.onmousemove = function (e) {
+            mousePos.x = e.offsetX;
+            mousePos.y = e.offsetY;
+        };
+
+        var prepareShader = plainShader.prepareShader;
+        plainShader.prepareShader = function () {
+            prepareShader.apply(this);
+            this.gl.uniform2f(this.getUni("mouse"),
+                    mousePos.x || this.viewportWidth/2,
+                    mousePos.y || this.viewportHeight/2);
+        };
+
+        return plainShader;
+    });
 
     function initialize () {
 
-        var textureCanvas, burnCanvas;
+        var demo, image, textureCanvas, burnCanvas;
+
+        textureCanvas = document.createElement("canvas");
+        document.body.appendChild(textureCanvas);
+
+        burnCanvas = document.createElement("canvas");
+        document.body.appendChild(burnCanvas);
 
         function draw () {
             var w = window.innerWidth;
             var h = window.innerHeight;
 
-            textureCanvas = document.createElement("canvas");
             textureCanvas.width = ~~(w/2);
             textureCanvas.height = h;
-            document.body.appendChild(textureCanvas);
 
-            burnCanvas = document.createElement("canvas");
             burnCanvas.width = ~~w - textureCanvas.width;
-            textureCanvas.height = h;
-            document.body.appendChild(burnCanvas);
+            burnCanvas.height = h;
 
             timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
             
-            fillWithFractal(textureCanvas, 3/h);
+            fillWithFractal(textureCanvas, 3/h, function () {
+                if (!demo) {
+                    var demo = new timotuominen.html5.BurnDemo({
+                        image1: textureCanvas,
+                        vsCode: document.getElementById("vs-shader").innerHTML,
+                        fsCode: document.getElementById("fs-shader").innerHTML,
+                        el: burnCanvas
+                    });
+                    demo.initialize();
+                    demo.updateSize();
+                }
+            });
         }
 
         window.onresize = draw;
-        draw();
+
+        // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
+        image = new Image();
+        image.onload = draw;
+        image.src = "IMG_2235.JPG";
     }
 
     // Fill canvas using the normal noise function, but run it multiple times,
     // each subsequent pass being half the size and strength.
-    function fillWithFractal (canvas, scale) {
+    function fillWithFractal (canvas, scale, callback) {
         var passes = 7;
         var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D();
         timotuominen.html5.fillCanvasGrayscale({
@@ -55,12 +164,15 @@ Burn
                     c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
                 }
                 return c;
-            }
+            },
+            finishCallback: callback
         });
     }
 
 </script>
-<script src="lib/simplexNoise2D.js" type="text/javascript" expand-type="none"></script>
+<script src="lib/plainShader.js" type="text/javascript"></script>
+<script src="lib/webglUtils.js" type="text/javascript"></script>
+<script src="lib/simplexNoise2D.js" type="text/javascript"></script>
 <script src="lib/fillCanvasAsync.js" type="text/javascript"></script>
 </head>
 <body onload="setTimeout(initialize, 15)">
