@@ -89,13 +89,13 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             var scale = 3/h;
 
             // Size the canvases to fit next to each other.
-            canvases[0].width = canvases[1].width = w/canvases.length;
-            canvases[2].width = w-canvases[0].width-canvases[1].width;
+            canvases[0].width = canvases[1].width = ~~(w/canvases.length);
+            canvases[2].width = ~~(w-canvases[0].width-canvases[1].width);
             canvases[0].height = canvases[1].height = canvases[2].height = h;
 
             // Render the effects onto respective canvases.
-            fillWith2DNoise(canvases[0], scale, gradientKernel);
-            fillWithSurflets(canvases[1], scale, gradientKernel);
+            fillWithSurflets(canvases[0], scale, gradientKernel);
+            fillWith2DNoise(canvases[1], scale, gradientKernel);
             fillWithFractal(canvases[2], scale, gradientKernel);
         }
 
@@ -190,7 +190,7 @@ For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified
             ctx.putImageData(imgData, 0, 0);
             drawStatus(ctx, text);
             x++;
-            if (x <= w) {
+            if (x < w) {
                 setTimeout(processNextColumn, 0);
             }
         }
