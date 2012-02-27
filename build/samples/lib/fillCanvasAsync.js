@@ -30,13 +30,6 @@
                     imgData.data[idx+3] = 255;
                 }
                 ctx.putImageData(imgData, 0, 0);
-                if (text) {
-                    drawStatus(ctx, text);
-                }
-                ctx.beginPath();
-                ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
-                ctx.strokeStyle = "#ff0000";
-                ctx.stroke();
                 x++;
                 setTimeout(processNextColumn, 0);
             } else if (finishCallback) {
@@ -57,13 +50,5 @@
             killCallback();
         }
     };
-
-    function drawStatus (ctx, text) {
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "black";
-        ctx.fillText(text, 16, 21);
-        ctx.fillStyle = "white";
-        ctx.fillText(text, 15, 20);
-    }
 
 })();

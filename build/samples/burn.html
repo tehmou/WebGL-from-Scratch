@@ -2,62 +2,13 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <!--
 
-Simplex Noise 2D on Canvas
-=======================
-
-[Wikipedia]:
-_"Simplex noise is a method for constructing an n-dimensional noise function comparable to Perlin noise ("classic" noise) but with a lower computational overhead, especially in larger dimensions. Ken Perlin designed the algorithm in 2001[1] to address the limitations of his classic noise function, especially in higher dimensions."_
-
-  [Wikipedia]: http://en.wikipedia.org/wiki/Simplex_noise
-
-
-Abstact
--------
-
-Cover a surface with organic-looking noise. We are only aiming for 2D noise
-here, though the principle is the same, other dimensions are to come later.
-
-
-High level
-----------
-
-Consider the surface to be covered with equilateral triangles (with all sides of
-same length) and have each corner point have a random influence. Let us have
-each corner point represented by a black and white linear gradient. Of course,
-each corner only affects the pixels close to it.
-
-For mathematical simplicity, we will make the triangles so that their sides
-together make 45 degree lines. See the sample or [Simplex Noise Demystified]
-for a graphical representation.  
-
-
-Technical
----------
-
-For setup we will create a random set of corner points. We don't want
-them to change in the middle of rendering.
-
-Then for each pixel we do the following:
-
-  1.  Scale the pixel to create an effect of wanted dimensions.
-  2.  Skew the pixel onto the rectangular grid.
-  3.  See on which tile it lands.
-  4.  Each tile is two triangles, figure out on which of the triangles it landed.
-  5.  Skew back onto the triangular grid.
-  6.  Get the gradients for all corner points of this triangle.
-  7.  Calculate and add the effects the cornerts points have on this pixel.
-  8.  Return the value between -1 and 1.
-
-
-For more theory, see [Ken Perlin's original paper] or [Simplex Noise Demystified] by Stefan Gustavson.
-
-  [Ken Perlin's original paper]: http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
-  [Simplex Noise Demystified]: http://www.google.co.uk/url?sa=t&rct=j&q=simplex%20noise&source=web&cd=7&ved=0CEUQFjAG&url=http%3A%2F%2Fwww.itn.liu.se%2F~stegu%2Fsimplexnoise%2Fsimplexnoise.pdf&ei=Xs9AT83iEcSp0QW5wfmODw&usg=AFQjCNEVzOM03haFrTgLrjJp-jPkQyTOKA
+Burn
+----
 
  -->
 <html>
 <head>
-<title>Simplex Noise 2D on Canvas</title>
+<title>Burn on WebGL</title>
 
 <style type="text/css">
 
@@ -106,6 +57,55 @@ var timotuominen = {
         timotuominen.defineWithRoot(timotuominen, path, obj)
     }
 };
+</script>
+<script type="text/javascript">
+
+    function initialize () {
+
+        var textureCanvas, burnCanvas;
+
+        function draw () {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            textureCanvas = document.createElement("canvas");
+            textureCanvas.width = ~~(w/2);
+            textureCanvas.height = h;
+            document.body.appendChild(textureCanvas);
+
+            burnCanvas = document.createElement("canvas");
+            burnCanvas.width = ~~w - textureCanvas.width;
+            textureCanvas.height = h;
+            document.body.appendChild(burnCanvas);
+
+            timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
+            
+            fillWithFractal(textureCanvas, 3/h);
+        }
+
+        window.onresize = draw;
+        draw();
+    }
+
+    // Fill canvas using the normal noise function, but run it multiple times,
+    // each subsequent pass being half the size and strength.
+    function fillWithFractal (canvas, scale) {
+        var passes = 7;
+        var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D();
+        timotuominen.html5.fillCanvasGrayscale({
+            canvas: canvas,
+            text: "With " + passes + " fractal passes",
+            processPixel: function (x, y) {
+                var c = 0;
+                for (var i = 0; i < passes; i++) {
+                    var s = Math.pow(2, i);
+                    c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
+                }
+                return c;
+            }
+        });
+    }
+
 </script>
 
 <script type="text/javascript">
@@ -293,139 +293,6 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
 });
 
 </script>
-<script type="text/javascript">
-
-    /**
-     * Show results
-     * ------------
-     *
-     * Initialize three canvases and use the noise in a slightly different
-     * way on each of them.
-     *
-     */
-    function initialize () {
-        // Create a gradient kernel that holds the random values
-        // the generators use. This is so we can have the same
-        // randomness on all noise generators we create.
-        var gradientKernel = new timotuominen.html5.simplexNoise.GradientKernel();
-
-        // Create some canvases to use for rendering.
-        var canvases = createCanvases(3);
-
-        function draw () {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-
-            // Calculate the scale of the effect. This is a purely
-            // experimental value that adjusts to the height of the viewport.
-            var scale = 3/h;
-
-            // Size the canvases to fit next to each other.
-            canvases[0].width = canvases[1].width = ~~(w/canvases.length);
-            canvases[2].width = ~~(w-canvases[0].width-canvases[1].width);
-            canvases[0].height = canvases[1].height = canvases[2].height = h;
-
-            timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
-            
-            // Render the effects onto respective canvases.
-            fillWithSurflets(canvases[0], scale, gradientKernel);
-            fillWith2DNoise(canvases[1], scale, gradientKernel);
-            fillWithFractal(canvases[2], scale, gradientKernel);
-        }
-
-        window.onresize = draw;
-        draw();
-    }
-
-    function createCanvases (num) {
-        var canvases = [];
-        for (var i = 0; i < num; i++) {
-            canvases[i] = document.createElement("canvas");
-            document.body.appendChild(canvases[i]);
-        }
-        return canvases;
-    }
-
-    // Fill a canvas with simplex 2D noise with the wanted scale.
-    // Effectively we run the noise function on each pixel and then
-    // scale the value to render nicely grayscale.
-    function fillWith2DNoise (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
-            gradientKernel: gradientKernel
-        });
-        timotuominen.html5.fillCanvasGrayscale({
-            canvas: canvas,
-            processPixel: function (x, y) {
-                return 128*(noiseGenerator.processPixel(x*scale, y*scale)+1);
-            },
-            finishCallback: function () {
-                drawInfo(canvas, "Surflet radius expanded");
-            }
-        });
-    }
-
-    // In this fill we tweak the noise generator a bit, and tell it to halve the
-    // effect radius each of our "surflets" has. These dots are the core of both
-    // the original Perlin Noise and the improved Simplex Noise. In Perlin
-    // Noise the surflets would be arranged into a rectangular grid.
-    function fillWithSurflets (canvas, scale, gradientKernel) {
-        var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
-            gradientKernel: gradientKernel,
-            triangleHeightSquared: .25
-        });
-        timotuominen.html5.fillCanvasGrayscale({
-            canvas: canvas,
-            processPixel: function (x, y) {
-                return (noiseGenerator.processPixel(x*scale, y*scale)*100 + 1)*128;
-            },
-            finishCallback: function () {
-                drawInfo(canvas, "\"Surflets\" which create the noise");
-            }
-        });
-    }
-
-    // Fill canvas using the normal noise function, but run it multiple times,
-    // each subsequent pass being half the size and strength.
-    function fillWithFractal (canvas, scale, gradientKernel, passes) {
-        passes = passes || 10;
-        var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
-            gradientKernel: gradientKernel
-        });
-        timotuominen.html5.fillCanvasGrayscale({
-            canvas: canvas,
-            processPixel: function (x, y) {
-                var c = 0;
-                for (var i = 0; i < passes; i++) {
-                    var s = Math.pow(2, i);
-                    c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
-                }
-                return c;
-            },
-            finishCallback: function () {
-                drawInfo(canvas, "With " + passes + " fractal passes");
-            }
-        });
-    }
-
-    function drawInfo (canvas, text) {
-        var ctx = canvas.getContext("2d");
-        drawStatus(ctx, text);
-        ctx.beginPath();
-        ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
-        ctx.strokeStyle = "#ff0000";
-        ctx.stroke();
-    }
-
-    function drawStatus (ctx, text) {
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "black";
-        ctx.fillText(text, 16, 21);
-        ctx.fillStyle = "white";
-        ctx.fillText(text, 15, 20);
-    }
-
-
-</script>
 
 <script type="text/javascript">
 
@@ -487,9 +354,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
 </script>
 </head>
 <body onload="setTimeout(initialize, 15)">
-    <a id="main-link" href="../explain.html#simplex_noise">Explain</a>
-    <span style="color: #000; position: absolute; bottom: 4px; left: 11px">Showing the same area with different tweaks to the algorithm</span>
-    <span style="color: #f00; position: absolute; bottom: 5px; left: 10px">Showing the same area with different tweaks to the algorithm</span>
+    <a id="main-link" href="../explain.html#burn">Explain</a>
     <script type="text/javascript">
         if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
     </script>
