@@ -325,7 +325,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             canvases[2].width = ~~(w-canvases[0].width-canvases[1].width);
             canvases[0].height = canvases[1].height = canvases[2].height = h;
 
-            killDrawingProcesses();
+            timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
             
             // Render the effects onto respective canvases.
             fillWithSurflets(canvases[0], scale, gradientKernel);
@@ -353,7 +353,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         var noiseGenerator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
-        fillCanvasGrayscale({
+        timotuominen.html5.fillCanvasGrayscale({
             canvas: canvas,
             text: "Surflet radius expanded",
             processPixel: function (x, y) {
@@ -371,7 +371,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             gradientKernel: gradientKernel,
             triangleHeightSquared: .25
         });
-        fillCanvasGrayscale({
+        timotuominen.html5.fillCanvasGrayscale({
             canvas: canvas,
             text: "\"Surflets\" which create the noise",
             processPixel: function (x, y) {
@@ -387,7 +387,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D({
             gradientKernel: gradientKernel
         });
-        fillCanvasGrayscale({
+        timotuominen.html5.fillCanvasGrayscale({
             canvas: canvas,
             text: "With " + passes + " fractal passes",
             processPixel: function (x, y) {
@@ -401,15 +401,23 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         });
     }
 
-    // Collect here all ongoing asynchronous drawing processes so
-    // we can kill them if we want to redraw.
-    var killDrawingProcessesStack = [];
+</script>
 
-    // Runs options.processPixel on all pixels on this canvas. Can
-    // also render a little status text to the top-left corner (I was lazy).
-    // Draws everything asynchronously one column at a time, lest the
-    // function be slow.
-    function fillCanvasGrayscale (options) {
+<script type="text/javascript">
+
+(function () {
+
+    /**
+     * Asynchronous canvas fill
+     * ------------------------
+     *
+     * This is a little utility for filling a canvas with the results from
+     * a function asynchronously. It runs options.processPixel on all pixels
+     * on the canvas and can also render a little status text to the top-left
+     * corner. It draws everything asynchronously one column at a
+     * time, lest the function be slow.
+     */
+    timotuominen.define("html5.fillCanvasGrayscale", function (options) {
         var canvas = options.canvas;
         var processPixel = options.processPixel;
         var text = options.text || "";
@@ -428,7 +436,9 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
                     imgData.data[idx+3] = 255;
                 }
                 ctx.putImageData(imgData, 0, 0);
-                drawStatus(ctx, text);
+                if (text) {
+                    drawStatus(ctx, text);
+                }
                 ctx.beginPath();
                 ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
                 ctx.strokeStyle = "#ff0000";
@@ -438,15 +448,19 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             }
         }
         processNextColumn();
-    }
+    });
+
+    // Collect here all ongoing asynchronous drawing processes so
+    // we can kill them if we want to redraw.
+    var killDrawingProcessesStack = [];
 
     // End all ongoing asynchronous drawing.
-    function killDrawingProcesses () {
+    timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses = function () {
         var killCallback;
         while (killCallback = killDrawingProcessesStack.pop()) {
             killCallback();
         }
-    }
+    };
 
     function drawStatus (ctx, text) {
         ctx.font = "14px Arial";
@@ -455,6 +469,8 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         ctx.fillStyle = "white";
         ctx.fillText(text, 15, 20);
     }
+
+})();
 
 </script>
 </head>
