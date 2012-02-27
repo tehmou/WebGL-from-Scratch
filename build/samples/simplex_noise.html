@@ -353,7 +353,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         });
         fillCanvasGrayscale({
             canvas: canvas,
-            text: "Plain noise at " + ~~(1/scale) + "x",
+            text: "Surflet radius expanded",
             processPixel: function (x, y) {
                 return 128*(noiseGenerator.processPixel(x*scale, y*scale)+1);
             }
@@ -371,7 +371,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         });
         fillCanvasGrayscale({
             canvas: canvas,
-            text: "\"Surflets\" that create the noise",
+            text: "\"Surflets\" which create the noise",
             processPixel: function (x, y) {
                 return (noiseGenerator.processPixel(x*scale, y*scale)*100 + 1)*128;
             }
@@ -421,6 +421,10 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             }
             ctx.putImageData(imgData, 0, 0);
             drawStatus(ctx, text);
+            ctx.beginPath();
+            ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
+            ctx.strokeStyle = "#ff0000";
+            ctx.stroke();
             x++;
             if (x < w) {
                 setTimeout(processNextColumn, 0);
@@ -441,6 +445,8 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
 </head>
 <body onload="setTimeout(initialize, 15)">
     <a id="main-link" href="../explain.html#simplex_noise">Explain</a>
+    <span style="color: #000; position: absolute; bottom: 4px; left: 11px">Showing the same area with different tweaks to the algorithm</span>
+    <span style="color: #f00; position: absolute; bottom: 5px; left: 10px">Showing the same area with different tweaks to the algorithm</span>
     <script type="text/javascript">
         if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
     </script>
