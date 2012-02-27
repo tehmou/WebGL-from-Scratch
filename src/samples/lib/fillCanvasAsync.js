@@ -14,6 +14,7 @@
         var canvas = options.canvas;
         var processPixel = options.processPixel;
         var text = options.text || "";
+        var finishCallback = options.finishCallback;
 
         var w = canvas.width, h = canvas.height, ctx = canvas.getContext("2d");
         var imgData = ctx.createImageData(w, h);
@@ -38,6 +39,8 @@
                 ctx.stroke();
                 x++;
                 setTimeout(processNextColumn, 0);
+            } else if (finishCallback) {
+                finishCallback();
             }
         }
         processNextColumn();
