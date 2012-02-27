@@ -325,6 +325,8 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
             canvases[2].width = ~~(w-canvases[0].width-canvases[1].width);
             canvases[0].height = canvases[1].height = canvases[2].height = h;
 
+            killDrawingProcesses();
+            
             // Render the effects onto respective canvases.
             fillWithSurflets(canvases[0], scale, gradientKernel);
             fillWith2DNoise(canvases[1], scale, gradientKernel);
@@ -399,6 +401,10 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         });
     }
 
+    // Collect here all ongoing asynchronous drawing processes so
+    // we can kill them if we want to redraw.
+    var killDrawingProcessesStack = [];
+
     // Runs options.processPixel on all pixels on this canvas. Can
     // also render a little status text to the top-left corner (I was lazy).
     // Draws everything asynchronously one column at a time, lest the
@@ -412,25 +418,34 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         var imgData = ctx.createImageData(w, h);
 
         var x = 0;
+        killDrawingProcessesStack.push(function () { x = w; });
         function processNextColumn () {
-            for (var y = 0; y < h; y++) {
-                var idx = (x + y * w) * 4;
-                var c = processPixel(x, y);
-                imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
-                imgData.data[idx+3] = 255;
-            }
-            ctx.putImageData(imgData, 0, 0);
-            drawStatus(ctx, text);
-            ctx.beginPath();
-            ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
-            ctx.strokeStyle = "#ff0000";
-            ctx.stroke();
-            x++;
-            if (x < w) {
+            if (x <= w) {
+                for (var y = 0; y < h; y++) {
+                    var idx = (x + y * w) * 4;
+                    var c = processPixel(x, y);
+                    imgData.data[idx+0] = imgData.data[idx+1] = imgData.data[idx+2] = c;
+                    imgData.data[idx+3] = 255;
+                }
+                ctx.putImageData(imgData, 0, 0);
+                drawStatus(ctx, text);
+                ctx.beginPath();
+                ctx.arc(80, 90, 50, 0, 2*Math.PI, true);
+                ctx.strokeStyle = "#ff0000";
+                ctx.stroke();
+                x++;
                 setTimeout(processNextColumn, 0);
             }
         }
         processNextColumn();
+    }
+
+    // End all ongoing asynchronous drawing.
+    function killDrawingProcesses () {
+        var killCallback;
+        while (killCallback = killDrawingProcessesStack.pop()) {
+            killCallback();
+        }
     }
 
     function drawStatus (ctx, text) {
