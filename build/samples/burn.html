@@ -45,70 +45,64 @@ body {
 
 <script id="vs-shader" type="x-shader/x-vertex">
 
-    // Position on the surface of the model.
     attribute vec4 position;
+    varying vec2 picturePosition;
 
-    // Entry point for shader is always the method main.
-    // It does not return anything, nor does it take arguments.
     void main(void) {
-    // Assigning a value to gl_Position is this the vertex shader's way of returning a value.
-    gl_Position = position;
+        picturePosition = position.st;
+        gl_Position = position;
     }
 
 </script>
 
 <script id="fs-shader" type="x-shader/x-fragment">
 
-    // Some boilerplate code; just include it.
     #ifdef GL_ES
     precision highp float;
     #endif
 
-    // Texture we want to use.
-    uniform sampler2D tex0;
-
-    // System absolute milliseconds passed from JavaScript.
-    uniform float time;
-
-    // Screen size in pixels.
     uniform vec2 resolution;
+    uniform sampler2D tex0;
+    uniform sampler2D tex1;
+    uniform float ratio;
+    varying vec2 picturePosition;
 
-    // Absolute mouse position.
-    uniform vec2 mouse;
-
-    // Entry point for all shaders.
-    void main(void)
-    {
-    // Flip the y-coordinate, as WebGL thinks the origin is at bottom left corner.
-    vec2 coord = vec2(gl_FragCoord.x,resolution.y-gl_FragCoord.y);
-
-    // Vector from mouse position to this pixel.
-    vec2 delta = vec2(coord.x-mouse.x,coord.y-mouse.y);
-
-    // Save distance from mouse position.
-    float distance = length(delta);
-
-    // Normalized delta.
-    vec2 deltaNormal = delta/distance;
-
-    // WebGL considers the texture to be from (0,0) to (1,1), so we need to calculate
-    // this coordinate from the pixel coordinates we have.
-    vec2 uv = coord.xy/resolution.xy;
-
-    // Distort the texture coordinate to create a ripple effect.
-    uv += deltaNormal*sin(distance*.025-time*4.0)*.025;
-
-    // Retrieve the texture pixel at the right location.
-    vec3 col = texture2D(tex0,uv).xyz;
-
-    // Apply some lighting effects depending on the distance from mouse; this
-    // simply multiplies all components of the colors, making ones closer brighter,
-    // and the ones further away darker. The circle that stays unmodified is of radius 50px.
-    col *= 100.0/distance;
-
-    // Return the color in the result variable gl_FragColor.
-    gl_FragColor = vec4(col,1.0);
+    void addDistortion(vec2 delta, in vec2 pos, in sampler2D s, inout vec2 distort) {
+        distort = distort + delta*texture2D(s, pos+delta).x;
     }
+
+    void main(void) {
+        vec2 p = picturePosition.xy;
+        vec2 texCoord = vec2(p.s*.5+.5,.5-p.t*.5);
+        vec4 o0 = texture2D(tex0,texCoord);
+        vec4 o1 = texture2D(tex1,texCoord);
+
+        float burnRatio = (o1.x-ratio/.75)+.3;
+
+        float alpha = clamp(burnRatio/.03, 0.0, 1.0);
+
+        float overlayColorMagnitude = 1.0-clamp(burnRatio/0.3, 0.0, 1.0);
+        vec3 overlayColor = vec3(-.3*overlayColorMagnitude,-.7*overlayColorMagnitude,-1.0);
+        vec3 colorAdjust = overlayColorMagnitude*overlayColor;
+
+
+        vec2 distort = vec2(0.0);
+        float nx = (1.0-burnRatio)*30.0/resolution.x;
+        float ny = (1.0-burnRatio)*30.0/resolution.y;
+
+        addDistortion(vec2(-nx, -ny), texCoord, tex1, distort);
+        addDistortion(vec2(0.0, -ny), texCoord, tex1, distort);
+        addDistortion(vec2(nx, -ny), texCoord, tex1, distort);
+        addDistortion(vec2(nx, 0.0), texCoord, tex1, distort);
+        addDistortion(vec2(nx, ny), texCoord, tex1, distort);
+        addDistortion(vec2(0.0, ny), texCoord, tex1, distort);
+        addDistortion(vec2(-nx, ny), texCoord, tex1, distort);
+        addDistortion(vec2(-nx, 0.0), texCoord, tex1, distort);
+
+        vec4 base = vec4(texture2D(tex0, texCoord+distort*burnRatio).xyz, 1.0);//(alpha>0.0?1.0:0.0));
+        gl_FragColor = vec4(base.xyz+colorAdjust+(1.0-alpha), alpha);
+    }
+
 
 </script>
 
@@ -144,9 +138,7 @@ var timotuominen = {
         var prepareShader = plainShader.prepareShader;
         plainShader.prepareShader = function () {
             prepareShader.apply(this);
-            this.gl.uniform2f(this.getUni("mouse"),
-                    mousePos.x || this.viewportWidth/2,
-                    mousePos.y || this.viewportHeight/2);
+            this.gl.uniform1f(this.getUni("ratio"), (mousePos.x || 0) / this.viewportWidth);
         };
 
         return plainShader;
@@ -183,6 +175,7 @@ var timotuominen = {
                 });
                 demo.initialize();
                 demo.updateSize();
+                document.getElementById("instruction-text").style.display = "block";
              });
         }
 
@@ -195,7 +188,7 @@ var timotuominen = {
     // Fill canvas using the normal noise function, but run it multiple times,
     // each subsequent pass being half the size and strength.
     function fillWithFractal (canvas, scale, callback) {
-        var passes = 7;
+        var passes = 8;
         var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D();
         timotuominen.html5.fillCanvasGrayscale({
             canvas: canvas,
@@ -251,7 +244,7 @@ timotuominen.html5.PlainShader = function (options) {
                     this.gl.getAttribLocation(this.shader, "position"));
             if (options.images) {
                 for (var i = 0; i < options.images.length; i++) {
-                    this.textures.push(shaderUtils.createTexture(this.gl, options.images[i]));
+                    this.textures[i] = shaderUtils.createTexture(this.gl, options.images[i]);
                 }
             }
             this.vertexBuffer = this.gl.createBuffer();
@@ -276,8 +269,8 @@ timotuominen.html5.PlainShader = function (options) {
             for (var i = 0; i < this.textures.length; i++) {
                 gl.activeTexture(gl["TEXTURE"+i]);
                 gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
+                gl.uniform1i(this.getUni("tex"+i), i);
             }
-            gl.uniform1i(this.getUni("tex0"), 0);
             gl.uniform2f(this.getUni("resolution"), this.viewportWidth, this.viewportHeight);
         },
 
@@ -685,6 +678,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
 </head>
 <body onload="setTimeout(initialize, 15)">
     <a id="main-link" href="../explain.html#burn">Explain</a>
+    <h2 id="instruction-text" style="position: absolute; color: #fff; right: 50%; display: none">slide mouse right ->&nbsp;</h2>
     <script type="text/javascript">
         if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
     </script>

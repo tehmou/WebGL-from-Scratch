@@ -33,7 +33,7 @@ timotuominen.html5.PlainShader = function (options) {
                     this.gl.getAttribLocation(this.shader, "position"));
             if (options.images) {
                 for (var i = 0; i < options.images.length; i++) {
-                    this.textures.push(shaderUtils.createTexture(this.gl, options.images[i]));
+                    this.textures[i] = shaderUtils.createTexture(this.gl, options.images[i]);
                 }
             }
             this.vertexBuffer = this.gl.createBuffer();
@@ -58,8 +58,8 @@ timotuominen.html5.PlainShader = function (options) {
             for (var i = 0; i < this.textures.length; i++) {
                 gl.activeTexture(gl["TEXTURE"+i]);
                 gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
+                gl.uniform1i(this.getUni("tex"+i), i);
             }
-            gl.uniform1i(this.getUni("tex0"), 0);
             gl.uniform2f(this.getUni("resolution"), this.viewportWidth, this.viewportHeight);
         },
 
