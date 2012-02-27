@@ -8,14 +8,13 @@ h1, h2 {
 
 #content {
     padding: 5em 2em 4em;
-}
 
-#content>:first-child .comment {
-    border-top: .3em solid #f6f0f0;
-}
-
-#content>:last-child .comment {
-    border-bottom: .3em solid #f6f0f0;
+    &>:first-child .comment {
+        border-top: .3em solid #f6f0f0;
+    }
+    &>:last-child .comment {
+        border-bottom: .3em solid #f6f0f0;
+    }
 }
 
 .comment, .code {
@@ -36,12 +35,13 @@ h1, h2 {
     font-size: 13px;
 }
 
-.html-comment .comment, .html-comment .code{
-    padding-top: 2em;
-}
-
-.html-comment .comment p {
-    margin-bottom: .8em;
+.html-comment {
+    .comment, .code {
+        padding-top: 2em;
+    }
+    .comment p {
+        margin-bottom: .8em;
+    }
 }
 
 .script-comment .comment p {
@@ -62,15 +62,15 @@ h1, h2 {
     display: block;
     text-align: center;
     color: #555555;
-}
 
-#demo-controls span {
-    display: inline-block;
-    margin: 5px 10px;
-    width: 150px;
-    cursor: pointer;
-}
+    span {
+        display: inline-block;
+        margin: 5px 10px;
+        width: 150px;
+        cursor: pointer;
 
-#demo-controls span:hover {
-    color: #300000;
+        &:hover {
+            color: #300000;
+        }
+    }
 }
