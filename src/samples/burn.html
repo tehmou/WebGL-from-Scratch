@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+
+Burn
+----
+
+ -->
+<html>
+<head>
+<title>Burn on WebGL</title>
+<link href="lib/style.css" rel="stylesheet" type="text/css">
+<script src="../js/namespace.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    function initialize () {
+
+        var textureCanvas, burnCanvas;
+
+        function draw () {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            textureCanvas = document.createElement("canvas");
+            textureCanvas.width = ~~(w/2);
+            textureCanvas.height = h;
+            document.body.appendChild(textureCanvas);
+
+            burnCanvas = document.createElement("canvas");
+            burnCanvas.width = ~~w - textureCanvas.width;
+            textureCanvas.height = h;
+            document.body.appendChild(burnCanvas);
+
+            timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
+            
+            fillWithFractal(textureCanvas, 3/h);
+        }
+
+        window.onresize = draw;
+        draw();
+    }
+
+    // Fill canvas using the normal noise function, but run it multiple times,
+    // each subsequent pass being half the size and strength.
+    function fillWithFractal (canvas, scale) {
+        var passes = 7;
+        var generator = new timotuominen.html5.simplexNoise.SimplexNoise2D();
+        timotuominen.html5.fillCanvasGrayscale({
+            canvas: canvas,
+            text: "With " + passes + " fractal passes",
+            processPixel: function (x, y) {
+                var c = 0;
+                for (var i = 0; i < passes; i++) {
+                    var s = Math.pow(2, i);
+                    c += (generator.processPixel(x*s*scale, y*s*scale) + 1)*64/s;
+                }
+                return c;
+            }
+        });
+    }
+
+</script>
+<script src="lib/simplexNoise2D.js" type="text/javascript" expand-type="none"></script>
+<script src="lib/fillCanvasAsync.js" type="text/javascript"></script>
+</head>
+<body onload="setTimeout(initialize, 15)">
+    <a id="main-link" href="../explain.html#burn">Explain</a>
+    <script type="text/javascript">
+        if (window.location.hash === "#thumbnail") { document.getElementById("main-link").style.display = "none"; }
+    </script>
+</body>
+</html>
