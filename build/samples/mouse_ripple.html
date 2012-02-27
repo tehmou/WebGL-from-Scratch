@@ -267,7 +267,7 @@ var timotuominen = {
                         this.gl.getAttribLocation(this.shader, "position"));
 
                 // Create texture from the image we have loaded.
-                this.texture = shaderUtils.createTexture(this.gl, options.image1);
+                this.texture = shaderUtils.createTexture(this.gl, options.images[0]);
 
                 // Create vertex buffer for storing the 3D model.
                 this.vertexBuffer = this.gl.createBuffer();
@@ -503,7 +503,7 @@ window.onload = function initialize () {
     // Point at which everything should be loaded and we can start the application.
     function start () {
         demo = new timotuominen.html5.FromScratchDemo({
-            image1: image,
+            images: [image],
             vsCode: document.getElementById("vs-shader").innerHTML,
             fsCode: document.getElementById("fs-shader").innerHTML,
             el: canvas

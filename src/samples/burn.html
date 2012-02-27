@@ -129,7 +129,7 @@ Burn
             
             fillWithFractal(textureCanvas, 3/h, function () {
                 var demo = new timotuominen.html5.BurnDemo({
-                    image1: textureCanvas,
+                    images: [image, textureCanvas],
                     vsCode: document.getElementById("vs-shader").innerHTML,
                     fsCode: document.getElementById("fs-shader").innerHTML,
                     el: burnCanvas

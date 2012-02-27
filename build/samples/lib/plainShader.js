@@ -13,7 +13,7 @@ timotuominen.html5.PlainShader = function (options) {
 
         shader: null,
         vertexBuffer: null,
-        texture: null,
+        textures: [],
         vertices: null,
         particles: null,
 
@@ -31,7 +31,11 @@ timotuominen.html5.PlainShader = function (options) {
             this.shader = shaderUtils.createProgram(this.gl, vsCode, fsCode);
             this.gl.enableVertexAttribArray(
                     this.gl.getAttribLocation(this.shader, "position"));
-            this.texture = shaderUtils.createTexture(this.gl, options.image1);
+            if (options.images) {
+                for (var i = 0; i < options.images.length; i++) {
+                    this.textures.push(shaderUtils.createTexture(this.gl, options.images[i]));
+                }
+            }
             this.vertexBuffer = this.gl.createBuffer();
             this.startTime = new Date().getTime();
             this.gl.useProgram(this.shader);
@@ -51,8 +55,10 @@ timotuominen.html5.PlainShader = function (options) {
                     gl.getAttribLocation(shader, "position"),
                     2, gl.FLOAT, false, 0, 0);
 
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            for (var i = 0; i < this.textures.length; i++) {
+                gl.activeTexture(gl["TEXTURE"+i]);
+                gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
+            }
             gl.uniform1i(this.getUni("tex0"), 0);
             gl.uniform2f(this.getUni("resolution"), this.viewportWidth, this.viewportHeight);
         },

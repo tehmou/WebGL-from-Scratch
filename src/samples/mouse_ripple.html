@@ -220,7 +220,7 @@ If you are wondering about all the keywords, here is a quick list of what the on
                         this.gl.getAttribLocation(this.shader, "position"));
 
                 // Create texture from the image we have loaded.
-                this.texture = shaderUtils.createTexture(this.gl, options.image1);
+                this.texture = shaderUtils.createTexture(this.gl, options.images[0]);
 
                 // Create vertex buffer for storing the 3D model.
                 this.vertexBuffer = this.gl.createBuffer();

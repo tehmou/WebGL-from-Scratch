@@ -17,7 +17,7 @@ window.onload = function initialize () {
     // Point at which everything should be loaded and we can start the application.
     function start () {
         demo = new timotuominen.html5.FromScratchDemo({
-            image1: image,
+            images: [image],
             vsCode: document.getElementById("vs-shader").innerHTML,
             fsCode: document.getElementById("fs-shader").innerHTML,
             el: canvas
