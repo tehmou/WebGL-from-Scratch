@@ -175,20 +175,16 @@ var timotuominen = {
             timotuominen.html5.fillCanvasGrayscale.killDrawingProcesses();
             
             fillWithFractal(textureCanvas, 3/h, function () {
-                if (!demo) {
-                    var demo = new timotuominen.html5.BurnDemo({
-                        image1: textureCanvas,
-                        vsCode: document.getElementById("vs-shader").innerHTML,
-                        fsCode: document.getElementById("fs-shader").innerHTML,
-                        el: burnCanvas
-                    });
-                    demo.initialize();
-                    demo.updateSize();
-                }
-            });
+                var demo = new timotuominen.html5.BurnDemo({
+                    image1: textureCanvas,
+                    vsCode: document.getElementById("vs-shader").innerHTML,
+                    fsCode: document.getElementById("fs-shader").innerHTML,
+                    el: burnCanvas
+                });
+                demo.initialize();
+                demo.updateSize();
+             });
         }
-
-        window.onresize = draw;
 
         // Create a simple image DOM element and tell it to load an image. When it is loaded, start!
         image = new Image();
