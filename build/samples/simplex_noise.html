@@ -420,7 +420,7 @@ timotuominen.define("html5.simplexNoise.GradientKernel", function (random) {
         var x = 0;
         killDrawingProcessesStack.push(function () { x = w; });
         function processNextColumn () {
-            if (x <= w) {
+            if (x < w) {
                 for (var y = 0; y < h; y++) {
                     var idx = (x + y * w) * 4;
                     var c = processPixel(x, y);
